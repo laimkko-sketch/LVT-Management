@@ -1,0 +1,2350 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>타일 제품 관리 시스템</title>
+<style>
+  :root {
+    --primary: #1a1a2e;
+    --primary-light: #16213e;
+    --accent: #0f3460;
+    --accent2: #e94560;
+    --surface: #ffffff;
+    --surface2: #f8f9fc;
+    --surface3: #f0f2f8;
+    --border: #e2e6f0;
+    --border2: #c8cfe0;
+    --text: #1a1a2e;
+    --text2: #4a5568;
+    --text3: #8892a4;
+    --teal: #0d9488;
+    --teal-light: #e6f7f6;
+    --blue: #3b82f6;
+    --blue-light: #eff6ff;
+    --amber: #f59e0b;
+    --amber-light: #fffbeb;
+    --red: #ef4444;
+    --red-light: #fef2f2;
+    --green: #10b981;
+    --green-light: #ecfdf5;
+    --purple: #8b5cf6;
+    --purple-light: #f5f3ff;
+    --font: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, sans-serif;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.05);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font);
+    background: var(--surface2);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== TOP NAV ===== */
+  .topbar {
+    background: var(--primary);
+    color: white;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-icon {
+    width: 32px; height: 32px;
+    background: var(--accent2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: white;
+  }
+  .brand-name {
+    font-size: 15px; font-weight: 600; letter-spacing: -0.3px;
+  }
+  .brand-sub { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .topbar-right {
+    display: flex; align-items: center; gap: 16px;
+  }
+  .topbar-date {
+    font-size: 12px; color: rgba(255,255,255,0.55);
+  }
+
+  /* ===== SIDEBAR ===== */
+  .layout {
+    display: flex;
+    flex: 1;
+  }
+  .sidebar {
+    width: 220px;
+    background: var(--primary-light);
+    min-height: calc(100vh - 56px);
+    padding: 1.5rem 0;
+    position: sticky;
+    top: 56px;
+    align-self: flex-start;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+  }
+  .nav-section {
+    padding: 0 1rem 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 0 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    color: rgba(255,255,255,0.6);
+    font-size: 13.5px;
+    font-weight: 450;
+    margin-bottom: 2px;
+  }
+  .nav-item:hover {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.9);
+  }
+  .nav-item.active {
+    background: var(--accent2);
+    color: white;
+    font-weight: 600;
+  }
+  .nav-item .nav-icon {
+    width: 18px; height: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+  }
+  .nav-badge {
+    margin-left: auto;
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.7);
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+  .nav-item.active .nav-badge {
+    background: rgba(255,255,255,0.2);
+    color: white;
+  }
+
+  /* ===== MAIN CONTENT ===== */
+  .main {
+    flex: 1;
+    padding: 2rem;
+    min-width: 0;
+  }
+
+  /* ===== PAGE SECTIONS ===== */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .page-header {
+    margin-bottom: 1.75rem;
+  }
+  .page-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .page-subtitle {
+    font-size: 13.5px;
+    color: var(--text3);
+  }
+  .page-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-body { padding: 1.25rem; }
+
+  /* ===== STAT CARDS ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 1.75rem;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .stat-card.teal::before { background: var(--teal); }
+  .stat-card.blue::before { background: var(--blue); }
+  .stat-card.amber::before { background: var(--amber); }
+  .stat-card.purple::before { background: var(--purple); }
+  .stat-card.red::before { background: var(--red); }
+  .stat-label {
+    font-size: 11.5px;
+    color: var(--text3);
+    font-weight: 500;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .stat-value {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-desc { font-size: 11.5px; color: var(--text3); }
+
+  /* ===== TABLES ===== */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead tr {
+    background: var(--surface3);
+  }
+  thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface3); }
+  td {
+    padding: 10px 14px;
+    color: var(--text2);
+    vertical-align: middle;
+  }
+  td.td-main {
+    color: var(--text);
+    font-weight: 500;
+  }
+  td.mono {
+    font-family: monospace;
+    font-size: 12px;
+  }
+
+  /* ===== BADGES ===== */
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-teal { background: var(--teal-light); color: #0d6b62; }
+  .badge-blue { background: var(--blue-light); color: #1d4ed8; }
+  .badge-amber { background: var(--amber-light); color: #b45309; }
+  .badge-red { background: var(--red-light); color: #b91c1c; }
+  .badge-green { background: var(--green-light); color: #065f46; }
+  .badge-purple { background: var(--purple-light); color: #6d28d9; }
+  .badge-gray { background: var(--surface3); color: var(--text2); }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 7px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--accent2);
+    color: white;
+  }
+  .btn-primary:hover { background: #d63851; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(233,69,96,0.3); }
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text2);
+    border: 1px solid var(--border2);
+  }
+  .btn-secondary:hover { background: var(--surface3); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+    padding: 6px 12px;
+  }
+  .btn-ghost:hover { background: var(--surface3); }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+  /* ===== FORMS ===== */
+  .form-group { margin-bottom: 1rem; }
+  .form-label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text2);
+    margin-bottom: 5px;
+  }
+  input[type=text], input[type=number], input[type=date], select, textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    font-size: 13.5px;
+    color: var(--text);
+    background: var(--surface);
+    font-family: var(--font);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 3px rgba(233,69,96,0.1);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+
+  /* ===== TABS ===== */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+  .tab {
+    padding: 9px 18px;
+    border-radius: 8px 8px 0 0;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-bottom: 2px solid transparent;
+  }
+  .tab:hover { color: var(--text2); background: var(--surface3); }
+  .tab.active {
+    color: var(--accent2);
+    border-bottom-color: var(--accent2);
+    font-weight: 600;
+  }
+
+  /* ===== SEARCH BAR ===== */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    padding: 7px 14px;
+    font-size: 13px;
+    color: var(--text3);
+    width: 280px;
+  }
+  .search-bar input {
+    border: none; padding: 0; width: 100%;
+    background: transparent;
+    font-size: 13.5px;
+    color: var(--text);
+    box-shadow: none;
+  }
+  .search-bar input:focus { box-shadow: none; border: none; }
+
+  /* ===== LAYER STRUCTURE VISUAL ===== */
+  .layer-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+  }
+  .layer-row {
+    display: grid;
+    grid-template-columns: 160px 1fr 80px 80px 80px;
+    align-items: center;
+    padding: 10px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    transition: opacity 0.2s;
+  }
+  .layer-row:last-child { border-bottom: none; }
+  .layer-row .layer-name {
+    font-weight: 600; font-size: 12.5px;
+    letter-spacing: 0.2px;
+  }
+  .layer-row .layer-bar-wrap {
+    padding-right: 1rem;
+  }
+  .layer-bar {
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.25);
+    transition: width 0.4s ease;
+    min-width: 4px;
+  }
+  .layer-val {
+    text-align: right;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  .layer-phr, .layer-filler {
+    text-align: right;
+    font-size: 11.5px;
+    opacity: 0.75;
+  }
+
+  /* Layer colors */
+  .layer-transparent { background: linear-gradient(135deg, #e0f2fe, #bfdbfe); color: #1e40af; }
+  .layer-print { background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #9d174d; }
+  .layer-mid1 { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
+  .layer-gf { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
+  .layer-mid2 { background: linear-gradient(135deg, #ede9fe, #ddd6fe); color: #5b21b6; }
+  .layer-mid3 { background: linear-gradient(135deg, #ffe4e6, #fecdd3); color: #9f1239; }
+  .layer-base { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); color: #1e293b; }
+  .layer-foam { background: linear-gradient(135deg, #ecfdf5, #d1fae5); color: #064e3b; }
+
+  /* ===== HISTORY TIMELINE ===== */
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px; top: 4px; bottom: 0;
+    width: 2px;
+    background: var(--border);
+    border-radius: 2px;
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+  .timeline-dot {
+    position: absolute;
+    left: -26px; top: 3px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent2);
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--accent2);
+  }
+  .timeline-date {
+    font-size: 11.5px;
+    color: var(--text3);
+    margin-bottom: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .timeline-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .timeline-body {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+    background: var(--surface3);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    border-left: 3px solid var(--accent2);
+  }
+
+  /* ===== FORMULA DISPLAY ===== */
+  .formula-box {
+    background: #1a1a2e;
+    color: #e2e8f0;
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+  .formula-box .kw { color: #f59e0b; }
+  .formula-box .val { color: #34d399; }
+  .formula-box .op { color: #e94560; }
+  .formula-box .comment { color: #6b7280; }
+
+  /* ===== COMPOSITION CHART ===== */
+  .comp-bar-group {
+    display: flex;
+    height: 28px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 8px 0;
+  }
+  .comp-segment {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: white;
+    transition: flex 0.4s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    min-width: 0;
+  }
+  .seg-pvc { background: #1d4ed8; }
+  .seg-dop { background: #0d9488; }
+  .seg-filler { background: #9333ea; }
+
+  /* ===== GRID LAYOUTS ===== */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; }
+  .grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 560px;
+    max-width: 95vw;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .modal-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-title { font-size: 16px; font-weight: 700; }
+  .modal-body { padding: 1.5rem; }
+  .modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  /* ===== ALERTS ===== */
+  .alert {
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+  .alert-info { background: var(--blue-light); color: #1d4ed8; border: 1px solid #bfdbfe; }
+  .alert-warning { background: var(--amber-light); color: #b45309; border: 1px solid #fde68a; }
+  .alert-success { background: var(--green-light); color: #065f46; border: 1px solid #a7f3d0; }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    text-align: center;
+    padding: 1.5rem;
+    color: var(--text3);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    margin-top: auto;
+  }
+  .footer strong {
+    color: var(--accent2);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== DIVIDER ===== */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+  /* ===== TAG INPUT ===== */
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .tag {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 12px;
+    display: flex; align-items: center; gap: 5px;
+    cursor: pointer;
+    color: var(--text2);
+    transition: all 0.15s;
+  }
+  .tag:hover { background: var(--red-light); border-color: #fca5a5; color: var(--red); }
+
+  /* ===== TOOLTIP ===== */
+  [data-tooltip] { position: relative; cursor: help; }
+  [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%; transform: translateX(-50%);
+    background: #1a1a2e;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 50;
+  }
+  [data-tooltip]:hover::after { opacity: 1; }
+
+  /* ===== LOADING ===== */
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent2);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* ===== PRINT STATUS ===== */
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+  }
+  .status-dot.active { background: var(--green); box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
+  .status-dot.inactive { background: var(--text3); }
+  .status-dot.review { background: var(--amber); box-shadow: 0 0 0 3px rgba(245,158,11,0.2); }
+
+  /* Version tag */
+  .version-tag {
+    display: inline-flex; align-items: center;
+    background: var(--accent2);
+    color: white;
+    font-size: 10.5px; font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-icon">T</div>
+    <div>
+      <div class="brand-name">Tile Management System</div>
+      <div class="brand-sub">배합 · 층별구조 · 원가 통합관리</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-date" id="today-date"></span>
+    <span class="version-tag">v1.0 가안</span>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-section">
+      <div class="nav-section-label">메인 메뉴</div>
+
+      <div class="nav-item active" onclick="showPage('dashboard')">
+        <span class="nav-icon">📊</span>
+        대시보드
+      </div>
+
+      <div class="nav-item" onclick="showPage('layer')">
+        <span class="nav-icon">🧱</span>
+        층별 구조
+        <span class="nav-badge">48</span>
+      </div>
+
+      <div class="nav-item" onclick="showPage('analysis')">
+        <span class="nav-icon">🔬</span>
+        종합 분석 계산식
+      </div>
+
+      <div class="nav-item" onclick="showPage('formula')">
+        <span class="nav-icon">⚗️</span>
+        세부 배합표
+      </div>
+
+      <div class="nav-item" onclick="showPage('cost')">
+        <span class="nav-icon">💰</span>
+        제품 원가
+      </div>
+
+      <div class="nav-item" onclick="showPage('packaging')">
+        <span class="nav-icon">📦</span>
+        포장 단위 설정
+      </div>
+    </div>
+
+    <div class="nav-section" style="border-top: 1px solid rgba(255,255,255,0.07); padding-top: 1rem; margin-top: 0.5rem;">
+      <div class="nav-section-label">기준정보</div>
+      <div class="nav-item" onclick="showPage('product-code')">
+        <span class="nav-icon">🗂️</span>
+        제품 코드 관리
+      </div>
+      <div class="nav-item" onclick="showPage('history')">
+        <span class="nav-icon">📝</span>
+        변경 히스토리
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- ============================================================ -->
+    <!-- PAGE: DASHBOARD                                               -->
+    <!-- ============================================================ -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-header">
+        <div class="page-title">대시보드</div>
+        <div class="page-subtitle">타일 제품 관리 시스템 전체 현황</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card teal">
+          <div class="stat-label">층별구조 등록</div>
+          <div class="stat-value">48</div>
+          <div class="stat-desc">서해테크 25 · 일신케미칼 23</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">배합 종류</div>
+          <div class="stat-value">12</div>
+          <div class="stat-desc">하지 · 중지 · 투명 등</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">제품 규격 수</div>
+          <div class="stat-value">32</div>
+          <div class="stat-desc">LVT · LLT · Click 등</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">거래처 수</div>
+          <div class="stat-value">2</div>
+          <div class="stat-desc">서해테크 · 일신케미칼</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">최근 업데이트</div>
+          <div class="stat-value" style="font-size:16px; margin-top:4px;">2026.04.13</div>
+          <div class="stat-desc">층별구조 분석 최신화</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="gap: 1.25rem; margin-bottom: 1.25rem;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 최근 변경된 층별구조</div>
+            <span class="badge badge-teal">최신 5건</span>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table>
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>거래처</th>
+                  <th>구분</th>
+                  <th>구조</th>
+                  <th>비중</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>25</td><td class="td-main">서해테크</td>
+                  <td><span class="badge badge-amber">HARD</span></td>
+                  <td class="mono">5/0.5</td><td>1.7972</td>
+                </tr>
+                <tr>
+                  <td>24</td><td class="td-main">서해테크</td>
+                  <td><span class="badge badge-blue">일반</span></td>
+                  <td class="mono">5/0.5</td><td>1.7948</td>
+                </tr>
+                <tr>
+                  <td>48</td><td class="td-main">일신케미칼</td>
+                  <td><span class="badge badge-blue">일반</span></td>
+                  <td class="mono">5/0.7</td><td>1.8297</td>
+                </tr>
+                <tr>
+                  <td>47</td><td class="td-main">일신케미칼</td>
+                  <td><span class="badge badge-blue">일반</span></td>
+                  <td class="mono">5/0.55</td><td>1.7456</td>
+                </tr>
+                <tr>
+                  <td>46</td><td class="td-main">일신케미칼</td>
+                  <td><span class="badge badge-purple">Acoustic(중국)</span></td>
+                  <td class="mono">5/0.5</td><td>1.7609</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚗️ 배합 계산식 요약</div>
+            <span class="badge badge-purple">4T·5T 기준</span>
+          </div>
+          <div class="card-body">
+            <div style="font-size:12.5px; color:var(--text3); margin-bottom:8px;">층별 PVC/DOP/FILLER 구성비율 (전체 1/2 기준)</div>
+            <div style="margin-bottom: 12px;">
+              <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:4px;">
+                <span>PVC</span><span style="font-weight:600; color:#1d4ed8;">36.1%</span>
+              </div>
+              <div class="comp-bar-group" style="height:14px;">
+                <div class="comp-segment seg-pvc" style="flex: 36.1">PVC</div>
+                <div class="comp-segment seg-dop" style="flex: 9.7">DOP</div>
+                <div class="comp-segment seg-filler" style="flex: 54.2">FILLER</div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:12.5px; margin-top:4px;">
+                <span style="color:var(--teal);">DOP: 9.7%</span>
+                <span style="color:var(--purple);">FILLER: 54.2%</span>
+              </div>
+            </div>
+            <div class="alert alert-info" style="margin-bottom:0;">
+              <span>💡</span>
+              <span>투명층 0.28mm / 중지(2) 1.95mm 기준값 — <strong>종합 분석 탭</strong>에서 전체 확인 가능</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏭 거래처별 층별구조 비중 분포</div>
+        </div>
+        <div class="card-body">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div>
+              <div style="font-size:13px; font-weight:600; color:var(--text2); margin-bottom:10px;">서해테크</div>
+              <div id="sht-chart" style="display:flex; flex-direction:column; gap:5px;"></div>
+            </div>
+            <div>
+              <div style="font-size:13px; font-weight:600; color:var(--text2); margin-bottom:10px;">일신케미칼</div>
+              <div id="isk-chart" style="display:flex; flex-direction:column; gap:5px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: LAYER STRUCTURE                                         -->
+    <!-- ============================================================ -->
+    <div id="page-layer" class="page">
+      <div class="page-header">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+          <div>
+            <div class="page-title">🧱 층별 구조 분석</div>
+            <div class="page-subtitle">서해테크 & 일신케미칼 층별구조 데이터 (Update: 2026.04.13)</div>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-secondary btn-sm" onclick="openModal('modal-history-add')">📝 변경이력 추가</button>
+            <button class="btn btn-primary btn-sm" onclick="openModal('modal-layer-add')">+ 구조 추가</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'layer-all')">전체 (48)</div>
+        <div class="tab" onclick="switchTab(this,'layer-sht')">서해테크 (25)</div>
+        <div class="tab" onclick="switchTab(this,'layer-isk')">일신케미칼 (23)</div>
+        <div class="tab" onclick="switchTab(this,'layer-detail')">구조 시각화</div>
+      </div>
+
+      <!-- Tab: All -->
+      <div id="layer-all" class="tab-content">
+        <div style="display:flex; gap:10px; margin-bottom:1rem; flex-wrap:wrap;">
+          <div class="search-bar">
+            <span>🔍</span>
+            <input type="text" placeholder="구조 검색..." id="layer-search" oninput="filterLayerTable()">
+          </div>
+          <select id="layer-filter-type" onchange="filterLayerTable()" style="width:140px;">
+            <option value="">전체 구분</option>
+            <option>일반</option>
+            <option>HARD</option>
+            <option>PE</option>
+            <option>DIY</option>
+            <option>Acoustic</option>
+            <option>4합</option>
+            <option>5합</option>
+          </select>
+          <select id="layer-filter-co" onchange="filterLayerTable()" style="width:130px;">
+            <option value="">전체 거래처</option>
+            <option>서해테크</option>
+            <option>일신케미칼</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table id="layer-table">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>거래처</th>
+                <th>구분</th>
+                <th>구조 (T/투명)</th>
+                <th>설정두께</th>
+                <th>상지(mm)</th>
+                <th>중지1</th>
+                <th>GF</th>
+                <th>중지2</th>
+                <th>하지</th>
+                <th>가소제 합</th>
+                <th>FILLER 합</th>
+                <th>비중</th>
+                <th>비고</th>
+              </tr>
+            </thead>
+            <tbody id="layer-tbody">
+              <!-- populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: SHT -->
+      <div id="layer-sht" class="tab-content" style="display:none;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>No.</th><th>구분</th><th>구조</th><th>설정두께</th>
+                <th>상지</th><th>중지1</th><th>중지2</th><th>하지</th>
+                <th>PVC%</th><th>DOP%</th><th>FILLER%</th><th>비중</th>
+              </tr>
+            </thead>
+            <tbody id="sht-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: ISK -->
+      <div id="layer-isk" class="tab-content" style="display:none;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>No.</th><th>구분</th><th>구조</th><th>설정두께</th>
+                <th>상지</th><th>중지1</th><th>중지2</th><th>하지</th>
+                <th>PVC%</th><th>DOP%</th><th>FILLER%</th><th>비중</th>
+              </tr>
+            </thead>
+            <tbody id="isk-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab: Visual -->
+      <div id="layer-detail" class="tab-content" style="display:none;">
+        <div class="alert alert-info">
+          <span>💡</span>
+          <span>아래 구조를 선택하면 층별 시각화가 표시됩니다. 실제 배합 데이터를 기반으로 각 층의 두께 비율을 표현합니다.</span>
+        </div>
+        <div style="display:flex; gap:1.25rem; flex-wrap:wrap;">
+          <div style="width:240px;">
+            <div style="font-size:13px; font-weight:600; margin-bottom:8px;">구조 선택</div>
+            <div id="layer-select-list" style="display:flex; flex-direction:column; gap:4px; max-height:400px; overflow-y:auto;"></div>
+          </div>
+          <div style="flex:1; min-width:300px;">
+            <div style="font-size:13px; font-weight:600; margin-bottom:8px;" id="viz-title">층별 시각화</div>
+            <div id="layer-viz"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: ANALYSIS                                                -->
+    <!-- ============================================================ -->
+    <div id="page-analysis" class="page">
+      <div class="page-header">
+        <div class="page-title">🔬 종합 제품 분석 계산식</div>
+        <div class="page-subtitle">층별구조와 연동된 DOP/FILLER PHR 계산 (4T·5T 기준)</div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'ana-calc')">1/2 공차 계산</div>
+        <div class="tab" onclick="switchTab(this,'ana-result')">분석 결과</div>
+        <div class="tab" onclick="switchTab(this,'ana-weight')">박스 중량 계산</div>
+      </div>
+
+      <div id="ana-calc" class="tab-content">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📐 층별 두께 입력</div>
+            </div>
+            <div class="card-body">
+              <div style="overflow-x:auto;">
+                <table style="font-size:13px;">
+                  <thead>
+                    <tr><th>층</th><th>두께(mm)</th><th>가소제 PHR</th><th>FILLER PHR</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>투명층</td>
+                      <td><input type="number" value="0.28" step="0.01" style="width:80px;" id="t-transparent" oninput="calcAnalysis()"></td>
+                      <td><input type="number" value="32" style="width:70px;" id="p-transparent" oninput="calcAnalysis()"></td>
+                      <td><span class="badge badge-gray">—</span></td>
+                    </tr>
+                    <tr>
+                      <td>인쇄지</td>
+                      <td><input type="number" value="0.07" step="0.01" style="width:80px;" id="t-print" oninput="calcAnalysis()"></td>
+                      <td><input type="number" value="8" style="width:70px;" id="p-print" oninput="calcAnalysis()"></td>
+                      <td><span class="badge badge-gray">—</span></td>
+                    </tr>
+                    <tr>
+                      <td>중지(1)</td>
+                      <td><input type="number" value="0" step="0.01" style="width:80px;" id="t-mid1" oninput="calcAnalysis()"></td>
+                      <td><input type="number" value="44" style="width:70px;" id="p-mid1" oninput="calcAnalysis()"></td>
+                      <td><input type="number" value="320" style="width:70px;" id="f-mid1" oninput="calcAnalysis()"></td>
+                    </tr>
+                    <tr>
+                      <td>GF</td>
+                      <td><input type="number" value="0" step="0.01" style="width:80px;" id="t-gf" oninput="calcAnalysis()"></td>
+                      <td><input type="number" value="80" style="width:70px;" id="p-gf" oninput="calcAnalysis()"></td>
+                      <td><input type="number" value="80" style="width:70px;" id="f-gf" oninput="calcAnalysis()"></td>
+                    </tr>
+                    <tr>
+                      <td>중지(2)</td>
+                      <td><input type="number" value="1.95" step="0.01" style="width:80px;" id="t-mid2" oninput="calcAnalysis()"></td>
+                      <td><input type="number" value="45" style="width:70px;" id="p-mid2" oninput="calcAnalysis()"></td>
+                      <td><input type="number" value="460" style="width:70px;" id="f-mid2" oninput="calcAnalysis()"></td>
+                    </tr>
+                    <tr>
+                      <td>하지</td>
+                      <td><input type="number" value="0.7" step="0.01" style="width:80px;" id="t-base" oninput="calcAnalysis()"></td>
+                      <td><input type="number" value="21" style="width:70px;" id="p-base" oninput="calcAnalysis()"></td>
+                      <td><input type="number" value="50" style="width:70px;" id="f-base" oninput="calcAnalysis()"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <hr class="divider">
+              <div style="display:flex; justify-content:space-between; font-size:13.5px; font-weight:600;">
+                <span>총 두께</span>
+                <span id="calc-total-t" style="color:var(--accent2);">3.00 mm</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--text3); margin-top:4px;">
+                <span>1/2 기준</span>
+                <span id="calc-half-t">1.50 mm</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📊 계산 결과</div>
+            </div>
+            <div class="card-body">
+              <div style="font-size:12.5px; color:var(--text3); margin-bottom:12px;">전체두께 1/2 공차 기준</div>
+
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom:16px;">
+                <div style="text-align:center; padding:12px; background:var(--blue-light); border-radius:8px;">
+                  <div style="font-size:11px; color:#1d4ed8; font-weight:600; margin-bottom:4px;">DOP (가소제)</div>
+                  <div style="font-size:22px; font-weight:700; color:#1d4ed8;" id="result-dop">40.8</div>
+                  <div style="font-size:11px; color:#3b82f6;">PHR</div>
+                </div>
+                <div style="text-align:center; padding:12px; background:var(--purple-light); border-radius:8px;">
+                  <div style="font-size:11px; color:#6d28d9; font-weight:600; margin-bottom:4px;">FILLER (경탄)</div>
+                  <div style="font-size:22px; font-weight:700; color:#6d28d9;" id="result-filler">352.7</div>
+                  <div style="font-size:11px; color:#8b5cf6;">PHR</div>
+                </div>
+              </div>
+
+              <div style="margin-bottom:16px;">
+                <div style="font-size:12px; color:var(--text3); margin-bottom:6px;">구성 비율 (비중 계산)</div>
+                <div id="result-bar" class="comp-bar-group"></div>
+                <div style="display:flex; gap:16px; font-size:11.5px; margin-top:6px;">
+                  <span style="color:#1d4ed8;">■ PVC: <span id="r-pvc">—</span>%</span>
+                  <span style="color:var(--teal);">■ DOP: <span id="r-dop2">—</span>%</span>
+                  <span style="color:var(--purple);">■ FILLER: <span id="r-fill2">—</span>%</span>
+                </div>
+              </div>
+
+              <div style="background:var(--surface3); border-radius:8px; padding:12px;">
+                <div style="font-size:12px; color:var(--text3); margin-bottom:8px;">비중 계산식</div>
+                <div style="font-size:13px; display:flex; justify-content:space-between;">
+                  <span>PVC (÷1.4)</span><span id="vol-pvc" style="font-weight:600;">—</span>
+                </div>
+                <div style="font-size:13px; display:flex; justify-content:space-between;">
+                  <span>DOP (÷1.0)</span><span id="vol-dop" style="font-weight:600;">—</span>
+                </div>
+                <div style="font-size:13px; display:flex; justify-content:space-between;">
+                  <span>FILLER (÷2.5)</span><span id="vol-fill" style="font-weight:600;">—</span>
+                </div>
+                <hr style="border:none; border-top:1px solid var(--border); margin:8px 0;">
+                <div style="font-size:14px; display:flex; justify-content:space-between; font-weight:700;">
+                  <span>계산 비중</span>
+                  <span style="color:var(--accent2);" id="result-density">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="ana-result" class="tab-content" style="display:none;">
+        <div class="alert alert-warning">
+          <span>⚠️</span>
+          <span>이 탭은 엑셀 파일의 5개 공차 방식(전체, GF제외, GF기준, 전체기준, 종합) 비교 결과를 표시합니다. 층별구조 탭과 연동 예정입니다.</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>분석 방식</th><th>상단 DOP</th><th>상단 FILLER</th>
+                <th>하단 DOP</th><th>하단 FILLER</th>
+                <th>비중 (상단)</th><th>비중 (하단)</th><th>공차</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-blue">전체두께 1/2</span></td>
+                <td>40.85</td><td>352.67</td><td>33.80</td><td>268.67</td>
+                <td style="font-weight:600;">1.7816</td><td style="font-weight:600;">1.7493</td>
+                <td><span class="badge badge-green">±0.032</span></td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-teal">GF 제외 1/2</span></td>
+                <td>40.85</td><td>352.67</td><td>33.80</td><td>268.67</td>
+                <td style="font-weight:600;">1.7816</td><td style="font-weight:600;">1.7493</td>
+                <td><span class="badge badge-green">±0.032</span></td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-amber">GF 기준 1/2</span></td>
+                <td>37.41</td><td>242.16</td><td>39.55</td><td>284.55</td>
+                <td style="font-weight:600;">1.7816</td><td style="font-weight:600;">1.7493</td>
+                <td><span class="badge badge-amber">±2.13</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="ana-weight" class="tab-content" style="display:none;">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📦 박스 중량 계산기</div>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">두께 (mm)</label>
+                <input type="number" value="5" id="wc-thick" oninput="calcWeight()">
+              </div>
+              <div class="grid-2" style="gap:10px;">
+                <div class="form-group">
+                  <label class="form-label">너비 (인치)</label>
+                  <input type="number" value="9" id="wc-w" oninput="calcWeight()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">길이 (인치)</label>
+                  <input type="number" value="60" id="wc-l" oninput="calcWeight()">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">PCS/BOX</label>
+                <input type="number" value="6" id="wc-pcs" oninput="calcWeight()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">비중</label>
+                <input type="number" value="1.797" step="0.001" id="wc-density" oninput="calcWeight()">
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📊 계산 결과</div>
+            </div>
+            <div class="card-body">
+              <div style="display:grid; gap:10px;">
+                <div style="background:var(--teal-light); padding:14px; border-radius:8px;">
+                  <div style="font-size:11px; color:var(--teal); font-weight:600; margin-bottom:4px;">박스 중량</div>
+                  <div style="font-size:28px; font-weight:700; color:var(--teal);" id="wc-result">—</div>
+                  <div style="font-size:12px; color:var(--teal); opacity:0.75;">kg/box</div>
+                </div>
+                <div style="background:var(--surface3); padding:12px; border-radius:8px; font-size:13px;">
+                  <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span>너비 (mm)</span><span id="wc-wmm" style="font-weight:600;">—</span>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span>길이 (mm)</span><span id="wc-lmm" style="font-weight:600;">—</span>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span>1매 부피 (cm³)</span><span id="wc-vol" style="font-weight:600;">—</span>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span>1매 중량 (kg)</span><span id="wc-piece" style="font-weight:600;">—</span>
+                  </div>
+                  <hr style="border:none; border-top:1px solid var(--border); margin:6px 0;">
+                  <div style="display:flex; justify-content:space-between; font-weight:700;">
+                    <span>BOX/㎡</span><span id="wc-sqm" style="color:var(--accent2);">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: FORMULA                                                 -->
+    <!-- ============================================================ -->
+    <div id="page-formula" class="page">
+      <div class="page-header">
+        <div class="page-title">⚗️ 세부 배합표</div>
+        <div class="page-subtitle">하지/중지/투명 배합 계산식 (원자재 투입량 · 원가 기준)</div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'form-list')">배합 목록</div>
+        <div class="tab" onclick="switchTab(this,'form-calc')">배합 계산기</div>
+        <div class="tab" onclick="switchTab(this,'form-raw')">원자재 단가</div>
+      </div>
+
+      <div id="form-list" class="tab-content">
+        <div class="grid-3" style="margin-bottom:1.25rem;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🔴 하지 배합</div>
+              <span class="badge badge-blue">하지</span>
+            </div>
+            <div class="card-body">
+              <table style="font-size:12.5px;">
+                <thead><tr><th>원자재</th><th>PHR</th><th>%</th></tr></thead>
+                <tbody>
+                  <tr><td class="td-main">PVC</td><td>100</td><td>30.5%</td></tr>
+                  <tr><td>DOP</td><td>42</td><td>12.8%</td></tr>
+                  <tr><td>경탄 (FILLER)</td><td>120</td><td>36.6%</td></tr>
+                  <tr><td>마명가루</td><td>80</td><td>—</td></tr>
+                  <tr><td>재벌</td><td>8</td><td>—</td></tr>
+                  <tr><td>샤시</td><td>8</td><td>—</td></tr>
+                  <tr><td>안료 (Black)</td><td>0.25</td><td>—</td></tr>
+                  <tr><td>액상안정제</td><td>1.5</td><td>—</td></tr>
+                </tbody>
+              </table>
+              <hr class="divider">
+              <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600;">
+                <span>총중량</span><span>277.75 kg</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--accent2); font-weight:700; margin-top:4px;">
+                <span>단가</span><span>274.3 원/kg</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🟢 재벌 배합 (2T)</div>
+              <span class="badge badge-teal">재벌</span>
+            </div>
+            <div class="card-body">
+              <table style="font-size:12.5px;">
+                <thead><tr><th>원자재</th><th>PHR</th><th>%</th></tr></thead>
+                <tbody>
+                  <tr><td class="td-main">PVC</td><td>100</td><td>28.6%</td></tr>
+                  <tr><td>DOP</td><td>28</td><td>8.0%</td></tr>
+                  <tr><td>경탄 (FILLER)</td><td>117</td><td>33.4%</td></tr>
+                </tbody>
+              </table>
+              <hr class="divider">
+              <div style="font-size:12px; color:var(--text3);">비중</div>
+              <div style="font-size:18px; font-weight:700; color:var(--teal);">2.243</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🔵 샤시 배합</div>
+              <span class="badge badge-purple">샤시</span>
+            </div>
+            <div class="card-body">
+              <table style="font-size:12.5px;">
+                <thead><tr><th>원자재</th><th>PHR</th><th>%</th></tr></thead>
+                <tbody>
+                  <tr><td class="td-main">PVC</td><td>100</td><td>7.77%</td></tr>
+                  <tr><td>DOP</td><td>3</td><td>0.23%</td></tr>
+                  <tr><td>FILLER</td><td>0</td><td>0%</td></tr>
+                </tbody>
+              </table>
+              <hr class="divider">
+              <div class="alert alert-info" style="margin-bottom:0; font-size:12px;">
+                배합 No. 27_380 신A100 신5T10 기준
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 비중 계산 상세</div>
+          </div>
+          <div class="card-body">
+            <div style="overflow-x:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>배합명</th><th>PVC (÷1.4)</th><th>DOP (÷1.0)</th><th>FILLER (÷2.5)</th><th>합계</th><th>비중</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="td-main">하지 배합</td>
+                    <td>66.87</td><td>22.06</td><td>187.07</td><td>275.99</td>
+                    <td style="font-weight:700; color:var(--teal);">1.908</td>
+                  </tr>
+                  <tr>
+                    <td class="td-main">재벌 2T</td>
+                    <td>71.43</td><td>28.00</td><td>46.80</td><td>146.23</td>
+                    <td style="font-weight:700; color:var(--blue);">2.243</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="form-calc" class="tab-content" style="display:none;">
+        <div class="alert alert-info">
+          💡 원자재 투입량을 입력하면 자동으로 비율 및 비중이 계산됩니다.
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">📐 배합 계산기</div></div>
+            <div class="card-body">
+              <div id="formula-inputs">
+                <div style="display:grid; grid-template-columns:1fr 80px 80px; gap:8px; margin-bottom:8px; font-size:12px; font-weight:600; color:var(--text3);">
+                  <span>원자재</span><span>투입량</span><span>단가(원)</span>
+                </div>
+                <!-- rows generated by JS -->
+              </div>
+              <hr class="divider">
+              <button class="btn btn-primary" onclick="calcFormula()" style="width:100%;">계산하기</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">📊 결과</div></div>
+            <div class="card-body" id="formula-result">
+              <div style="color:var(--text3); font-size:13px; text-align:center; padding:2rem 0;">
+                원자재를 입력 후 계산하기를 누르세요
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="form-raw" class="tab-content" style="display:none;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>원자재명</th><th>단가 (원/kg)</th><th>비고</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="td-main">PVC</td><td>1,000</td><td><span class="badge badge-blue">기준재</span></td></tr>
+              <tr><td class="td-main">DOP (가소제)</td><td>1,370</td><td></td></tr>
+              <tr><td class="td-main">액상안정제</td><td>3,000</td><td></td></tr>
+              <tr><td class="td-main">경탄 (FILLER)</td><td>40</td><td><span class="badge badge-gray">저가</span></td></tr>
+              <tr><td class="td-main">마명가루 (고급)</td><td>440</td><td></td></tr>
+              <tr><td class="td-main">안료 (Black 901)</td><td>1,700</td><td></td></tr>
+              <tr><td class="td-main">난연가소제 (DPO)</td><td>4,500</td><td><span class="badge badge-red">고가</span></td></tr>
+              <tr><td class="td-main">붕산아연</td><td>620</td><td></td></tr>
+              <tr><td class="td-main">송진</td><td>3,200</td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: COST                                                    -->
+    <!-- ============================================================ -->
+    <div id="page-cost" class="page">
+      <div class="page-header">
+        <div class="page-title">💰 제품 원가 분석</div>
+        <div class="page-subtitle">배합표 연동 원가 계산 · 규격별 원가 비교</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card teal">
+          <div class="stat-label">하지 단가</div>
+          <div class="stat-value" style="font-size:20px;">274.3</div>
+          <div class="stat-desc">원/kg</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">재벌 단가 (예상)</div>
+          <div class="stat-value" style="font-size:20px;">~250</div>
+          <div class="stat-desc">원/kg</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">평균 비중</div>
+          <div class="stat-value" style="font-size:20px;">1.80</div>
+          <div class="stat-desc">g/cm³</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-label">규격 수</div>
+          <div class="stat-value">32</div>
+          <div class="stat-desc">기준정보 등록 기준</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📊 규격별 원가 계산기</div>
+          <span class="badge badge-amber">배합 연동</span>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning">
+            ⚠️ 이 섹션은 세부 배합표(3번)와 연동되어 층별 원가를 산출합니다. 배합표 데이터 입력 완료 후 자동 계산됩니다.
+          </div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>규격</th><th>제품두께</th><th>투명두께</th>
+                  <th>비중</th><th>박스중량(kg)</th><th>원자재비(원/m²)</th>
+                  <th>상태</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="td-main">7" × 48"</td>
+                  <td>3T</td><td>0.3mm</td>
+                  <td>1.803</td><td>15.95</td>
+                  <td style="font-weight:600; color:var(--teal);">—</td>
+                  <td><span class="badge badge-amber">계산필요</span></td>
+                </tr>
+                <tr>
+                  <td class="td-main">9" × 48"</td>
+                  <td>5T</td><td>0.5mm</td>
+                  <td>1.797</td><td>19.70</td>
+                  <td style="font-weight:600; color:var(--teal);">—</td>
+                  <td><span class="badge badge-amber">계산필요</span></td>
+                </tr>
+                <tr>
+                  <td class="td-main">455 × 455mm</td>
+                  <td>3T</td><td>0.15mm</td>
+                  <td>1.750</td><td>17.40</td>
+                  <td style="font-weight:600; color:var(--teal);">—</td>
+                  <td><span class="badge badge-amber">계산필요</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top:1rem; text-align:center;">
+            <button class="btn btn-primary" onclick="showPage('formula')">배합표 입력하러 가기 →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: PACKAGING                                               -->
+    <!-- ============================================================ -->
+    <div id="page-packaging" class="page">
+      <div class="page-header">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <div class="page-title">📦 제품 포장 단위 설정</div>
+            <div class="page-subtitle">규격별 포장 방식 · 박스 구성 · 중량 관리</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-pkg-add')">+ 포장 추가</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.25rem;">
+        <div class="card-header">
+          <div class="card-title">📐 중량 기준 정보</div>
+          <span class="badge badge-teal">기준정보 파일 연동</span>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>규격</th><th>제품두께</th><th>투명두께</th>
+                  <th>중량(kg/box)</th><th>PCS/BOX</th><th>단위</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="td-main">2.5T(0.3) × 7" × 48"</td><td>2.5T</td><td>0.3mm</td>
+                  <td style="font-weight:600;">16.28</td><td>—</td><td><span class="badge badge-blue">BOX</span></td>
+                </tr>
+                <tr>
+                  <td class="td-main">3T(0.07) × 184 × 950</td><td>3T</td><td>0.07mm</td>
+                  <td style="font-weight:600;">17.79</td><td>—</td><td><span class="badge badge-blue">BOX</span></td>
+                </tr>
+                <tr>
+                  <td class="td-main">3T(0.15) × 455 × 455</td><td>3T</td><td>0.15mm</td>
+                  <td style="font-weight:600;">17.40</td><td>—</td><td><span class="badge badge-blue">BOX</span></td>
+                </tr>
+                <tr>
+                  <td class="td-main">5T(0.5) × 9" × 48"</td><td>5T</td><td>0.5mm</td>
+                  <td style="font-weight:600;">19.70</td><td>6</td><td><span class="badge badge-teal">PCS</span></td>
+                </tr>
+                <tr>
+                  <td class="td-main">5T(0.5) × 9" × 60"</td><td>5T</td><td>0.5mm</td>
+                  <td style="font-weight:600;">18.90</td><td>—</td><td><span class="badge badge-blue">BOX</span></td>
+                </tr>
+                <tr>
+                  <td class="td-main">5T(0.3) × 9" × 48"</td><td>5T</td><td>0.3mm</td>
+                  <td style="font-weight:600;">20.00</td><td>—</td><td><span class="badge badge-blue">BOX</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🔧 포장 단위 설정기</div></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">규격 선택</label>
+              <select id="pkg-size">
+                <option>7" × 48"</option><option>9" × 48"</option>
+                <option>9" × 60"</option><option>455 × 455mm</option>
+                <option>184 × 950mm</option><option>직접 입력</option>
+              </select>
+            </div>
+            <div class="grid-2" style="gap:10px;">
+              <div class="form-group">
+                <label class="form-label">제품두께 (T)</label>
+                <select id="pkg-thick">
+                  <option>2T</option><option>2.5T</option><option>3T</option>
+                  <option>4T</option><option>4.5T</option><option>5T</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">투명두께 (mm)</label>
+                <select id="pkg-trans">
+                  <option>0.07</option><option>0.1</option><option>0.15</option>
+                  <option>0.2</option><option>0.3</option><option>0.5</option><option>0.55</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">PCS/BOX</label>
+              <input type="number" value="6" id="pkg-pcs">
+            </div>
+            <div class="form-group">
+              <label class="form-label">포장 타입</label>
+              <select id="pkg-type">
+                <option>Dry Back</option><option>LooseLay</option>
+                <option>Click</option><option>EZ Fit</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="addPackaging()">포장 단위 등록</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">📋 등록된 포장</div></div>
+          <div class="card-body" id="pkg-list" style="padding:0;">
+            <table>
+              <thead>
+                <tr><th>규격</th><th>두께</th><th>PCS</th><th>타입</th><th></th></tr>
+              </thead>
+              <tbody id="pkg-tbody">
+                <tr>
+                  <td class="td-main">9"×48"</td><td>5T/0.5</td><td>6</td>
+                  <td><span class="badge badge-blue">DB</span></td>
+                  <td><button class="btn btn-ghost btn-sm" style="color:var(--red);">×</button></td>
+                </tr>
+                <tr>
+                  <td class="td-main">9"×60"</td><td>5T/0.5</td><td>6</td>
+                  <td><span class="badge badge-teal">LL</span></td>
+                  <td><button class="btn btn-ghost btn-sm" style="color:var(--red);">×</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: PRODUCT CODE                                            -->
+    <!-- ============================================================ -->
+    <div id="page-product-code" class="page">
+      <div class="page-header">
+        <div class="page-title">🗂️ 제품 코드 기준정보</div>
+        <div class="page-subtitle">대분류 · 규격 · 처리 · 배합 유형 코드 관리</div>
+      </div>
+
+      <div class="grid-auto" style="margin-bottom:1.25rem;">
+        <div class="card">
+          <div class="card-header"><div class="card-title">대분류 코드</div></div>
+          <div class="card-body" style="padding:0.75rem 1.25rem;">
+            <table style="font-size:12.5px;">
+              <thead><tr><th>코드</th><th>명칭</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">1</td><td>제품</td></tr>
+                <tr><td class="mono">2</td><td>반제품</td></tr>
+                <tr><td class="mono">V</td><td>인라인 중지</td></tr>
+                <tr><td class="mono">6</td><td>원부자재</td></tr>
+                <tr><td class="mono">7</td><td>포장재</td></tr>
+                <tr><td class="mono">8</td><td>기자재</td></tr>
+                <tr><td class="mono">9</td><td>소모자재</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">UV 처리 코드</div></div>
+          <div class="card-body" style="padding:0.75rem 1.25rem;">
+            <table style="font-size:12.5px;">
+              <thead><tr><th>코드</th><th>명칭</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">V</td><td>무처리</td></tr>
+                <tr><td class="mono">L</td><td>LLT</td></tr>
+                <tr><td class="mono">N</td><td>LLT NS</td></tr>
+                <tr><td class="mono">C</td><td>Click</td></tr>
+                <tr><td class="mono">B</td><td>Bevel</td></tr>
+                <tr><td class="mono">O</td><td>OA</td></tr>
+                <tr><td class="mono">H</td><td>온돌용</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">배합 유형</div></div>
+          <div class="card-body" style="padding:0.75rem 1.25rem;">
+            <table style="font-size:12.5px;">
+              <thead><tr><th>코드</th><th>명칭</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">C</td><td>일반</td></tr>
+                <tr><td class="mono">E</td><td>EF</td></tr>
+                <tr><td class="mono">M</td><td>중지</td></tr>
+                <tr><td class="mono">L</td><td>하지</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">업체 코드</div></div>
+          <div class="card-body" style="padding:0.75rem 1.25rem;">
+            <table style="font-size:12.5px;">
+              <thead><tr><th>코드</th><th>업체명</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">ACE</td><td>ACE FLOOR</td></tr>
+                <tr><td class="mono">KCS</td><td>KCC-S</td></tr>
+                <tr><td class="mono">KCT</td><td>KCC-T</td></tr>
+                <tr><td class="mono">SO0</td><td>Special Offer</td></tr>
+                <tr><td class="mono">XFP</td><td>Flexi-Plank</td></tr>
+                <tr><td class="mono">XTD</td><td>Tile & Done</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- PAGE: HISTORY                                                 -->
+    <!-- ============================================================ -->
+    <div id="page-history" class="page">
+      <div class="page-header">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <div class="page-title">📝 변경 히스토리</div>
+            <div class="page-subtitle">층별구조 · 배합 · 원가 변경 이력 관리</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-history-add')">+ 이력 추가</button>
+        </div>
+      </div>
+
+      <div class="grid-2" style="align-items:start;">
+        <div>
+          <div class="timeline" id="history-timeline">
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-date">2026.04.13</div>
+              <div class="timeline-title">층별구조 분석 업데이트</div>
+              <div class="timeline-body">서해테크 & 일신케미칼 전체 48개 구조 최신화. 비중 재계산 및 GF 층 데이터 수정</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--blue);box-shadow:0 0 0 2px var(--blue);"></div>
+              <div class="timeline-date">2026.04.23</div>
+              <div class="timeline-title">종합 제품 분석 계산식 업데이트</div>
+              <div class="timeline-body">4T·5T 공차 계산 방식 5가지 기준으로 정리. 반제품 연동 계산 추가</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--amber);box-shadow:0 0 0 2px var(--amber);"></div>
+              <div class="timeline-date">2026.01.16</div>
+              <div class="timeline-title">배합 No.27_380 신A100 신5T10 등록</div>
+              <div class="timeline-body">하지 배합 원가 계산식 업데이트. 경탄 117PHR, DOP 42PHR 기준. 단가 274.3원/kg</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">🔍 이력 검색 · 필터</div></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">카테고리</label>
+              <select>
+                <option>전체</option>
+                <option>층별구조</option>
+                <option>종합계산식</option>
+                <option>배합표</option>
+                <option>원가</option>
+                <option>포장</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">기간</label>
+              <div style="display:flex; gap:8px;">
+                <input type="date" value="2026-01-01">
+                <span style="line-height:36px; color:var(--text3);">~</span>
+                <input type="date" value="2026-12-31">
+              </div>
+            </div>
+            <button class="btn btn-secondary" style="width:100%;">필터 적용</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <strong>directed by noahkim</strong> &nbsp;·&nbsp; Tile Management System v1.0 &nbsp;·&nbsp; 2026
+</footer>
+
+<!-- ============================================================ -->
+<!-- MODALS -->
+<!-- ============================================================ -->
+<div id="modal-history-add" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📝 변경 이력 추가</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-history-add')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">날짜</label>
+        <input type="date" id="h-date" value="2026-06-23">
+      </div>
+      <div class="form-group">
+        <label class="form-label">카테고리</label>
+        <select id="h-cat">
+          <option>층별구조</option><option>종합계산식</option>
+          <option>배합표</option><option>원가</option><option>포장</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">제목</label>
+        <input type="text" id="h-title" placeholder="변경 내용 제목">
+      </div>
+      <div class="form-group">
+        <label class="form-label">상세 내용</label>
+        <textarea id="h-body" placeholder="변경된 내용을 상세히 기입하세요..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-history-add')">취소</button>
+      <button class="btn btn-primary" onclick="addHistory()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-layer-add" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🧱 층별구조 추가</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-layer-add')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid-2" style="gap:10px;">
+        <div class="form-group">
+          <label class="form-label">거래처</label>
+          <select id="la-co"><option>서해테크</option><option>일신케미칼</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">구분</label>
+          <select id="la-type"><option>일반</option><option>HARD</option><option>PE</option><option>DIY</option></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">구조 (예: 3 / 0.15)</label>
+        <input type="text" id="la-struct" placeholder="두께 / 투명두께">
+      </div>
+      <div style="display:grid; grid-template-columns: repeat(3,1fr); gap:8px;">
+        <div class="form-group">
+          <label class="form-label">상지 두께</label>
+          <input type="number" id="la-top" step="0.01" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">상지 가소제</label>
+          <input type="number" id="la-top-p">
+        </div>
+        <div class="form-group">
+          <label class="form-label">상지 FILLER</label>
+          <input type="number" id="la-top-f">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">비고</label>
+        <input type="text" id="la-note" placeholder="특이사항">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-layer-add')">취소</button>
+      <button class="btn btn-primary" onclick="saveLayer()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-pkg-add" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📦 포장 단위 추가</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-pkg-add')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info">포장 단위를 추가하면 포장 단위 설정 탭에 자동으로 반영됩니다.</div>
+      <div class="form-group">
+        <label class="form-label">규격</label>
+        <input type="text" placeholder='예: 9" × 48"'>
+      </div>
+      <div class="grid-2" style="gap:10px;">
+        <div class="form-group"><label class="form-label">PCS/BOX</label><input type="number" value="6"></div>
+        <div class="form-group"><label class="form-label">포장 타입</label>
+          <select><option>DB</option><option>LL</option><option>Click</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-pkg-add')">취소</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-pkg-add')">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const layerData = [
+  {no:1,co:'서해테크',type:'DIY',struct:'1.8/0.07',setT:1.8,topT:0.07,topP:28,topF:0,midT:1,midP:40,midF:340,gfT:0,gfP:0,gfF:0,mid2T:0,mid2P:0,mid2F:0,baseT:0.8,baseP:28,baseF:110,pvc:34.2,dop:10.2,filler:55.6,density:1.804},
+  {no:2,co:'서해테크',type:'일반',struct:'2/0.07',setT:2,topT:0.07,topP:28,topF:0,midT:1.1,midP:40,midF:340,gfT:0,gfP:0,gfF:0,mid2T:0,mid2P:0,mid2F:0,baseT:0.9,baseP:29,baseF:130,pvc:35.9,dop:11.0,filler:63.4,density:1.828},
+  {no:3,co:'서해테크',type:'일반',struct:'2/0.1',setT:2,topT:0.1,topP:28,topF:0,midT:1.1,midP:40,midF:340,gfT:0,gfP:0,gfF:0,mid2T:0,mid2P:0,mid2F:0,baseT:0.9,baseP:29,baseF:130,pvc:37.1,dop:11.3,filler:63.4,density:1.818},
+  {no:4,co:'서해테크',type:'HARD',struct:'2/0.2',setT:2,topT:0.2,topP:30,topF:0,midT:1,midP:33,midF:250,gfT:0,gfP:0,gfF:0,mid2T:0,mid2P:0,mid2F:0,baseT:0.8,baseP:24,baseF:60,pvc:47.1,dop:12.5,filler:47.1,density:1.672},
+  {no:5,co:'서해테크',type:'일반',struct:'2/0.2',setT:2,topT:0.2,topP:30,topF:0,midT:1,midP:40,midF:340,gfT:0,gfP:0,gfF:0,mid2T:0,mid2P:0,mid2F:0,baseT:0.9,baseP:28,baseF:110,pvc:41.5,dop:12.4,filler:58.0,density:1.754},
+  {no:6,co:'서해테크',type:'일반',struct:'2/0.3',setT:2,topT:0.3,topP:30,topF:0,midT:0.9,midP:40,midF:340,gfT:0,gfP:0,gfF:0,mid2T:0,mid2P:0,mid2F:0,baseT:0.9,baseP:25,baseF:100,pvc:45.5,dop:12.9,filler:53.5,density:1.709},
+  {no:7,co:'서해테크',type:'일반',struct:'2.5/0.07',setT:2.5,topT:0.07,topP:28,topF:0,midT:1,midP:40,midF:340,gfT:0,gfP:0,gfF:0,mid2T:0.8,mid2P:40,mid2F:300,baseT:0.8,baseP:30,baseF:150,pvc:41.0,dop:13.5,filler:86.7,density:1.878},
+  {no:8,co:'서해테크',type:'일반',struct:'2.5/0.2',setT:2.5,topT:0.2,topP:30,topF:0,midT:0.8,midP:40,midF:340,gfT:0,gfP:0,gfF:0,mid2T:0.8,mid2P:40,mid2F:300,baseT:0.8,baseP:26,baseF:80,pvc:49.3,dop:15.0,filler:73.3,density:1.772},
+  {no:9,co:'서해테크',type:'일반',struct:'2.5/0.4',setT:2.5,topT:0.4,topP:32,topF:0,midT:1.1,midP:40,midF:340,gfT:0,gfP:0,gfF:0,mid2T:0,mid2P:0,mid2F:0,baseT:1.1,baseP:26,baseF:80,pvc:58.3,dop:17.1,filler:62.2,density:1.675},
+  {no:10,co:'서해테크',type:'일반',struct:'2.5/0.5',setT:2.5,topT:0.5,topP:35,topF:0,midT:1,midP:40,midF:340,gfT:0,gfP:0,gfF:0,mid2T:0,mid2P:0,mid2F:0,baseT:1.1,baseP:24,baseF:60,pvc:64.0,dop:18.6,filler:55.0,density:1.617},
+  {no:11,co:'서해테크',type:'일반',struct:'3/0.07',setT:3,topT:0.07,topP:28,topF:0,midT:1.1,midP:40,midF:340,gfT:0,gfP:0,gfF:0,mid2T:1,mid2P:40,mid2F:340,baseT:0.9,baseP:28,baseF:110,pvc:48.2,dop:15.5,filler:98.1,density:1.869},
+  {no:12,co:'서해테크',type:'일반',struct:'3/0.1',setT:3,topT:0.1,topP:28,topF:0,midT:1.1,midP:40,midF:340,gfT:0,gfP:0,gfF:0,mid2T:1,mid2P:40,mid2F:340,baseT:0.9,baseP:28,baseF:110,pvc:49.4,dop:15.9,filler:98.1,density:1.860},
+  {no:13,co:'서해테크',type:'일반',struct:'3/0.2',setT:3,topT:0.2,topP:30,topF:0,midT:1,midP:40,midF:340,gfT:0,gfP:0,gfF:0,mid2T:1,mid2P:40,mid2F:340,baseT:0.9,baseP:28,baseF:110,pvc:52.2,dop:16.7,filler:94.5,density:1.829},
+  {no:17,co:'서해테크',type:'일반',struct:'5/0.5',setT:5,topT:0.5,topP:35,topF:0,midT:1.2,midP:40,midF:330,gfT:0,gfP:0,gfF:0,mid2T:1.2,mid2P:40,mid2F:330,baseT:1,baseP:33,baseF:80,pvc:86.1,dop:30.7,filler:149.7,density:1.797},
+  {no:22,co:'서해테크',type:'일반',struct:'4.5/0.5',setT:4.5,topT:0.5,topP:35,topF:0,midT:0.8,midP:55,midF:380,gfT:0.35,gfP:80,gfF:80,mid2T:1,mid2P:55,mid2F:380,baseT:1.1,baseP:40,baseF:180,pvc:74.1,dop:34.4,filler:140.0,density:1.776},
+  {no:25,co:'서해테크',type:'HARD',struct:'5/0.5',setT:5,topT:0.5,topP:35,topF:0,midT:1.2,midP:33,midF:250,gfT:0.35,gfP:80,gfF:80,mid2T:0.9,mid2P:40,mid2F:340,baseT:1,baseP:42,baseF:200,pvc:81.2,dop:34.0,filler:153.8,density:1.797},
+  {no:26,co:'일신케미칼',type:'일반',struct:'2/0.15',setT:2,topT:0.15,topP:25,topF:0,midT:1.15,midP:30,midF:350,gfT:0,gfP:0,gfF:0,mid2T:0,mid2P:0,mid2F:0,baseT:0.7,baseP:24,baseF:80,pvc:39.6,dop:9.8,filler:57.4,density:1.794},
+  {no:27,co:'일신케미칼',type:'일반',struct:'2/0.2',setT:2,topT:0.2,topP:26,topF:0,midT:1.1,midP:27,midF:380,gfT:0,gfP:0,gfF:0,mid2T:0,mid2P:0,mid2F:0,baseT:0.7,baseP:24,baseF:80,pvc:40.4,dop:9.7,filler:56.6,density:1.788},
+  {no:28,co:'일신케미칼',type:'일반',struct:'2/0.3',setT:2,topT:0.3,topP:28,topF:0,midT:1,midP:27,midF:380,gfT:0,gfP:0,gfF:0,mid2T:0,mid2P:0,mid2F:0,baseT:0.7,baseP:24,baseF:80,pvc:43.3,dop:10.6,filler:52.8,density:1.740},
+  {no:34,co:'일신케미칼',type:'일반',struct:'3/0.1',setT:3,topT:0.1,topP:25,topF:0,midT:1.65,midP:44,midF:400,gfT:0,gfP:0,gfF:0,mid2T:0,mid2P:0,mid2F:0,baseT:1.2,baseP:30,baseF:200,pvc:41.8,dop:13.8,filler:100.0,density:1.921},
+  {no:38,co:'일신케미칼',type:'일반',struct:'4/0.5',setT:4,topT:0.5,topP:30,topF:0,midT:0.7,midP:35,midF:380,gfT:0.3,gfP:71.5,gfF:70,mid2T:1.6,mid2P:65,mid2F:600,baseT:0.9,baseP:40,baseF:250,pvc:59.3,dop:25.0,filler:125.5,density:1.835},
+  {no:39,co:'일신케미칼',type:'HARD',struct:'4.5/0.5',setT:4.5,topT:0.5,topP:30,topF:0,midT:1.3,midP:30,midF:120,gfT:0.3,gfP:71.5,gfF:70,mid2T:1.35,mid2P:38,mid2F:280,baseT:1,baseP:30,baseF:200,pvc:88.6,dop:29.8,filler:114.5,density:1.711},
+  {no:42,co:'일신케미칼',type:'일반',struct:'5/0.3',setT:5,topT:0.3,topP:30,topF:0,midT:1.2,midP:35,midF:380,gfT:0.3,gfP:71.5,gfF:70,mid2T:2.2,mid2P:65,mid2F:600,baseT:1,baseP:40,baseF:250,pvc:61.7,dop:27.5,filler:172.1,density:1.923},
+  {no:43,co:'일신케미칼',type:'일반',struct:'5/0.5',setT:5,topT:0.5,topP:30,topF:0,midT:1.1,midP:35,midF:380,gfT:0.3,gfP:71.5,gfF:70,mid2T:2.1,mid2P:65,mid2F:600,baseT:1,baseP:40,baseF:250,pvc:67.9,dop:29.1,filler:164.3,density:1.879},
+  {no:44,co:'일신케미칼',type:'Hard (Sol)',struct:'5/0.5',setT:5,topT:0.5,topP:30,topF:0,midT:1.25,midP:30,midF:120,gfT:0.3,gfP:71.5,gfF:70,mid2T:1.5,mid2P:30,mid2F:280,baseT:1.45,baseP:40,baseF:250,pvc:93.4,dop:31.8,filler:136.1,density:1.747},
+  {no:45,co:'일신케미칼',type:'Acoustic',struct:'5/0.5',setT:5,topT:0.5,topP:30,topF:0,midT:1.25,midP:30,midF:120,gfT:0.3,gfP:71.5,gfF:70,mid2T:1.05,mid2P:34,mid2F:420,baseT:1.95,baseP:30,baseF:200,pvc:95.6,dop:31.0,filler:137.4,density:1.751},
+  {no:47,co:'일신케미칼',type:'일반',struct:'5/0.55',setT:5,topT:0.55,topP:32,topF:0,midT:0.95,midP:30,midF:120,gfT:0.3,gfP:71.5,gfF:70,mid2T:1.85,mid2P:38,mid2F:280,baseT:1.45,baseP:40,baseF:250,pvc:92.8,dop:33.9,filler:139.8,density:1.746},
+  {no:48,co:'일신케미칼',type:'일반',struct:'5/0.7',setT:5,topT:0.7,topP:38,topF:0,midT:1.1,midP:35,midF:380,gfT:0.3,gfP:71.5,gfF:70,mid2T:1.9,mid2P:65,mid2F:600,baseT:1,baseP:40,baseF:250,pvc:72.9,dop:32.2,filler:156.2,density:1.830},
+];
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+id+"'")) n.classList.add('active');
+  });
+}
+
+function switchTab(el, tabId) {
+  const container = el.closest('.page') || document.body;
+  container.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const page = el.closest('.page');
+  page.querySelectorAll('.tab-content').forEach(c=>c.style.display='none');
+  const target = document.getElementById(tabId);
+  if(target) target.style.display='block';
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('open'); });
+});
+
+// ============================================================
+// DATE
+// ============================================================
+const d = new Date();
+document.getElementById('today-date').textContent = d.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
+
+// ============================================================
+// LAYER TABLE
+// ============================================================
+function renderLayerTable(data, tbodyId) {
+  const tbody = document.getElementById(tbodyId);
+  if(!tbody) return;
+  tbody.innerHTML = data.map(r=>`
+    <tr>
+      <td>${r.no}</td>
+      <td class="td-main">${r.co}</td>
+      <td><span class="badge ${r.type==='HARD'?'badge-amber':r.type==='PE'?'badge-purple':r.type==='Acoustic'||r.type.includes('Acoustic')?'badge-green':'badge-blue'}">${r.type}</span></td>
+      <td class="mono">${r.struct}</td>
+      <td>${r.setT.toFixed(2)}</td>
+      <td>${r.topT}</td>
+      <td>${r.midT}</td>
+      <td>${r.gfT>0?r.gfT:'—'}</td>
+      <td>${r.mid2T>0?r.mid2T:'—'}</td>
+      <td>${r.baseT>0?r.baseT:'—'}</td>
+      <td>${r.dop.toFixed(1)}</td>
+      <td>${r.filler.toFixed(1)}</td>
+      <td style="font-weight:600; color:var(--teal);">${r.density.toFixed(4)}</td>
+      <td>—</td>
+    </tr>
+  `).join('');
+}
+
+function filterLayerTable() {
+  const q = document.getElementById('layer-search').value.toLowerCase();
+  const type = document.getElementById('layer-filter-type').value;
+  const co = document.getElementById('layer-filter-co').value;
+  const filtered = layerData.filter(r=>{
+    const matchQ = !q || r.struct.includes(q) || r.co.includes(q) || r.type.toLowerCase().includes(q);
+    const matchType = !type || r.type===type;
+    const matchCo = !co || r.co===co;
+    return matchQ && matchType && matchCo;
+  });
+  renderLayerTable(filtered, 'layer-tbody');
+}
+
+function renderShtIsk() {
+  const sht = layerData.filter(r=>r.co==='서해테크');
+  const isk = layerData.filter(r=>r.co==='일신케미칼');
+  const shtTbody = document.getElementById('sht-tbody');
+  const iskTbody = document.getElementById('isk-tbody');
+  if(shtTbody) shtTbody.innerHTML = sht.map(r=>`
+    <tr>
+      <td>${r.no}</td>
+      <td><span class="badge ${r.type==='HARD'?'badge-amber':'badge-blue'}">${r.type}</span></td>
+      <td class="mono">${r.struct}</td><td>${r.setT}</td>
+      <td>${r.topT}</td><td>${r.midT}</td><td>${r.mid2T||'—'}</td><td>${r.baseT}</td>
+      <td>${r.pvc.toFixed(1)}%</td><td>${r.dop.toFixed(1)}</td><td>${r.filler.toFixed(1)}</td>
+      <td style="font-weight:600;">${r.density.toFixed(4)}</td>
+    </tr>`).join('');
+  if(iskTbody) iskTbody.innerHTML = isk.map(r=>`
+    <tr>
+      <td>${r.no}</td>
+      <td><span class="badge ${r.type==='HARD'||r.type.includes('Hard')?'badge-amber':r.type.includes('Acoustic')?'badge-green':'badge-blue'}">${r.type}</span></td>
+      <td class="mono">${r.struct}</td><td>${r.setT}</td>
+      <td>${r.topT}</td><td>${r.midT}</td><td>${r.mid2T||'—'}</td><td>${r.baseT}</td>
+      <td>${r.pvc.toFixed(1)}%</td><td>${r.dop.toFixed(1)}</td><td>${r.filler.toFixed(1)}</td>
+      <td style="font-weight:600;">${r.density.toFixed(4)}</td>
+    </tr>`).join('');
+}
+
+// Layer visualization selector
+function renderLayerSelectList() {
+  const el = document.getElementById('layer-select-list');
+  if(!el) return;
+  el.innerHTML = layerData.map(r=>`
+    <div onclick="showLayerViz(${r.no})" style="padding:8px 12px; border-radius:6px; cursor:pointer; font-size:12.5px; display:flex; justify-content:space-between; transition:background 0.1s; border:1px solid transparent;" 
+      onmouseover="this.style.background='var(--surface3)';this.style.borderColor='var(--border)'"
+      onmouseout="this.style.background='';this.style.borderColor='transparent'">
+      <span><strong>${r.no}</strong> ${r.co.slice(0,2)}</span>
+      <span style="color:var(--text3);">${r.struct}</span>
+    </div>
+  `).join('');
+}
+
+function showLayerViz(no) {
+  const r = layerData.find(x=>x.no===no);
+  if(!r) return;
+  document.getElementById('viz-title').textContent = `No.${r.no} ${r.co} — ${r.struct} (${r.type})`;
+  const total = r.topT + r.midT + (r.gfT||0) + (r.mid2T||0) + (r.baseT||0);
+
+  const layers = [
+    {name:'투명/인쇄지',t:r.topT,p:r.topP,f:r.topF||0,cls:'layer-transparent'},
+    {name:'중지 1',t:r.midT,p:r.midP,f:r.midF,cls:'layer-mid1'},
+    r.gfT>0?{name:'Glass Fiber',t:r.gfT,p:r.gfP,f:r.gfF,cls:'layer-gf'}:null,
+    r.mid2T>0?{name:'중지 2',t:r.mid2T,p:r.mid2P,f:r.mid2F,cls:'layer-mid2'}:null,
+    r.baseT>0?{name:'하지',t:r.baseT,p:r.baseP,f:r.baseF,cls:'layer-base'}:null,
+  ].filter(Boolean);
+
+  document.getElementById('layer-viz').innerHTML = `
+    <div class="layer-visual">
+      <div style="display:grid; grid-template-columns:160px 1fr 80px 80px 80px; padding:8px 16px; background:var(--surface3); font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px;">
+        <span>층</span><span>두께 비율</span><span style="text-align:right;">두께</span><span style="text-align:right;">가소제</span><span style="text-align:right;">FILLER</span>
+      </div>
+      ${layers.map(l=>`
+        <div class="layer-row ${l.cls}">
+          <div class="layer-name">${l.name}</div>
+          <div class="layer-bar-wrap">
+            <div class="layer-bar" style="width:${Math.min(100,(l.t/total)*100)}%"></div>
+          </div>
+          <div class="layer-val">${l.t.toFixed(2)}</div>
+          <div class="layer-phr">${l.p}</div>
+          <div class="layer-filler">${l.f||'—'}</div>
+        </div>
+      `).join('')}
+      <div style="padding:10px 16px; background:var(--surface3); display:flex; justify-content:space-between; font-size:13px; font-weight:600;">
+        <span>합계</span>
+        <span>${total.toFixed(2)} mm &nbsp;|&nbsp; 비중: ${r.density.toFixed(4)}</span>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <div style="font-size:12px; color:var(--text3); margin-bottom:6px;">구성 비율</div>
+      <div class="comp-bar-group">
+        <div class="comp-segment seg-pvc" style="flex:${r.pvc}">PVC ${r.pvc.toFixed(1)}%</div>
+        <div class="comp-segment seg-dop" style="flex:${r.dop}">DOP</div>
+        <div class="comp-segment seg-filler" style="flex:${r.filler}">FILLER ${r.filler.toFixed(1)}</div>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// DASHBOARD CHARTS
+// ============================================================
+function renderDashCharts() {
+  const sht = layerData.filter(r=>r.co==='서해테크');
+  const isk = layerData.filter(r=>r.co==='일신케미칼');
+  const buckets = {'1.6~1.65':0,'1.65~1.7':0,'1.7~1.75':0,'1.75~1.8':0,'1.8~1.85':0,'1.85~1.9':0,'1.9+':0};
+
+  function buildChart(data, elId) {
+    const el = document.getElementById(elId);
+    if(!el) return;
+    const b = {...buckets};
+    data.forEach(r=>{
+      const d = r.density;
+      if(d<1.65) b['1.6~1.65']++;
+      else if(d<1.7) b['1.65~1.7']++;
+      else if(d<1.75) b['1.7~1.75']++;
+      else if(d<1.8) b['1.75~1.8']++;
+      else if(d<1.85) b['1.8~1.85']++;
+      else if(d<1.9) b['1.85~1.9']++;
+      else b['1.9+']++;
+    });
+    const max = Math.max(...Object.values(b),1);
+    el.innerHTML = Object.entries(b).map(([k,v])=>`
+      <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
+        <span style="width:70px; color:var(--text3);">${k}</span>
+        <div style="flex:1; height:14px; background:var(--surface3); border-radius:4px; overflow:hidden;">
+          <div style="height:100%; width:${(v/max)*100}%; background:var(--teal); border-radius:4px; transition:width 0.4s;"></div>
+        </div>
+        <span style="width:20px; text-align:right; font-weight:600;">${v}</span>
+      </div>
+    `).join('');
+  }
+  buildChart(sht, 'sht-chart');
+  buildChart(isk, 'isk-chart');
+}
+
+// ============================================================
+// ANALYSIS CALCULATOR
+// ============================================================
+function calcAnalysis() {
+  const layers = [
+    {t: +document.getElementById('t-transparent').value||0, p: +document.getElementById('p-transparent').value||0, f: 0},
+    {t: +document.getElementById('t-print').value||0, p: +document.getElementById('p-print').value||0, f: 0},
+    {t: +document.getElementById('t-mid1').value||0, p: +document.getElementById('p-mid1').value||0, f: +document.getElementById('f-mid1').value||0},
+    {t: +document.getElementById('t-gf').value||0, p: +document.getElementById('p-gf').value||0, f: +document.getElementById('f-gf').value||0},
+    {t: +document.getElementById('t-mid2').value||0, p: +document.getElementById('p-mid2').value||0, f: +document.getElementById('f-mid2').value||0},
+    {t: +document.getElementById('t-base').value||0, p: +document.getElementById('p-base').value||0, f: +document.getElementById('f-base').value||0},
+  ];
+  const totalT = layers.reduce((a,l)=>a+l.t,0);
+  const halfT = totalT/2;
+  document.getElementById('calc-total-t').textContent = totalT.toFixed(2)+' mm';
+  document.getElementById('calc-half-t').textContent = halfT.toFixed(2)+' mm';
+
+  let dop=0, filler=0;
+  layers.forEach(l=>{
+    if(l.t>0 && halfT>0) {
+      dop += l.t*l.p/halfT;
+      filler += l.t*l.f/halfT;
+    }
+  });
+
+  document.getElementById('result-dop').textContent = dop.toFixed(1);
+  document.getElementById('result-filler').textContent = filler.toFixed(1);
+
+  const pvc = 100;
+  const total = pvc+dop+filler;
+  const pvcPct = total>0?(pvc/total*100):0;
+  const dopPct = total>0?(dop/total*100):0;
+  const fillPct = total>0?(filler/total*100):0;
+  document.getElementById('r-pvc').textContent = pvcPct.toFixed(1);
+  document.getElementById('r-dop2').textContent = dopPct.toFixed(1);
+  document.getElementById('r-fill2').textContent = fillPct.toFixed(1);
+
+  const bar = document.getElementById('result-bar');
+  bar.innerHTML = `
+    <div class="comp-segment seg-pvc" style="flex:${pvcPct}">PVC</div>
+    <div class="comp-segment seg-dop" style="flex:${dopPct}">DOP</div>
+    <div class="comp-segment seg-filler" style="flex:${fillPct}">FILLER</div>`;
+
+  const vPvc = pvc/1.4, vDop = dop/1.0, vFill = filler/2.5;
+  const density = total>0?total/(vPvc+vDop+vFill):0;
+  document.getElementById('vol-pvc').textContent = vPvc.toFixed(2);
+  document.getElementById('vol-dop').textContent = vDop.toFixed(2);
+  document.getElementById('vol-fill').textContent = vFill.toFixed(2);
+  document.getElementById('result-density').textContent = density.toFixed(4);
+}
+
+// ============================================================
+// WEIGHT CALCULATOR
+// ============================================================
+function calcWeight() {
+  const thick = +document.getElementById('wc-thick').value||0;
+  const wIn = +document.getElementById('wc-w').value||0;
+  const lIn = +document.getElementById('wc-l').value||0;
+  const pcs = +document.getElementById('wc-pcs').value||1;
+  const density = +document.getElementById('wc-density').value||1.8;
+
+  const wMm = wIn*25.4, lMm = lIn*25.4;
+  const vol = wMm/10 * lMm/10 * thick/10; // cm³
+  const pieceKg = vol * density / 1000;
+  const boxKg = pieceKg * pcs;
+  const sqm = wMm*lMm/1000000;
+  const boxPerSqm = 1/(sqm*pcs);
+
+  document.getElementById('wc-wmm').textContent = wMm.toFixed(1)+' mm';
+  document.getElementById('wc-lmm').textContent = lMm.toFixed(1)+' mm';
+  document.getElementById('wc-vol').textContent = vol.toFixed(2);
+  document.getElementById('wc-piece').textContent = pieceKg.toFixed(4);
+  document.getElementById('wc-result').textContent = boxKg.toFixed(3);
+  document.getElementById('wc-sqm').textContent = boxPerSqm.toFixed(4)+' box/m²';
+}
+
+// ============================================================
+// FORMULA INPUTS
+// ============================================================
+function buildFormulaInputs() {
+  const raws = ['PVC','DOP (가소제)','경탄 (FILLER)','마명가루','재벌','샤시','안료','액상안정제'];
+  const defaults = [100,42,120,80,8,8,0.25,1.5];
+  const prices = [1000,1370,40,440,300,300,1700,3000];
+  const el = document.getElementById('formula-inputs');
+  if(!el) return;
+  el.innerHTML = raws.map((r,i)=>`
+    <div style="display:grid; grid-template-columns:1fr 80px 80px; gap:8px; margin-bottom:6px; align-items:center;">
+      <span style="font-size:13px; color:var(--text2);">${r}</span>
+      <input type="number" id="fr-amt-${i}" value="${defaults[i]}" step="0.01" style="width:100%;">
+      <input type="number" id="fr-price-${i}" value="${prices[i]}" style="width:100%;">
+    </div>
+  `).join('');
+}
+
+function calcFormula() {
+  const raws = ['PVC','DOP','경탄','마명가루','재벌','샤시','안료','액상안정제'];
+  let totalAmt=0, totalCost=0;
+  const rows = raws.map((r,i)=>{
+    const amt = +document.getElementById(`fr-amt-${i}`).value||0;
+    const price = +document.getElementById(`fr-price-${i}`).value||0;
+    totalAmt+=amt; totalCost+=amt*price;
+    return {r,amt,price,cost:amt*price};
+  });
+  const pvc=rows[0].amt||1;
+  const unitCost = totalAmt>0?totalCost/totalAmt:0;
+  document.getElementById('formula-result').innerHTML = `
+    <div style="margin-bottom:12px;">
+      <div style="font-size:12px; color:var(--text3); margin-bottom:8px;">원가 분석 결과</div>
+      <table style="font-size:12.5px; width:100%;">
+        <thead><tr><th>원자재</th><th>PHR</th><th>%</th><th>금액</th></tr></thead>
+        <tbody>${rows.map(r=>`
+          <tr>
+            <td class="td-main">${r.r}</td>
+            <td>${r.amt}</td>
+            <td>${(r.amt/pvc*100).toFixed(1)}%</td>
+            <td>${r.cost.toLocaleString()}원</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div style="background:var(--teal-light); padding:12px; border-radius:8px;">
+      <div style="font-size:12px; color:var(--teal);">단가 (원/kg)</div>
+      <div style="font-size:24px; font-weight:700; color:var(--teal);">${unitCost.toFixed(1)}</div>
+      <div style="font-size:12px; color:var(--teal); margin-top:4px;">총 중량: ${totalAmt.toFixed(2)} kg &nbsp;|&nbsp; 총 비용: ${totalCost.toLocaleString()}원</div>
+    </div>
+  `;
+}
+
+// ============================================================
+// HISTORY
+// ============================================================
+function addHistory() {
+  const date = document.getElementById('h-date').value;
+  const title = document.getElementById('h-title').value;
+  const body = document.getElementById('h-body').value;
+  if(!title) return;
+  const tl = document.getElementById('history-timeline');
+  const item = document.createElement('div');
+  item.className = 'timeline-item';
+  item.innerHTML = `
+    <div class="timeline-dot" style="background:var(--green);box-shadow:0 0 0 2px var(--green);"></div>
+    <div class="timeline-date">${date}</div>
+    <div class="timeline-title">${title}</div>
+    <div class="timeline-body">${body||'(상세 내용 없음)'}</div>
+  `;
+  tl.insertBefore(item, tl.firstChild);
+  closeModal('modal-history-add');
+  document.getElementById('h-title').value='';
+  document.getElementById('h-body').value='';
+}
+
+// ============================================================
+// PACKAGING
+// ============================================================
+function addPackaging() {
+  const size = document.getElementById('pkg-size').value;
+  const thick = document.getElementById('pkg-thick').value;
+  const trans = document.getElementById('pkg-trans').value;
+  const pcs = document.getElementById('pkg-pcs').value;
+  const type = document.getElementById('pkg-type').value;
+  const tbody = document.getElementById('pkg-tbody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td class="td-main">${size}</td>
+    <td>${thick}/${trans}</td>
+    <td>${pcs}</td>
+    <td><span class="badge badge-blue">${type.substring(0,2).toUpperCase()}</span></td>
+    <td><button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="this.closest('tr').remove()">×</button></td>
+  `;
+  tbody.appendChild(tr);
+}
+
+// ============================================================
+// SAVE LAYER (modal)
+// ============================================================
+function saveLayer() {
+  closeModal('modal-layer-add');
+  alert('층별구조가 저장되었습니다. (실제 데이터베이스 연동 시 자동 반영)');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', ()=>{
+  renderLayerTable(layerData, 'layer-tbody');
+  renderShtIsk();
+  renderLayerSelectList();
+  renderDashCharts();
+  calcAnalysis();
+  calcWeight();
+  buildFormulaInputs();
+});
+</script>
+</body>
+</html>
+HTMLEOF
