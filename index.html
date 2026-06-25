@@ -710,6 +710,110 @@
     border-radius: 20px;
     letter-spacing: 0.5px;
   }
+  /* ===== 인쇄 전용 스타일 ===== */
+  @media print {
+    /* 기본 리셋 */
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    /* 사이드바, 탑바, 버튼, 탭, 푸터 숨김 */
+    .topbar,
+    .sidebar,
+    .footer,
+    .tabs,
+    .page-actions,
+    .btn,
+    button,
+    .search-bar,
+    select,
+    .modal-overlay,
+    .alert,
+    .nav-item,
+    .nav-section,
+    #sht-filter-type,
+    #sht-search { display: none !important; }
+
+    /* 레이아웃: 사이드바 제거, 전체 너비 */
+    body { background: white !important; }
+    .layout { display: block !important; }
+    .main {
+      padding: 8mm 6mm !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+
+    /* 활성 페이지만 표시 */
+    .page { display: none !important; }
+    .page.active { display: block !important; }
+
+    /* 층별구조 탭 콘텐츠: 현재 활성 탭만 인쇄 */
+    .tab-content { display: none !important; }
+    .tab-content[style*="display:block"],
+    .tab-content[style*="display: block"] { display: block !important; }
+
+    /* 페이지 헤더 심플하게 */
+    .page-header {
+      margin-bottom: 6mm !important;
+      border-bottom: 1.5px solid #1a1a2e;
+      padding-bottom: 4mm;
+    }
+    .page-title { font-size: 16pt !important; }
+    .page-subtitle { font-size: 9pt !important; }
+
+    /* 테이블 가로 전체 */
+    .table-wrap {
+      overflow: visible !important;
+      border: none !important;
+      box-shadow: none !important;
+      width: 100% !important;
+    }
+    table {
+      width: 100% !important;
+      font-size: 7.5pt !important;
+      border-collapse: collapse !important;
+      table-layout: auto !important;
+    }
+    thead th {
+      background: #1a1a2e !important;
+      color: white !important;
+      padding: 3pt 4pt !important;
+      font-size: 7pt !important;
+      white-space: nowrap !important;
+      border: 0.5pt solid #333 !important;
+    }
+    tbody td {
+      padding: 3pt 4pt !important;
+      border: 0.5pt solid #ccc !important;
+      vertical-align: middle !important;
+    }
+    tbody tr:nth-child(even) td { background: #f8f9fc !important; }
+
+    /* 카드 스타일 제거 */
+    .card, .stat-card {
+      box-shadow: none !important;
+      border: 0.5pt solid #ddd !important;
+    }
+
+    /* 인쇄 페이지 설정 */
+    @page {
+      size: A4 landscape;
+      margin: 12mm 8mm;
+    }
+
+    /* 페이지 나눔: 행 중간에 끊기지 않도록 */
+    tbody tr { page-break-inside: avoid; }
+    thead { display: table-header-group; }
+
+    /* 배지 색상 유지 */
+    .badge { border: 0.5pt solid #999 !important; }
+    .badge-amber { background: #fef3c7 !important; color: #92400e !important; }
+    .badge-blue  { background: #eff6ff !important; color: #1d4ed8 !important; }
+    .badge-purple{ background: #f5f3ff !important; color: #6d28d9 !important; }
+    .badge-red   { background: #fef2f2 !important; color: #b91c1c !important; }
+    .badge-teal  { background: #f0fdf4 !important; color: #065f46 !important; }
+
+    /* 통계 그리드 숨김 (필요시 주석 해제) */
+    .stats-grid { display: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -931,7 +1035,7 @@
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
           <div>
             <div class="page-title">🧱 층별 구조 분석</div>
-            <div class="page-subtitle">서해테크 기준 — 일신케미칼 참고 병행 표시 | Update: 2026.06.24</div>
+            <div class="page-subtitle">서해테크 기준 | Update: 2026.06.24</div>
           </div>
           <div style="display:flex; gap:10px;">
             <button class="btn btn-secondary btn-sm" onclick="openModal('modal-history-add')">📝 변경이력 추가</button>
@@ -942,7 +1046,7 @@
 
       <div class="tabs">
         <div class="tab active" onclick="switchTab(this,'layer-sht')">🏭 서해테크 <span style="font-size:11px; opacity:0.75;">(26종)</span></div>
-        <div class="tab" onclick="switchTab(this,'layer-isk')">📋 일신케미칼 참고 <span style="font-size:11px; opacity:0.75;">(23종)</span></div>
+        <div class="tab" onclick="switchTab(this,'layer-isk')">📋 일신케미칼 <span style="font-size:11px; opacity:0.75;">(23종)</span></div>
         <div class="tab" onclick="switchTab(this,'layer-all')">전체 목록</div>
         <div class="tab" onclick="switchTab(this,'layer-detail')">구조 시각화</div>
       </div>
@@ -990,7 +1094,7 @@
       <!-- ===== Tab: 일신케미칼 (참고) ===== -->
       <div id="layer-isk" class="tab-content" style="display:none;">
         <div style="padding:8px 14px; background:#fffbeb; border:1px solid #fde68a; border-radius:8px; margin-bottom:1rem; font-size:13px; color:#b45309;">
-          ⚠️ 일신케미칼 데이터는 참고용입니다. 서해테크가 기준 거래처입니다.
+          📋 일신케미칼 층별구조 데이터입니다.
         </div>
         <div style="display:flex; gap:10px; margin-bottom:1rem;">
           <div class="search-bar">
@@ -2435,11 +2539,11 @@ const layerData = [
   {no:15,co:'서해테크',type:'일반', struct:'3/0.4',   setT:3.17, topT:0.4, topP:30,topF:0,   printT:0.07,printP:8,  midT:0.8, midP:40, midF:340, gfT:0,   gfP:0,    gfF:0,  mid2T:0.9, mid2P:40, mid2F:340, mid3T:0,  mid3P:0, mid3F:0, baseT:1,   baseP:24, baseF:60,  formT:0, pvc:65.47, dotp:19.05, filler:78.88, density:1.7125},
   {no:16,co:'서해테크',type:'일반', struct:'3/0.5',   setT:3.27, topT:0.5, topP:35,topF:0,   printT:0.07,printP:8,  midT:0.8, midP:40, midF:340, gfT:0,   gfP:0,    gfF:0,  mid2T:0.8, mid2P:40, mid2F:340, mid3T:0,  mid3P:0, mid3F:0, baseT:1.1, baseP:24, baseF:60,  formT:0, pvc:70.43, dotp:21.22, filler:76.91, density:1.6781},
   {no:17,co:'서해테크',type:'일반', struct:'5/0.5',   setT:5.17, topT:0.5, topP:35,topF:0,   printT:0.07,printP:8,  midT:1.2, midP:40, midF:330, gfT:0,   gfP:0,    gfF:0,  mid2T:1.2, mid2P:40, mid2F:330, mid3T:1.2,mid3P:40,mid3F:330,baseT:1,   baseP:33, baseF:80,  formT:0, pvc:86.11, dotp:30.73, filler:149.65,density:1.7971},
-  {no:18,co:'서해테크',type:'PE',   struct:'2/0.1',   setT:2.17, topT:0.1, topP:20,topF:0,   printT:0.07,printP:8,  midT:1,   midP:25, midF:150, gfT:0,   gfP:0,    gfF:0,  mid2T:0,   mid2P:0,  mid2F:0,   mid3T:0,  mid3P:0, mid3F:0, baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:26.38, dotp:5.81,  filler:28.12, density:1.7139, note:'Foam 정보없음'},
-  {no:19,co:'서해테크',type:'PE',   struct:'2/0.3',   setT:2.29, topT:0.3, topP:20,topF:0,   printT:0.07,printP:8,  midT:0.8, midP:25, midF:150, gfT:0,   gfP:0,    gfF:0,  mid2T:0.12,mid2P:20, mid2F:20,  mid3T:0,  mid3P:0, mid3F:0, baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:35.64, dotp:7.48,  filler:23.38, density:1.5929, note:'Foam 정보없음'},
-  {no:20,co:'서해테크',type:'PE',   struct:'3.5/0.3', setT:3.77, topT:0.3, topP:16,topF:0,   printT:0.07,printP:8,  midT:1.2, midP:40, midF:340, gfT:0,   gfP:0,    gfF:0,  mid2T:1.2, mid2P:40, mid2F:340, mid3T:0,  mid3P:0, mid3F:0, baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:42.45, dotp:12.71, filler:87.63, density:1.8851, note:'Foam 정보없음'},
+  {no:18,co:'서해테크',type:'PE',   struct:'2/0.1',   setT:2.17, topT:0.1, topP:20,topF:0,   printT:0.07,printP:8,  midT:1,   midP:25, midF:150, gfT:0,   gfP:0,    gfF:0,  mid2T:0,   mid2P:0,  mid2F:0,   mid3T:0,  mid3P:0, mid3F:0, baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:26.38, dotp:5.81,  filler:28.12, density:1.7139, note:''},
+  {no:19,co:'서해테크',type:'PE',   struct:'2/0.3',   setT:2.29, topT:0.3, topP:20,topF:0,   printT:0.07,printP:8,  midT:0.8, midP:25, midF:150, gfT:0,   gfP:0,    gfF:0,  mid2T:0.12,mid2P:20, mid2F:20,  mid3T:0,  mid3P:0, mid3F:0, baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:35.64, dotp:7.48,  filler:23.38, density:1.5929, note:''},
+  {no:20,co:'서해테크',type:'PE',   struct:'3.5/0.3', setT:3.77, topT:0.3, topP:16,topF:0,   printT:0.07,printP:8,  midT:1.2, midP:40, midF:340, gfT:0,   gfP:0,    gfF:0,  mid2T:1.2, mid2P:40, mid2F:340, mid3T:0,  mid3P:0, mid3F:0, baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:42.45, dotp:12.71, filler:87.63, density:1.8851, note:''},
   {no:21,co:'서해테크',type:'PE',   struct:'5/0.5',   setT:5.37, topT:0.5, topP:24,topF:0,   printT:0.07,printP:8,  midT:1.25,midP:55, midF:410, gfT:0,   gfP:0,    gfF:0,  mid2T:1.25,mid2P:55, mid2F:410, mid3T:1.3,mid3P:55,mid3F:450,baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:58.01, dotp:23.89, filler:143.36,density:1.8944},
-  {no:22,co:'서해테크',type:'PE',   struct:'5/0.7',   setT:5.22, topT:0.7, topP:35,topF:0,   printT:0.07,printP:8,  midT:1.05,midP:48, midF:380, gfT:0,   gfP:0,    gfF:0,  mid2T:1.2, mid2P:48, mid2F:380, mid3T:1.2,mid3P:48,mid3F:380,baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:63.75, dotp:25.79, filler:127.99,density:1.8241, note:'Foam 정보없음'},
+  {no:22,co:'서해테크',type:'PE',   struct:'5/0.7',   setT:5.22, topT:0.7, topP:35,topF:0,   printT:0.07,printP:8,  midT:1.05,midP:48, midF:380, gfT:0,   gfP:0,    gfF:0,  mid2T:1.2, mid2P:48, mid2F:380, mid3T:1.2,mid3P:48,mid3F:380,baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:63.75, dotp:25.79, filler:127.99,density:1.8241, note:''},
   {no:23,co:'서해테크',type:'일반', struct:'4.5/0.5', setT:4.67, topT:0.5, topP:30,topF:0,   printT:0.07,printP:8,  midT:0.8, midP:33, midF:250, gfT:0.3, gfP:80,   gfF:80, mid2T:1,   mid2P:55, mid2F:410, mid3T:1,  mid3P:55,mid3F:410,baseT:1,   baseP:42, baseF:200, formT:0, pvc:73.20, dotp:30.89, filler:136.63,density:1.7909},
   {no:24,co:'서해테크',type:'HARD', struct:'4.5/0.5', setT:4.72, topT:0.5, topP:35,topF:0,   printT:0.07,printP:8,  midT:1,   midP:33, midF:250, gfT:0.3, gfP:80,   gfF:80, mid2T:0.9, mid2P:40, mid2F:300, mid3T:0.9,mid3P:40,mid3F:300,baseT:1,   baseP:42, baseF:200, formT:0, pvc:78.00, dotp:30.91, filler:131.81,density:1.7690},
   {no:25,co:'서해테크',type:'일반', struct:'5/0.5',   setT:5.22, topT:0.5, topP:35,topF:0,   printT:0.07,printP:8,  midT:1,   midP:55, midF:380, gfT:0.3, gfP:80,   gfF:80, mid2T:1,   mid2P:55, mid2F:380, mid3T:1.3,mid3P:55,mid3F:380,baseT:1,   baseP:40, baseF:180, formT:0, pvc:76.28, dotp:35.64, filler:154.57,density:1.7994},
@@ -3531,40 +3635,40 @@ function renderPhrTable() {
 
 
 const RAW_MATERIALS = [
-  {id:'PVC',       name:'PVC',              price:1000, density:1.4,  note:'기준재'},
-  {id:'DOTP',      name:'DOTP (가소제)',     price:1200, density:1.0,  note:'구 DOP'},
-  {id:'경탄',      name:'경탄 (FILLER)',     price:40,   density:2.5,  note:'Calcium Carbonate'},
-  {id:'안정제',    name:'안정제 (DS352)',    price:1500, density:1.0,  note:'Solid'},
-  {id:'액상안정제', name:'액상안정제',        price:3000, density:1.0,  note:'Liquid'},
-  {id:'안료',      name:'안료 (Black 901)',  price:1700, density:1.0,  note:''},
-  {id:'특A급',     name:'특A급 (재생가루)',  price:320,  density:1.65, note:'Recycled 1.65'},
-  {id:'재벌',      name:'재벌 (Chip)',       price:0,    density:1.55, note:'투입량 직접입력'},
-  {id:'PVC샤시',   name:'PVC 샤시',          price:1000, density:1.4,  note:'PVC100/DOP3'},
-  {id:'붕산아연',  name:'붕산아연',           price:620,  density:1.0,  note:''},
-  {id:'송진',      name:'송진',              price:3200, density:1.0,  note:''},
-  {id:'인쇄지',    name:'인쇄지',            price:600,  density:1.0,  note:'per sheet'},
+  {id:'PVC',           name:'PVC',              price:1820, density:1.4,  note:'기준재'},
+  {id:'DOTP',          name:'DOTP (가소제)',     price:2570, density:1.0,  note:'구 DOP'},
+  {id:'경탄',          name:'FILLER',           price:50,   density:2.5,  note:'CaCO3'},
+  {id:'안정제',        name:'안정제',            price:2100, density:1.0,  note:'Solid'},
+  {id:'액상안정제',    name:'액상안정제',        price:3000, density:1.0,  note:'Liquid'},
+  {id:'SCRAP1.80',     name:'SCRAP가루 1.80',   price:290,  density:1.80, note:'PVC0 / DOTP35 / FILLER180 (마명1.80)', pvc:0, dotp:35, filler:180},
+  {id:'SCRAP1.65',     name:'SCRAP가루 1.65',   price:280,  density:1.65, note:'PVC100 / DOTP42 / FILLER120 (마명1.65)', pvc:100, dotp:42, filler:120},
+  {id:'재벌',          name:'재벌 (Chip)',       price:300,  density:1.55, note:'투입량 직접입력'},
+  {id:'PVC샤시',       name:'PVC 샤시',          price:930,  density:1.4,  note:'PVC100/DOTP3', pvc:100, dotp:3, filler:0},
+  {id:'붕산아연',      name:'붕산아연',          price:3900, density:1.0,  note:''},
+  {id:'인쇄지',        name:'인쇄지',           price:810,  density:1.0,  note:'per sheet'},
+  {id:'수산화마그네슘',name:'수산화마그네슘',    price:900,  density:2.4,  note:'Mg(OH)₂'},
 ];
 
 // 배합 프리셋 (엑셀 기준)
 const FORMULA_PRESETS = [
   {id:'wear_35', name:'WEAR LAYER (DOTP 35)', type:'WEAR', color:'#bfdbfe', textColor:'#1e40af',
    desc:'투명층 — DOTP 35 / 비중 1.27',
-   items:[{mat:'PVC',phr:100,note:'기준'},{mat:'DOTP',phr:35,note:'가소제'},{mat:'경탄',phr:0,note:''},{mat:'안정제',phr:4,note:'DS352'},{mat:'안료',phr:0.007,note:''}]},
+   items:[{mat:'PVC',phr:100,note:'기준'},{mat:'DOTP',phr:35,note:'가소제'},{mat:'경탄',phr:0,note:''},{mat:'안정제',phr:4,note:''}]},
   {id:'wear_25', name:'WEAR LAYER (DOTP 25)', type:'WEAR', color:'#bfdbfe', textColor:'#1e40af',
    desc:'투명층 HARD — DOTP 25 / 비중 1.30',
-   items:[{mat:'PVC',phr:100,note:'기준'},{mat:'DOTP',phr:25,note:'가소제'},{mat:'경탄',phr:0,note:''},{mat:'안정제',phr:4,note:'DS352'},{mat:'안료',phr:0.007,note:''}]},
-  {id:'base1_1.65', name:'BASE-1 (1.65 재생)', type:'BASE', color:'#d1fae5', textColor:'#065f46',
-   desc:'중지1 — 재생 1.65 / DOTP 25 / 경탄 216',
-   items:[{mat:'PVC',phr:57,note:''},{mat:'DOTP',phr:25,note:'가소제'},{mat:'경탄',phr:216,note:'FILLER'},{mat:'안정제',phr:2.3,note:''},{mat:'안료',phr:0.25,note:''}]},
+   items:[{mat:'PVC',phr:100,note:'기준'},{mat:'DOTP',phr:25,note:'가소제'},{mat:'경탄',phr:0,note:''},{mat:'안정제',phr:4,note:''}]},
+  {id:'base1_scrap', name:'BASE (SCRAP 1.80)', type:'BASE', color:'#d1fae5', textColor:'#065f46',
+   desc:'중지 — SCRAP1.80 + FILLER 추가 배합',
+   items:[{mat:'SCRAP1.80',phr:100,note:'PVC100/D35/F180'},{mat:'DOTP',phr:0,note:''},{mat:'경탄',phr:0,note:''},{mat:'안정제',phr:2,note:''}]},
   {id:'incal_38', name:'IN-CAL (DOTP 38)', type:'BASE', color:'#d1fae5', textColor:'#065f46',
    desc:'중지2/CAL — PVC 126 / DOTP 38 / FILLER 100',
-   items:[{mat:'PVC',phr:126,note:''},{mat:'DOTP',phr:38,note:'가소제'},{mat:'경탄',phr:100,note:'FILLER'},{mat:'안정제',phr:5,note:''},{mat:'안료',phr:0.25,note:''}]},
+   items:[{mat:'PVC',phr:126,note:''},{mat:'DOTP',phr:38,note:'가소제'},{mat:'경탄',phr:100,note:'FILLER'},{mat:'안정제',phr:5,note:''}]},
   {id:'balance_38', name:'BALANCE LAYER (DOTP 38)', type:'BALANCE', color:'#f1f5f9', textColor:'#334155',
    desc:'하지 Balance — PVC 126 / DOTP 38 / FILLER 100',
-   items:[{mat:'PVC',phr:126,note:''},{mat:'DOTP',phr:38,note:'가소제'},{mat:'경탄',phr:100,note:'FILLER'},{mat:'안정제',phr:5,note:''},{mat:'안료',phr:0.25,note:''}]},
+   items:[{mat:'PVC',phr:126,note:''},{mat:'DOTP',phr:38,note:'가소제'},{mat:'경탄',phr:100,note:'FILLER'},{mat:'안정제',phr:5,note:''}]},
   {id:'base2_high', name:'BASE-2 고충진 (FILLER 224)', type:'BASE', color:'#ede9fe', textColor:'#5b21b6',
    desc:'중지 고충진 — DOTP 35 / FILLER 224',
-   items:[{mat:'PVC',phr:100,note:''},{mat:'DOTP',phr:35.51,note:'가소제'},{mat:'경탄',phr:224,note:'FILLER'},{mat:'안정제',phr:0,note:''}]},
+   items:[{mat:'PVC',phr:100,note:''},{mat:'DOTP',phr:35.51,note:'가소제'},{mat:'경탄',phr:224,note:'FILLER'}]},
 ];
 
 // ============================================================
@@ -3582,17 +3686,46 @@ const LAYER_TYPES = [
 
 function getMatInfo(id){ return RAW_MATERIALS.find(r=>r.id===id)||{price:0,density:1.0,note:''}; }
 
-function calcLayerDensity(items) {
-  const pvcE = items.find(x=>x.mat==='PVC');
-  if(!pvcE||pvcE.phr===0) return 0;
-  const sc = 100/pvcE.phr;
-  let sp=0,sv=0;
-  items.forEach(it=>{
-    const m=getMatInfo(it.mat);
-    const ph=it.phr*sc;
-    sp+=ph; sv+=m.density>0?ph/m.density:0;
+// SCRAP처럼 내부 PHR이 있는 원자재를 실제 성분(PVC/DOTP/FILLER)으로 전개
+function expandItems(items) {
+  const result = [];
+  items.forEach(it => {
+    const m = getMatInfo(it.mat);
+    if (m.pvc !== undefined && it.phr > 0) {
+      // SCRAP 내부 성분 비율로 전개 (엑셀 마명1.80 기준: PVC=0, DOTP=35, FILLER=180)
+      const total = m.pvc + m.dotp + m.filler;
+      if (total === 0) return;
+      const scale = it.phr / total;
+      if (m.pvc > 0) {
+        // PVC가 있는 경우: 그대로 비율 전개
+        result.push({mat:'PVC',  phr: m.pvc   * scale, density: 1.4});
+      } else {
+        // PVC=0인 SCRAP(마명1.80): 총합을 PVC=100 기준으로 환산하여 추가
+        result.push({mat:'PVC',  phr: it.phr * (100/total), density: 1.4});
+      }
+      result.push({mat:'DOTP',   phr: m.dotp  * scale, density: 1.0});
+      result.push({mat:'경탄',   phr: m.filler * scale, density: 2.5});
+    } else {
+      result.push({mat: it.mat, phr: it.phr, density: m.density || 1.0});
+    }
   });
-  return sv>0?sp/sv:0;
+  return result;
+}
+
+function calcLayerDensity(items) {
+  // SCRAP 등 내부 PHR 전개 후 계산
+  const expanded = expandItems(items);
+  // PVC 합산 (전개 후 여러 PVC가 합산될 수 있음)
+  const totalPVC = expanded.filter(x=>x.mat==='PVC').reduce((a,x)=>a+x.phr, 0);
+  if(totalPVC === 0) return 0;
+  const sc = 100 / totalPVC;
+  let sp=0, sv=0;
+  expanded.forEach(it => {
+    const ph = it.phr * sc;
+    sp += ph;
+    sv += it.density > 0 ? ph / it.density : 0;
+  });
+  return sv > 0 ? sp/sv : 0;
 }
 
 function calcLayerUnitCost(items) {
@@ -3609,18 +3742,18 @@ function buildItemRow(li,ji,it) {
 
   // 원자재별 step / 소수점 자리수 설정
   const MAT_STEP = {
-    'PVC':     {step:'1',    deci:0},
-    'DOTP':    {step:'0.1',  deci:1},
-    '경탄':    {step:'1',    deci:0},
-    '안정제':  {step:'0.01', deci:2},
-    '액상안정제':{step:'0.01',deci:2},
-    '안료':    {step:'0.01', deci:2},
-    '특A급':   {step:'1',    deci:0},
-    '재벌':    {step:'1',    deci:0},
-    'PVC샤시': {step:'1',    deci:0},
-    '붕산아연':{step:'0.1',  deci:1},
-    '송진':    {step:'0.1',  deci:1},
-    '인쇄지':  {step:'1',    deci:0},
+    'PVC':          {step:'1',    deci:0},
+    'DOTP':         {step:'0.1',  deci:1},
+    '경탄':         {step:'1',    deci:0},
+    '안정제':       {step:'0.01', deci:2},
+    '액상안정제':   {step:'0.01', deci:2},
+    'SCRAP1.80':    {step:'1',    deci:0},
+    'SCRAP1.65':    {step:'1',    deci:0},
+    '재벌':         {step:'1',    deci:0},
+    'PVC샤시':      {step:'1',    deci:0},
+    '붕산아연':     {step:'0.1',  deci:1},
+    '인쇄지':       {step:'1',    deci:0},
+    '수산화마그네슘':{step:'1',   deci:0},
   };
   const cfg  = MAT_STEP[it.mat] || {step:'0.1', deci:1};
   const disp = cfg.deci === 0 ? Math.round(it.phr) : it.phr.toFixed(cfg.deci);
@@ -3632,32 +3765,69 @@ function buildItemRow(li,ji,it) {
     <div>
       <input type="number" value="${disp}" min="0" step="${cfg.step}"
         style="width:100%;font-size:15px;font-weight:800;text-align:center;color:var(--accent2);border:2px solid var(--border2);border-radius:6px;padding:6px 4px;"
-        onchange="formulaLayers[${li}].items[${ji}].phr=+this.value;refreshLayerView(${li});"
-        oninput="formulaLayers[${li}].items[${ji}].phr=+this.value;refreshLayerView(${li});">
+        oninput="formulaLayers[${li}].items[${ji}].phr=+this.value; updateStatsOnly(${li});"
+        onblur="refreshLayerView(${li});">
     </div>
-    <div style="text-align:center;font-size:12.5px;font-weight:600;color:#0369a1;">${pct}%</div>
-    <div style="text-align:center;font-size:12.5px;font-weight:600;color:var(--teal);">${vc}</div>
+    <div style="text-align:center;font-size:12.5px;font-weight:600;color:#0369a1;" id="pct-${li}-${ji}">${pct}%</div>
+    <div style="text-align:center;font-size:12.5px;font-weight:600;color:var(--teal);" id="vc-${li}-${ji}">${vc}</div>
     <button onclick="formulaLayers[${li}].items.splice(${ji},1);refreshLayerView(${li});"
       style="width:26px;height:26px;border:1px solid var(--border2);border-radius:5px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text3);">✕</button>
   </div>`;
 }
 
+// 입력 중: 행은 유지하고 소계와 %만 업데이트 (포커스 유지)
+function updateStatsOnly(li) {
+  const layer = formulaLayers[li];
+  if(!layer) return;
+  const tot  = layer.items.reduce((a,x)=>a+x.phr,0)||1;
+
+  // ★ SCRAP 전개 후 DOTP/FILLER 합산
+  const expanded = expandItems(layer.items);
+  const totalPVC = expanded.filter(x=>x.mat==='PVC').reduce((a,x)=>a+x.phr,0);
+  const sc = totalPVC > 0 ? 100/totalPVC : 1;
+  const dotp = expanded.filter(x=>x.mat==='DOTP').reduce((a,x)=>a+x.phr,0) * sc;
+  const fill = expanded.filter(x=>x.mat==='경탄').reduce((a,x)=>a+x.phr,0) * sc;
+
+  const dens = calcLayerDensity(layer.items);
+  const s = id => document.getElementById(id);
+  if(s(`layer-total-phr-${li}`)) s(`layer-total-phr-${li}`).textContent = tot.toFixed(2);
+  if(s(`layer-dotp-${li}`))      s(`layer-dotp-${li}`).textContent      = dotp.toFixed(2);
+  if(s(`layer-filler-${li}`))    s(`layer-filler-${li}`).textContent    = fill.toFixed(2);
+  if(s(`layer-density-${li}`))   s(`layer-density-${li}`).textContent   = dens>0?dens.toFixed(4):'—';
+  // % 비율과 부피기여 업데이트 (행 innerHTML 변경 없이)
+  layer.items.forEach((it, ji) => {
+    const pEl = s(`pct-${li}-${ji}`);
+    const vEl = s(`vc-${li}-${ji}`);
+    if(pEl) pEl.textContent = (it.phr/tot*100).toFixed(1)+'%';
+    if(vEl) {
+      const m = getMatInfo(it.mat);
+      vEl.textContent = m.density>0?(it.phr/m.density).toFixed(2):'—';
+    }
+  });
+  calcAllLayers();
+}
+
 function refreshLayerView(li) {
   if(li!==activeLayerIdx) return;
   const layer = formulaLayers[li];
-  // 행 갱신
+  // 포커스 잃을 때 행 전체 재렌더
   const c = document.getElementById(`layer-items-${li}`);
   if(c) c.innerHTML = layer.items.map((it,ji)=>buildItemRow(li,ji,it)).join('');
-  // 소계 갱신
+
+  // ★ expandItems 전개 후 소계 계산 (SCRAP/PVC샤시 내부 성분 반영)
   const tot  = layer.items.reduce((a,x)=>a+x.phr,0);
-  const dotp = layer.items.filter(x=>x.mat==='DOTP').reduce((a,x)=>a+x.phr,0);
-  const fill = layer.items.filter(x=>x.mat==='경탄').reduce((a,x)=>a+x.phr,0);
-  const dens = calcLayerDensity(layer.items);
-  const s=id=>document.getElementById(id);
-  if(s(`layer-total-phr-${li}`)) s(`layer-total-phr-${li}`).textContent=tot.toFixed(2);
-  if(s(`layer-dotp-${li}`))      s(`layer-dotp-${li}`).textContent=dotp.toFixed(2);
-  if(s(`layer-filler-${li}`))    s(`layer-filler-${li}`).textContent=fill.toFixed(2);
-  if(s(`layer-density-${li}`))   s(`layer-density-${li}`).textContent=dens>0?dens.toFixed(4):'—';
+  const expanded  = expandItems(layer.items);
+  const totalPVC  = expanded.filter(x=>x.mat==='PVC').reduce((a,x)=>a+x.phr,0);
+  const sc        = totalPVC > 0 ? 100/totalPVC : 1;
+  const dotp      = expanded.filter(x=>x.mat==='DOTP').reduce((a,x)=>a+x.phr,0) * sc;
+  const fill      = expanded.filter(x=>x.mat==='경탄').reduce((a,x)=>a+x.phr,0) * sc;
+  const dens      = calcLayerDensity(layer.items);
+
+  const s = id => document.getElementById(id);
+  if(s(`layer-total-phr-${li}`)) s(`layer-total-phr-${li}`).textContent = tot.toFixed(2);
+  if(s(`layer-dotp-${li}`))      s(`layer-dotp-${li}`).textContent      = dotp.toFixed(2);
+  if(s(`layer-filler-${li}`))    s(`layer-filler-${li}`).textContent    = fill.toFixed(2);
+  if(s(`layer-density-${li}`))   s(`layer-density-${li}`).textContent   = dens>0?dens.toFixed(4):'—';
   calcAllLayers();
 }
 
@@ -3679,9 +3849,14 @@ function buildLayerCard() {
     <div class="card-header" style="background:${ti.color}25; border-bottom:2px solid ${ti.color};">
       <div style="display:flex;align-items:center;gap:10px;flex:1;flex-wrap:wrap;">
         <div style="width:14px;height:14px;border-radius:3px;background:${ti.color};border:2px solid ${ti.text};flex-shrink:0;"></div>
-        <input type="text" value="${layer.name}" id="layer-name-inp"
-          style="font-size:14px;font-weight:700;border:none;background:transparent;color:var(--text);padding:0;min-width:160px;max-width:220px;"
-          onchange="formulaLayers[${activeLayerIdx}].name=this.value;buildLayerTabs();">
+        <div style="display:flex;align-items:center;gap:6px;flex:1;">
+          <span style="font-size:11px;color:var(--text3);white-space:nowrap;">층 이름:</span>
+          <input type="text" value="${layer.name}" id="layer-name-inp"
+            placeholder="층 이름 입력..."
+            style="font-size:15px;font-weight:700;border:1.5px solid ${ti.color};border-radius:7px;background:white;color:var(--text);padding:4px 10px;min-width:180px;max-width:280px;flex:1;"
+            oninput="formulaLayers[${activeLayerIdx}].name=this.value;buildLayerTabs();"
+            onchange="formulaLayers[${activeLayerIdx}].name=this.value;buildLayerTabs();">
+        </div>
         <select onchange="formulaLayers[${activeLayerIdx}].type=this.value;buildLayerCard();buildLayerTabs();"
           style="font-size:12px;border-radius:6px;padding:4px 8px;">
           ${LAYER_TYPES.map(t=>`<option value="${t.type}"${t.type===layer.type?' selected':''}>${t.label}</option>`).join('')}
@@ -3757,10 +3932,15 @@ function calcAllLayers() {
   }
   const rows = formulaLayers.map(layer=>{
     const ti   = LAYER_TYPES.find(t=>t.type===layer.type)||LAYER_TYPES[0];
-    const pvcE = layer.items.find(x=>x.mat==='PVC');
-    const sc   = pvcE&&pvcE.phr>0 ? 100/pvcE.phr : 1;
-    const dotp = (layer.items.find(x=>x.mat==='DOTP')?.phr||0)*sc;
-    const fill = (layer.items.find(x=>x.mat==='경탄')?.phr||0)*sc;
+
+    // ★ SCRAP 등 전개 후 계산
+    const expanded = expandItems(layer.items);
+    const totalPVC = expanded.filter(x=>x.mat==='PVC').reduce((a,x)=>a+x.phr, 0);
+    const sc = totalPVC > 0 ? 100/totalPVC : 1;
+
+    const dotp = expanded.filter(x=>x.mat==='DOTP').reduce((a,x)=>a+x.phr,0) * sc;
+    const fill = expanded.filter(x=>x.mat==='경탄').reduce((a,x)=>a+x.phr,0) * sc;
+
     const dens = calcLayerDensity(layer.items);
     const cost = calcLayerUnitCost(layer.items);
     return {layer,ti,dotp,fill,dens,cost};
@@ -3827,8 +4007,47 @@ function addFormulaLayer(){
   const names=['Wear Layer','Base Layer 1','Glass Fiber','Base Layer 2','Balance Layer'];
   const types=['WEAR','BASE','GF','BASE','BALANCE'];
   const idx=formulaLayers.length;
-  formulaLayers.push({id:Date.now(), name:names[idx]||`Layer ${idx+1}`, type:types[idx]||'BASE',
-    items:[{mat:'PVC',phr:100,note:''},{mat:'DOTP',phr:35,note:'가소제'},{mat:'경탄',phr:100,note:'FILLER'},{mat:'안정제',phr:4,note:''},{mat:'안료',phr:0.25,note:''}]});
+  const type = types[idx]||'BASE';
+  const name = names[idx]||`Layer ${idx+1}`;
+
+  // 층 타입별 기본 원자재 목록
+  const DEFAULT_ITEMS = {
+    'WEAR': [
+      {mat:'PVC',    phr:100, note:''},
+      {mat:'DOTP',   phr:35,  note:'가소제'},
+      {mat:'경탄',   phr:0,   note:''},
+      {mat:'안정제', phr:4,   note:''},
+    ],
+    'BASE': [
+      {mat:'PVC',       phr:0,   note:''},
+      {mat:'DOTP',      phr:0,   note:'가소제'},
+      {mat:'경탄',      phr:0,   note:'FILLER'},
+      {mat:'안정제',    phr:3,   note:''},
+      {mat:'SCRAP1.80', phr:0,   note:'PVC0/D35/F180'},
+      {mat:'SCRAP1.65', phr:0,   note:'PVC100/D42/F120'},
+      {mat:'재벌',      phr:0,   note:''},
+      {mat:'PVC샤시',   phr:0,   note:''},
+    ],
+    'BALANCE': [
+      {mat:'PVC',       phr:0,   note:''},
+      {mat:'DOTP',      phr:0,   note:'가소제'},
+      {mat:'경탄',      phr:0,   note:'FILLER'},
+      {mat:'안정제',    phr:3,   note:''},
+      {mat:'SCRAP1.80', phr:0,   note:'PVC0/D35/F180'},
+      {mat:'SCRAP1.65', phr:0,   note:'PVC100/D42/F120'},
+      {mat:'재벌',      phr:0,   note:''},
+      {mat:'PVC샤시',   phr:0,   note:''},
+    ],
+    'GF': [
+      {mat:'PVC',    phr:100, note:''},
+      {mat:'DOTP',   phr:71.5,note:'가소제'},
+      {mat:'경탄',   phr:70,  note:'FILLER'},
+      {mat:'안정제', phr:4,   note:''},
+    ],
+  };
+
+  const items = (DEFAULT_ITEMS[type] || DEFAULT_ITEMS['BASE']).map(x=>({...x}));
+  formulaLayers.push({id:Date.now(), name, type, items});
   activeLayerIdx=formulaLayers.length-1;
   buildLayerTabs(); buildLayerCard(); calcAllLayers();
 }
