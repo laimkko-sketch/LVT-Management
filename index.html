@@ -4810,27 +4810,54 @@ function saveLayer() {
 // 층별구조 변경점 관리 (4M1E) — 층별구조 연동
 // ============================================================
 let changeMgmtData = (() => {
+  const entries = [];
+
+  // 초기 등록 변경점: No.22 중지1·2·3 배합 및 층별 변경
+  const r22 = layerData.find(x => x.no === 22);
+  if (r22) {
+    const beforeSnap = JSON.parse(JSON.stringify(r22));
+    Object.assign(beforeSnap, {setT:5.22, midT:1.05, midP:48, midF:380, mid2P:48, mid2F:380, mid3P:48, mid3F:380});
+    entries.push({
+      id: 2,
+      date: '2026-07-15',
+      m4: 'Material',
+      struct: '22',
+      structLabel: `No.22 ${formatStruct(r22.struct)}`,
+      before: 'setT: 5.22 / midT: 1.05 / midP: 48 / midF: 380 / mid2P: 48 / mid2F: 380 / mid3P: 48 / mid3F: 380',
+      after: '5.37 / 1.2 / 55 / 410 / 55 / 410 / 55 / 450',
+      beforeSnap,
+      afterSnap: JSON.parse(JSON.stringify(r22)),
+      content: '배합 및 층별 변경',
+      reason: '중지1 1.05 48/380 → 1.20 55/410, 중지2 48/380 → 55/410, 중지3 48/380 → 55/450',
+      person: '',
+      diffs: ['setT: 5.22 → 5.37', 'midT: 1.05 → 1.2', 'midP: 48 → 55', 'midF: 380 → 410', 'mid2P: 48 → 55', 'mid2F: 380 → 410', 'mid3P: 48 → 55', 'mid3F: 380 → 450'],
+    });
+  }
+
   // 초기 등록 변경점: No.21 중지3 두께 1.30 → 1.20 (total 두께조정)
   const r = layerData.find(x => x.no === 21);
-  if (!r) return [];
-  const beforeSnap = JSON.parse(JSON.stringify(r));
-  beforeSnap.setT = 5.37;
-  beforeSnap.mid3T = 1.3;
-  return [{
-    id: 1,
-    date: '2026-07-15',
-    m4: 'Method',
-    struct: '21',
-    structLabel: `No.21 ${formatStruct(r.struct)}`,
-    before: 'setT: 5.37 / mid3T: 1.3',
-    after: '5.27 / 1.2',
-    beforeSnap,
-    afterSnap: JSON.parse(JSON.stringify(r)),
-    content: 'total 두께조정',
-    reason: '중지3 두께 1.30 → 1.20 변경',
-    person: '',
-    diffs: ['setT: 5.37 → 5.27', 'mid3T: 1.3 → 1.2'],
-  }];
+  if (r) {
+    const beforeSnap = JSON.parse(JSON.stringify(r));
+    beforeSnap.setT = 5.37;
+    beforeSnap.mid3T = 1.3;
+    entries.push({
+      id: 1,
+      date: '2026-07-15',
+      m4: 'Method',
+      struct: '21',
+      structLabel: `No.21 ${formatStruct(r.struct)}`,
+      before: 'setT: 5.37 / mid3T: 1.3',
+      after: '5.27 / 1.2',
+      beforeSnap,
+      afterSnap: JSON.parse(JSON.stringify(r)),
+      content: 'total 두께조정',
+      reason: '중지3 두께 1.30 → 1.20 변경',
+      person: '',
+      diffs: ['setT: 5.37 → 5.27', 'mid3T: 1.3 → 1.2'],
+    });
+  }
+
+  return entries;
 })();
 let cmAfterData = {};  // 변경 후 층 데이터 임시 저장 {no, layers:{topT,...}}
 
