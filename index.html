@@ -2691,7 +2691,7 @@ const layerData = [
   {no:18,co:'서해테크',type:'PE',   struct:'2/0.1',   setT:2.17, topT:0.1, topP:20,topF:0,   printT:0.07,printP:8,  midT:1,   midP:25, midF:150, gfT:0,   gfP:0,    gfF:0,  mid2T:0,   mid2P:0,  mid2F:0,   mid3T:0,  mid3P:0, mid3F:0, baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:26.38, dotp:5.81,  filler:28.12, density:1.7139, note:''},
   {no:19,co:'서해테크',type:'PE',   struct:'2/0.3',   setT:2.29, topT:0.3, topP:20,topF:0,   printT:0.07,printP:8,  midT:0.8, midP:25, midF:150, gfT:0,   gfP:0,    gfF:0,  mid2T:0.12,mid2P:20, mid2F:20,  mid3T:0,  mid3P:0, mid3F:0, baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:35.64, dotp:7.48,  filler:23.38, density:1.5929, note:''},
   {no:20,co:'서해테크',type:'PE',   struct:'3.5/0.3', setT:3.77, topT:0.3, topP:16,topF:0,   printT:0.07,printP:8,  midT:1.2, midP:40, midF:340, gfT:0,   gfP:0,    gfF:0,  mid2T:1.2, mid2P:40, mid2F:340, mid3T:0,  mid3P:0, mid3F:0, baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:42.45, dotp:12.71, filler:87.63, density:1.8851, note:''},
-  {no:21,co:'서해테크',type:'PE',   struct:'5/0.5',   setT:5.37, topT:0.5, topP:24,topF:0,   printT:0.07,printP:8,  midT:1.25,midP:55, midF:410, gfT:0,   gfP:0,    gfF:0,  mid2T:1.25,mid2P:55, mid2F:410, mid3T:1.3,mid3P:55,mid3F:450,baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:58.01, dotp:23.89, filler:143.36,density:1.8944},
+  {no:21,co:'서해테크',type:'PE',   struct:'5/0.5',   setT:5.27, topT:0.5, topP:24,topF:0,   printT:0.07,printP:8,  midT:1.25,midP:55, midF:410, gfT:0,   gfP:0,    gfF:0,  mid2T:1.25,mid2P:55, mid2F:410, mid3T:1.2,mid3P:55,mid3F:450,baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:58.01, dotp:23.89, filler:143.36,density:1.8944},
   {no:22,co:'서해테크',type:'PE',   struct:'5/0.7',   setT:5.22, topT:0.7, topP:35,topF:0,   printT:0.07,printP:8,  midT:1.05,midP:48, midF:380, gfT:0,   gfP:0,    gfF:0,  mid2T:1.2, mid2P:48, mid2F:380, mid3T:1.2,mid3P:48,mid3F:380,baseT:0,   baseP:0,  baseF:0,   formT:1, pvc:63.75, dotp:25.79, filler:127.99,density:1.8241, note:''},
   {no:23,co:'서해테크',type:'일반', struct:'4.5/0.5', setT:4.67, topT:0.5, topP:30,topF:0,   printT:0.07,printP:8,  midT:0.8, midP:33, midF:250, gfT:0.3, gfP:80,   gfF:80, mid2T:1,   mid2P:55, mid2F:410, mid3T:1,  mid3P:55,mid3F:410,baseT:1,   baseP:42, baseF:200, formT:0, pvc:73.20, dotp:30.89, filler:136.63,density:1.7909},
   {no:24,co:'서해테크',type:'HARD', struct:'4.5/0.5', setT:4.72, topT:0.5, topP:35,topF:0,   printT:0.07,printP:8,  midT:1,   midP:33, midF:250, gfT:0.3, gfP:80,   gfF:80, mid2T:0.9, mid2P:40, mid2F:300, mid3T:0.9,mid3P:40,mid3F:300,baseT:1,   baseP:42, baseF:200, formT:0, pvc:78.00, dotp:30.91, filler:131.81,density:1.7690},
@@ -2736,6 +2736,7 @@ function showPage(id) {
   // 페이지 전환 시 계산 재실행
   if(id === 'analysis') { calcMain(); calcBI(); calcWeight(); }
   if(id === 'phr-table') { renderPhrTable(); }
+  if(id === 'change-mgmt') { renderChangeMgmt(); }
 }
 
 function switchTab(el, tabId) {
@@ -3628,7 +3629,7 @@ const PHR_DATA = [
   { no:20, type:'PE',   struct:'3.5/0.3',  gf:null,
     m1:[1.20,40,340], m2:[1.20,40,340], m3:null, base:null, density:1.8851 },
   { no:21, type:'PE',   struct:'5/0.5',    gf:null,
-    m1:[1.25,55,410], m2:[1.25,55,410], m3:[1.30,55,450], base:null, density:1.8944 },
+    m1:[1.25,55,410], m2:[1.25,55,410], m3:[1.20,55,450], base:null, density:1.8944 },
   { no:22, type:'PE',   struct:'5/0.7',    gf:null,
     m1:[1.05,48,380], m2:[1.20,48,380], m3:[1.20,48,380], base:null, density:1.8241 },
   { no:23, type:'일반', struct:'4.5/0.5',  gf:'0.30',
@@ -4808,7 +4809,29 @@ function saveLayer() {
 // ============================================================
 // 층별구조 변경점 관리 (4M1E) — 층별구조 연동
 // ============================================================
-let changeMgmtData = [];
+let changeMgmtData = (() => {
+  // 초기 등록 변경점: No.21 중지3 두께 1.30 → 1.20 (total 두께조정)
+  const r = layerData.find(x => x.no === 21);
+  if (!r) return [];
+  const beforeSnap = JSON.parse(JSON.stringify(r));
+  beforeSnap.setT = 5.37;
+  beforeSnap.mid3T = 1.3;
+  return [{
+    id: 1,
+    date: '2026-07-15',
+    m4: 'Method',
+    struct: '21',
+    structLabel: `No.21 ${formatStruct(r.struct)}`,
+    before: 'setT: 5.37 / mid3T: 1.3',
+    after: '5.27 / 1.2',
+    beforeSnap,
+    afterSnap: JSON.parse(JSON.stringify(r)),
+    content: 'total 두께조정',
+    reason: '중지3 두께 1.30 → 1.20 변경',
+    person: '',
+    diffs: ['setT: 5.37 → 5.27', 'mid3T: 1.3 → 1.2'],
+  }];
+})();
 let cmAfterData = {};  // 변경 후 층 데이터 임시 저장 {no, layers:{topT,...}}
 
 const CM_4M_COLOR = {
@@ -5134,6 +5157,7 @@ function initAll() {
   buildFormulaInputs();
   renderPackaging();
   buildPalletSelect();
+  renderChangeMgmt();
   setTimeout(()=>{ calcMain(); calcBI(); calcWeight(); }, 50);
 }
 
