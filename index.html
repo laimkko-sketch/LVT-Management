@@ -2574,6 +2574,12 @@
         <div>
           <div class="timeline" id="history-timeline">
             <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--green);box-shadow:0 0 0 2px var(--green);"></div>
+              <div class="timeline-date">2026.07.16</div>
+              <div class="timeline-title">No.10 (2.5/0.5) 하지 배합 변경</div>
+              <div class="timeline-body">하지 PHR 24/60 → 24/80 (두께 유지). 사유: 원가절감. 비중 1.6266 → 1.6556, DOTP/FILLER 집계값 재계산 반영</div>
+            </div>
+            <div class="timeline-item">
               <div class="timeline-dot"></div>
               <div class="timeline-date">2026.04.13</div>
               <div class="timeline-title">층별구조 분석 업데이트</div>
@@ -2766,7 +2772,7 @@ const layerData = [
   {no:7, co:'서해테크',type:'일반', struct:'2.5/0.07',setT:2.74, topT:0.07,topP:28,topF:0,   printT:0.07,printP:8,  midT:1,   midP:40, midF:340, gfT:0,   gfP:0,    gfF:0,  mid2T:0.8, mid2P:40, mid2F:340, mid3T:0,  mid3P:0, mid3F:0, baseT:0.8, baseP:30, baseF:150, formT:0, pvc:41.00, dotp:13.46, filler:89.52, density:1.8898},
   {no:8, co:'서해테크',type:'일반', struct:'2.5/0.2', setT:2.67, topT:0.2, topP:30,topF:0,   printT:0.07,printP:8,  midT:0.8, midP:40, midF:340, gfT:0,   gfP:0,    gfF:0,  mid2T:0.8, mid2P:40, mid2F:340, mid3T:0,  mid3P:0, mid3F:0, baseT:0.8, baseP:26, baseF:80,  formT:0, pvc:49.25, dotp:14.96, filler:75.63, density:1.7822},
   {no:9, co:'서해테크',type:'일반', struct:'2.5/0.4', setT:2.67, topT:0.4, topP:30,topF:0,   printT:0.07,printP:8,  midT:1.1, midP:40, midF:380, gfT:0,   gfP:0,    gfF:0,  mid2T:0,   mid2P:0,  mid2F:0,   mid3T:0,  mid3P:0, mid3F:0, baseT:1.1, baseP:25, baseF:100, formT:0, pvc:55.31, dotp:15.69, filler:66.64, density:1.7163},
-  {no:10,co:'서해테크',type:'일반', struct:'2.5/0.5', setT:2.67, topT:0.5, topP:35,topF:0,   printT:0.07,printP:8,  midT:1,   midP:40, midF:380, gfT:0,   gfP:0,    gfF:0,  mid2T:0,   mid2P:0,  mid2F:0,   mid3T:0,  mid3P:0, mid3F:0, baseT:1.1, baseP:24, baseF:60,  formT:0, pvc:63.99, dotp:18.55, filler:56.90, density:1.6266},
+  {no:10,co:'서해테크',type:'일반', struct:'2.5/0.5', setT:2.67, topT:0.5, topP:35,topF:0,   printT:0.07,printP:8,  midT:1,   midP:40, midF:380, gfT:0,   gfP:0,    gfF:0,  mid2T:0,   mid2P:0,  mid2F:0,   mid3T:0,  mid3P:0, mid3F:0, baseT:1.1, baseP:24, baseF:80,  formT:0, pvc:63.99, dotp:18.71, filler:63.74, density:1.6556},
   {no:11,co:'서해테크',type:'일반', struct:'3/0.07',  setT:3.14, topT:0.07,topP:28,topF:0,   printT:0.07,printP:8,  midT:1.05,midP:40, midF:340, gfT:0,   gfP:0,    gfF:0,  mid2T:1.05,mid2P:40, mid2F:340, mid3T:0,  mid3P:0, mid3F:0, baseT:0.9, baseP:26, baseF:120, formT:0, pvc:47.57, dotp:14.98, filler:99.31, density:1.8811},
   {no:12,co:'서해테크',type:'일반', struct:'3/0.1',   setT:3.17, topT:0.1, topP:28,topF:0,   printT:0.07,printP:8,  midT:1.1, midP:40, midF:340, gfT:0,   gfP:0,    gfF:0,  mid2T:1,   mid2P:40, mid2F:340, mid3T:0,  mid3P:0, mid3F:0, baseT:0.9, baseP:28, baseF:110, formT:0, pvc:49.41, dotp:15.87, filler:98.12, density:1.8604},
   {no:13,co:'서해테크',type:'일반', struct:'3/0.2',   setT:3.17, topT:0.2, topP:30,topF:0,   printT:0.07,printP:8,  midT:1,   midP:40, midF:340, gfT:0,   gfP:0,    gfF:0,  mid2T:1,   mid2P:40, mid2F:340, mid3T:0,  mid3P:0, mid3F:0, baseT:0.9, baseP:28, baseF:110, formT:0, pvc:52.24, dotp:16.70, filler:94.47, density:1.8290},
@@ -3707,7 +3713,7 @@ const PHR_DATA = [
   { no:9,  type:'일반', struct:'2.5/0.4',  gf:null,
     m1:[1.10,40,380], m2:null, m3:null, base:[1.10,25,100], density:1.7163 },
   { no:10, type:'일반', struct:'2.5/0.5',  gf:null,
-    m1:[1.00,40,380], m2:null, m3:null, base:[1.10,24,60],  density:1.6266 },
+    m1:[1.00,40,380], m2:null, m3:null, base:[1.10,24,80],  density:1.6556 },
   { no:11, type:'일반', struct:'3/0.07',   gf:null,
     m1:[1.05,40,340], m2:[1.05,40,340], m3:null, base:[0.90,26,120], density:1.8811 },
   { no:12, type:'일반', struct:'3/0.1',    gf:null,
@@ -4928,6 +4934,8 @@ let changeMgmtData = (() => {
     };
   };
   return [
+    mk(8, 10, '2026-07-16', 'Material', '하지 FILLER 조정',       '원가절감 (하지 PHR 24/60 → 24/80, 두께 유지)',
+       {baseF:[60,80]}),
     mk(7, 7,  '2026-07-16', 'Material', '중지2 FILLER 조정',      '중지2 FILLER 300 → 340',
        {mid2F:[300,340]}),
     mk(6, 8,  '2026-07-16', 'Material', '중지2 FILLER 조정',      '중지2 FILLER 300 → 340',
