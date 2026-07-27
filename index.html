@@ -2763,9 +2763,9 @@ function formatStruct(s) {
 
 const layerData = [
   // ===== 서해테크 (26종) =====
-  {no:1, co:'서해테크',type:'DIY',  struct:'1.8/0.07',setT:1.94, topT:0.07,topP:28,topF:0,   printT:0.07,printP:8,  midT:1,   midP:40, midF:340, gfT:0,   gfP:0,    gfF:0,  mid2T:0,   mid2P:0,  mid2F:0,   mid3T:0,  mid3P:0, mid3F:0, baseT:0.8, baseP:28, baseF:110, formT:0, pvc:34.23, dotp:10.20, filler:55.57, density:1.8037},
+  {no:1, co:'서해테크',type:'DIY',  struct:'1.8/0.07',setT:1.94, topT:0.07,topP:28,topF:0,   printT:0.07,printP:8,  midT:1,   midP:40, midF:380, gfT:0,   gfP:0,    gfF:0,  mid2T:0,   mid2P:0,  mid2F:0,   mid3T:0,  mid3P:0, mid3F:0, baseT:0.8, baseP:28, baseF:110, formT:0, pvc:34.23, dotp:10.12, filler:58.14, density:1.8197},
   {no:2, co:'서해테크',type:'일반', struct:'2/0.07',  setT:2.14, topT:0.07,topP:28,topF:0,   printT:0.07,printP:8,  midT:1.1, midP:40, midF:380, gfT:0,   gfP:0,    gfF:0,  mid2T:0,   mid2P:0,  mid2F:0,   mid3T:0,  mid3P:0, mid3F:0, baseT:0.9, baseP:27, baseF:130, formT:0, pvc:35.12, dotp:10.29, filler:64.90, density:1.8501},
-  {no:3, co:'서해테크',type:'일반', struct:'2/0.1',   setT:2.17, topT:0.1, topP:28,topF:0,   printT:0.07,printP:8,  midT:1.1, midP:40, midF:340, gfT:0,   gfP:0,    gfF:0,  mid2T:0,   mid2P:0,  mid2F:0,   mid3T:0,  mid3P:0, mid3F:0, baseT:0.9, baseP:29, baseF:130, formT:0, pvc:37.09, dotp:11.31, filler:63.45, density:1.8176},
+  {no:3, co:'서해테크',type:'일반', struct:'2/0.1',   setT:2.17, topT:0.1, topP:28,topF:0,   printT:0.07,printP:8,  midT:1.1, midP:40, midF:380, gfT:0,   gfP:0,    gfF:0,  mid2T:0,   mid2P:0,  mid2F:0,   mid3T:0,  mid3P:0, mid3F:0, baseT:0.9, baseP:29, baseF:130, formT:0, pvc:37.09, dotp:11.23, filler:66.34, density:1.8336},
   {no:4, co:'서해테크',type:'HARD', struct:'2/0.2',   setT:2.07, topT:0.2, topP:30,topF:0,   printT:0.07,printP:8,  midT:1,   midP:33, midF:280, gfT:0,   gfP:0,    gfF:0,  mid2T:0,   mid2P:0,  mid2F:0,   mid3T:0,  mid3P:0, mid3F:0, baseT:0.8, baseP:25, baseF:90,  formT:0, pvc:42.93, dotp:11.56, filler:52.21, density:1.7266},
   {no:5, co:'서해테크',type:'일반', struct:'2/0.2',   setT:2.17, topT:0.2, topP:30,topF:0,   printT:0.07,printP:8,  midT:1,   midP:40, midF:380, gfT:0,   gfP:0,    gfF:0,  mid2T:0,   mid2P:0,  mid2F:0,   mid3T:0,  mid3P:0, mid3F:0, baseT:0.9, baseP:28, baseF:110, formT:0, pvc:40.68, dotp:12.07, filler:59.11, density:1.7681},
   {no:6, co:'서해테크',type:'일반', struct:'2/0.3',   setT:2.17, topT:0.3, topP:30,topF:0,   printT:0.07,printP:8,  midT:0.9, midP:40, midF:380, gfT:0,   gfP:0,    gfF:0,  mid2T:0,   mid2P:0,  mid2F:0,   mid3T:0,  mid3P:0, mid3F:0, baseT:0.9, baseP:25, baseF:100, formT:0, pvc:44.78, dotp:12.56, filler:54.52, density:1.7211},
@@ -3695,11 +3695,11 @@ function calcWeight() {
 // ============================================================
 const PHR_DATA = [
   { no:1,  type:'DIY',  struct:'1.8/0.07', gf:null,
-    m1:[1.00,40,340], m2:null, m3:null, base:[0.80,28,110], density:1.8037 },
+    m1:[1.00,40,380], m2:null, m3:null, base:[0.80,28,110], density:1.8197 },
   { no:2,  type:'일반', struct:'2/0.07',   gf:null,
     m1:[1.10,40,380], m2:null, m3:null, base:[0.90,27,130], density:1.8501 },
   { no:3,  type:'일반', struct:'2/0.1',    gf:null,
-    m1:[1.10,40,340], m2:null, m3:null, base:[0.90,29,130], density:1.8176 },
+    m1:[1.10,40,380], m2:null, m3:null, base:[0.90,29,130], density:1.8336 },
   { no:4,  type:'HARD', struct:'2/0.2',   gf:null,
     m1:[1.00,33,280], m2:null, m3:null, base:[0.80,25,90],  density:1.7266 },
   { no:5,  type:'일반', struct:'2/0.2',    gf:null,
@@ -4934,6 +4934,10 @@ let changeMgmtData = (() => {
     };
   };
   return [
+    mk(10, 1, '2026-07-16', 'Material', '중지1 FILLER 조정',      '중지1 배합 40/340 → 40/380',
+       {midF:[340,380]}),
+    mk(9, 3,  '2026-07-16', 'Material', '중지1 FILLER 조정',      '중지1 배합 40/340 → 40/380',
+       {midF:[340,380]}),
     mk(8, 10, '2026-07-16', 'Material', '하지 FILLER 조정',       '원가절감 (하지 PHR 24/60 → 24/80, 두께 유지)',
        {baseF:[60,80]}),
     mk(7, 7,  '2026-07-16', 'Material', '중지2 FILLER 조정',      '중지2 FILLER 300 → 340',
