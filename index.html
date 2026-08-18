@@ -7401,12 +7401,22 @@ function calcSheet(items){
 }
 
 /* ---------------- 배합표(sheet) 모델 ---------------- */
+const FIXED_MATERIAL_NAMES = ['PVC(원료)','DOTP(가소제)','경탄(CaCO3)','안정제(분말)'];
+function fixedItems(){
+  if(!DB || !DB.materials) return [];
+  return FIXED_MATERIAL_NAMES.map(name=>{
+    const m = DB.materials.find(x=>x.name===name);
+    if(!m) return null;
+    return {materialId:m.id, name:m.name, price:m.price, input:0, pinned:true,
+      recipe:{pvc:m.pvc,dop:m.dop,filler:m.filler,znb:m.znb,mgoh:m.mgoh,stab:m.stab,pig:m.pig}};
+  }).filter(Boolean);
+}
 function newSheet(){
   return {id:uid(), no:null, regNo:null, machine:'', phrLabel:'', writeDate:todayStr(),
-    manager:'', distributor:'', gubun:'', note:'', items:[],
+    manager:'', distributor:'', gubun:'', note:'', items:fixedItems(),
     status:'draft', distributedAt:null, voidInfo:null};
 }
-let curSheet = newSheet();
+let curSheet;
 
 /* ---------------- 공통 UI ---------------- */
 function toast(msg, kind){
@@ -7507,7 +7517,9 @@ function collectFieldsIntoSheet(){
 }
 function persistDraft(){
   if(curSheet.status!=='draft') return;
-  if(!curSheet.machine && !curSheet.items.length) return;
+  const hasData = curSheet.machine || curSheet.phrLabel || curSheet.gubun || curSheet.manager ||
+    curSheet.distributor || curSheet.note || curSheet.items.some(it=>+it.input>0);
+  if(!hasData) return;
   if(!DB.sheets.find(x=>x.id===curSheet.id)) DB.sheets.push(curSheet);
   save();
 }
@@ -7525,11 +7537,11 @@ function renderItems(){
     const amt = (+it.input||0)*(+it.price||0);
     const locked = curSheet.status==='distributed';
     html += `<tr>
-      <td>${locked ? esc(it.name) : `<select class="inline-input" onchange="FM._pickMaterial(${i},this.value)">${materialOptions(it.materialId)}</select>`}</td>
+      <td>${locked ? esc(it.name) : `<select class="inline-input" onchange="FM._pickMaterial(${i},this.value)">${materialOptions(it.materialId)}</select>`}${it.pinned?' <span class="pill gray sm" style="margin-left:4px">기본</span>':''}</td>
       <td>${locked ? fmtN(it.input) : `<input type="number" step="0.01" class="inline-input" style="width:100px" value="${it.input}" oninput="FM._setItemField(${i},'input',this.value)">`}</td>
       <td>${locked ? fmtN(it.price) : `<input type="number" class="inline-input" style="width:100px" value="${it.price}" oninput="FM._setItemField(${i},'price',this.value)">`}</td>
       <td class="num" id="fm-item-amt-${i}">${fmtN(Math.round(amt))}</td>
-      <td>${locked ? '' : `<button class="pbtn sm danger-ghost" onclick="FM._removeItem(${i})">삭제</button>`}</td>
+      <td>${(locked || it.pinned) ? '' : `<button class="pbtn sm danger-ghost" onclick="FM._removeItem(${i})">삭제</button>`}</td>
     </tr>`;
   });
   html += `</tbody>`;
@@ -7836,6 +7848,7 @@ $('fm-btn-ledger-print').addEventListener('click', ()=>{
 
 /* ---------------- 초기화 & 노출 ---------------- */
 load();
+curSheet = newSheet();
 loadEditor(curSheet);
 refreshLoadSelect();
 
