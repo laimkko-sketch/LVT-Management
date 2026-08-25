@@ -10724,9 +10724,32 @@ const sb = (window.supabase && window.supabase.createClient)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
   : null;   // CDN 로드 실패 시 null
 
+/* 불러오기 실패 안내 —
+   페이지를 열자마자 alert 이 뜨면 사이트 전체가 멈춰 확인을 누를 때까지 아무것도 못 한다.
+   그래서 조회 실패는 팝업 대신 화면 안 배너로만 알린다.
+   (저장·삭제 실패는 사용자가 방금 누른 동작이라 alert 을 그대로 둔다) */
+let qcLoadError = null;
+function qcNotice(msg){
+  let el = QCROOT.querySelector('#qc-notice');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'qc-notice';
+    el.style.cssText = 'margin:10px 0 0;padding:11px 15px;border-radius:9px;background:#fef3c7;'
+      + 'border:1px solid #fcd34d;color:#92400e;font-size:12.5px;line-height:1.7';
+    const hdr = QCROOT.querySelector('.app-hdr');
+    if(hdr) hdr.insertAdjacentElement('afterend', el); else QCROOT.prepend(el);
+  }
+  el.innerHTML = msg;
+  el.style.display = '';
+}
+function qcNoticeClear(){
+  const el = QCROOT.querySelector('#qc-notice');
+  if(el) el.style.display = 'none';
+}
+
 async function dbLoadInspections(){
   const {data,error}=await sb.from('inspections').select('data').order('created_at',{ascending:true});
-  if(error){ console.error(error); alert('검사 데이터를 불러오지 못했습니다: '+error.message); return []; }
+  if(error){ console.error(error); qcLoadError = error.message; return []; }
   return (data||[]).map(r=>r.data);
 }
 async function dbUpsertInspection(rec){
@@ -10739,7 +10762,7 @@ async function dbDeleteInspection(id){
 }
 async function dbLoadHL(){
   const {data,error}=await sb.from('heat_length_records').select('data').order('created_at',{ascending:true});
-  if(error){ console.error(error); alert('가열길이 데이터를 불러오지 못했습니다: '+error.message); return []; }
+  if(error){ console.error(error); qcLoadError = error.message; return []; }
   return (data||[]).map(r=>r.data);
 }
 async function dbUpsertHL(rec){
@@ -12968,10 +12991,23 @@ async function bootstrapFromDB(){
   loading.style.cssText='position:fixed;top:0;left:0;right:0;padding:8px;background:#1a3a5c;color:#fff;text-align:center;font-size:13px;z-index:9999';
   loading.textContent='☁️ 클라우드 데이터 불러오는 중...';
   document.body.appendChild(loading);
+  qcLoadError = null;
   try{
     [RECORDS, HL_RECORDS] = await Promise.all([dbLoadInspections(), dbLoadHL()]);
+  }catch(e){
+    console.error(e);
+    qcLoadError = (e && e.message) ? e.message : String(e);
   }finally{
     loading.remove();
+  }
+  if(qcLoadError){
+    qcNotice('☁️ <b>클라우드 데이터를 불러오지 못했습니다.</b> 아래 화면은 빈 상태로 표시됩니다.'
+      + '<br><span style="color:#a16207">사유: ' + String(qcLoadError).replace(/</g,'&lt;') + '</span>'
+      + '<br>인터넷 연결을 확인해 주세요. 계속 같은 증상이면 검사 데이터 서버(Supabase)가 중지된 상태일 수 있습니다.'
+      + ' <button onclick="QC.retryLoad()" style="margin-left:6px;padding:4px 12px;border:1px solid #d97706;'
+      + 'background:#fff;color:#92400e;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer">다시 시도</button>');
+  } else {
+    qcNoticeClear();
   }
   renderDash();
 }
@@ -13894,7 +13930,16 @@ window.QC = {
   onShow(){
     if(qcReady) return;
     qcReady = true;
-    if(!sb){ alert('품질관리 DB(Supabase) 스크립트를 불러오지 못했습니다. 인터넷 연결을 확인하세요.'); return; }
+    if(!sb){
+      qcNotice('☁️ <b>검사 데이터 서버에 연결하지 못했습니다.</b> 연결 스크립트를 불러오지 못했습니다.'
+        + '<br>인터넷 연결을 확인한 뒤 페이지를 새로고침해 주세요.');
+      return;
+    }
+    bootstrapFromDB();
+  },
+  // 배너의 "다시 시도" 버튼
+  retryLoad(){
+    if(!sb){ location.reload(); return; }
     bootstrapFromDB();
   },
   gp,
