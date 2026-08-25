@@ -857,8 +857,12 @@
     .page { display: none !important; }
     .page.active { display: block !important; }
 
-    /* 층별구조 탭 콘텐츠: 현재 활성 탭만 인쇄 */
+    /* 층별구조 탭 콘텐츠: 현재 활성 탭만 인쇄
+       (markPrintTabs()가 인쇄 직전 실제 표시 상태를 보고 print-visible을 붙인다.
+        각 페이지의 첫 탭은 인라인 style이 없어 style 속성 선택자로는 잡히지 않으므로
+        속성 매칭에 의존하면 안 된다.) */
     .tab-content { display: none !important; }
+    .tab-content.print-visible,
     .tab-content[style*="display:block"],
     .tab-content[style*="display: block"] { display: block !important; }
 
@@ -3809,6 +3813,7 @@ function showPage(id) {
   if(id === 'change-mgmt') { renderChangeMgmt(); }
   if(id && id.indexOf('pm-') === 0 && window.PM) PM.onShow(id);
   if(id && id.indexOf('fm-') === 0 && window.FM) FM.onShow(id);
+  markPrintTabs();
 }
 
 function switchTab(el, tabId) {
@@ -3826,7 +3831,19 @@ function switchTab(el, tabId) {
   if(tabId === 'form-calc') { buildLayerTabs(); buildLayerCard(); calcAllLayers(); }
   if(tabId === 'form-list') { buildFormulaPresets(); }
   if(tabId === 'form-raw')  { buildRawPriceTable(); }
+  markPrintTabs();
 }
+
+// 인쇄 대상 탭 표시.
+// 탭 전환은 전부 인라인 style로 처리되므로 인라인 값만 본다.
+// 각 페이지의 첫 탭은 인라인 style이 없는 상태(=기본 표시)이므로 'none이 아니면 표시'로 판정한다.
+// getComputedStyle을 쓰면 인쇄 CSS가 이미 적용된 시점에 호출될 경우 전부 none으로 읽혀 오판한다.
+function markPrintTabs() {
+  document.querySelectorAll('.tab-content').forEach(c=>{
+    c.classList.toggle('print-visible', c.style.display !== 'none');
+  });
+}
+window.addEventListener('beforeprint', markPrintTabs);
 
 // ============================================================
 // MODALS
@@ -6253,6 +6270,7 @@ function initAll() {
   renderPackaging();
   buildPalletSelect();
   renderChangeMgmt();
+  markPrintTabs();
   setTimeout(()=>{ calcMain(); calcBI(); calcWeight(); }, 50);
 }
 
