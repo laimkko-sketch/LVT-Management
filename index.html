@@ -4258,9 +4258,19 @@
               <input type="date" id="ht" onchange="QC.renderHist()" style="width:135px">
               <button class="btn bg bs" onclick="QC.clearHF()">초기화</button>
             </div>
+            <div class="fbar" style="margin-top:9px;align-items:center">
+              <span style="font-size:12px;color:var(--t2);font-weight:700">보기</span>
+              <div class="sb sl" id="hv-sheet" onclick="QC.setHistView('sheet')">📄 시트별</div>
+              <div class="sb"    id="hv-meas"  onclick="QC.setHistView('meas')">📊 측정별 누적</div>
+              <div class="sb"    id="hv-hl"    onclick="QC.setHistView('hl')">🌡️ 가열 길이변화율</div>
+              <span style="flex:1"></span>
+              <button class="btn bg bs no-print" onclick="QC.exportHistView()">⬇ 보이는 표 내보내기</button>
+            </div>
           </div>
         </div>
-        <div class="card">
+
+        <!-- 시트별 (한 줄 = 검사 시트 1건) -->
+        <div class="card" id="hist-wrap-sheet">
           <div class="ch"><span class="ct" id="hist-cnt">총 0건</span></div>
           <div style="overflow-x:auto">
             <table class="dt"><thead><tr>
@@ -4268,6 +4278,36 @@
               <th>두께 M1</th><th>직각도 M1</th><th>UV M1</th><th>중량 X̄</th>
               <th>작성자</th><th>판정</th><th>작업</th>
             </tr></thead><tbody id="hist-tbody"></tbody></table>
+          </div>
+        </div>
+
+        <!-- 측정별 누적 (한 줄 = 측정 1개) -->
+        <div class="card" id="hist-wrap-meas" style="display:none">
+          <div class="ch">
+            <span class="ct" id="hist-meas-cnt">총 0행</span>
+            <span style="font-size:11.5px;color:var(--t3);margin-left:8px">
+              검사 시트를 측정 단위로 펼친 표입니다 — 헤더를 누르면 정렬됩니다</span>
+          </div>
+          <div style="overflow-x:auto;max-height:70vh">
+            <table class="dt" id="hist-meas-tbl">
+              <thead><tr id="hist-meas-head"></tr></thead>
+              <tbody id="hist-meas-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 가열 길이변화율 (한 줄 = 시험 1건) -->
+        <div class="card" id="hist-wrap-hl" style="display:none">
+          <div class="ch">
+            <span class="ct" id="hist-hl-cnt">총 0행</span>
+            <span style="font-size:11.5px;color:var(--t3);margin-left:8px">
+              가열 길이변화율 시험 이력입니다 — 헤더를 누르면 정렬됩니다</span>
+          </div>
+          <div style="overflow-x:auto;max-height:70vh">
+            <table class="dt" id="hist-hl-tbl">
+              <thead><tr id="hist-hl-head"></tr></thead>
+              <tbody id="hist-hl-tbody"></tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -11610,6 +11650,8 @@ function renderDash(){
 // HISTORY
 // ══════════════════════════════════════════
 function renderHist(){
+  if(HIST_VIEW==='meas'){ renderHistMeas(); return; }
+  if(HIST_VIEW==='hl'){ renderHistHL(); return; }
   const q=(document.getElementById('hs')?.value||'').toLowerCase();
   const jdg=document.getElementById('hj')?.value||'';
   const from=document.getElementById('hf')?.value||'';
@@ -11652,6 +11694,227 @@ function renderHist(){
   }).join('')||'<tr><td colspan="11" style="text-align:center;padding:26px;color:#9e9e9e">결과 없음</td></tr>';
 }
 function clearHF(){['hs','hj','hf','ht'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});renderHist();}
+
+/* ════════════════════════════════════════════════════════
+   이력 조회 — 누적 데이터 보기
+   검사 성적서는 한 장에 측정이 여러 개 들어가 있어서 시트 단위로는
+   통계에 쓰기 어렵다. 여기서는 측정 1개 = 1행으로 펼쳐 놓아
+   정렬·필터·내보내기로 그대로 데이터로 쓸 수 있게 한다.
+   ════════════════════════════════════════════════════════ */
+let HIST_VIEW = 'sheet';
+let HIST_SORT = {key:null, dir:1};
+
+const num = v => (v===null||v===undefined||v===''||isNaN(v)) ? null : Number(v);
+const f3  = v => { const n=num(v); return n===null ? '' : n.toFixed(3); };
+
+// 측정별 누적 — 컬럼 정의 (표와 내보내기가 같은 정의를 쓴다)
+const MEAS_COLS = [
+  {k:'date',   t:'날짜',      w:86},
+  {k:'client', t:'거래처',    w:96, strong:true},
+  {k:'shift',  t:'주야',      w:52},
+  {k:'no',     t:'측정',      w:46, center:true},
+  {k:'mach',   t:'호기',      w:62},
+  {k:'lot',    t:'PO No.',    w:104},
+  {k:'ptn',    t:'PTN',       w:86},
+  {k:'emboss', t:'엠보',      w:80},
+  {k:'spec',   t:'규격',      w:120},
+  {k:'time',   t:'검사시간',  w:70},
+  {k:'worker', t:'담당자',    w:70},
+  {k:'thk',    t:'두께',      w:64, numeric:true},
+  {k:'topT',   t:'투명두께',  w:70, numeric:true},
+  {k:'len',    t:'길이',      w:70, numeric:true},
+  {k:'wid',    t:'너비',      w:70, numeric:true},
+  {k:'sq',     t:'직각도',    w:66, numeric:true},
+  {k:'gap',    t:'개구부',    w:66, numeric:true},
+  {k:'lf',     t:'레이플랫',  w:70, numeric:true},
+  {k:'uv',     t:'UV',        w:60},
+  {k:'ri',     t:'잔류수축',  w:70, numeric:true},
+  {k:'dsl',    t:'치수변화 종', w:82, numeric:true},
+  {k:'dsw',    t:'치수변화 횡', w:82, numeric:true},
+  {k:'curl',   t:'컬',        w:56, numeric:true},
+  {k:'gloss',  t:'광택',      w:70},
+  {k:'w1',     t:'중량1',     w:64, numeric:true},
+  {k:'w2',     t:'중량2',     w:64, numeric:true},
+  {k:'w3',     t:'중량3',     w:64, numeric:true},
+  {k:'wavg',   t:'중량 X̄',   w:70, numeric:true, strong:true},
+  {k:'judge',  t:'판정',      w:62, chip:true},
+  {k:'author', t:'작성자',    w:70},
+];
+
+// 가열 길이변화율 — 컬럼 정의
+const HL_COLS = [
+  {k:'date',    t:'시험일',     w:90},
+  {k:'lot',     t:'Lot No.',    w:110, strong:true},
+  {k:'ptn',     t:'PTN',        w:90},
+  {k:'spec',    t:'규격',       w:130},
+  {k:'std',     t:'기준',       w:90},
+  {k:'lenShr',  t:'종방향 수축률', w:100, numeric:true},
+  {k:'lenJdg',  t:'종 판정',    w:70, chip:true},
+  {k:'widShr',  t:'횡방향 수축률', w:100, numeric:true},
+  {k:'widJdg',  t:'횡 판정',    w:70, chip:true},
+  {k:'link',    t:'연결된 검사', w:120},
+  {k:'author',  t:'작성자',     w:70},
+  {k:'memo',    t:'비고',       w:150},
+];
+
+// 필터(검색·판정·기간) — 시트별 보기와 같은 입력을 쓴다.
+// skipJudge: 측정별 보기에서는 시트 단위가 아니라 측정 단위로 판정을 걸러야 하므로
+//            여기서는 건너뛰고 행을 만든 뒤에 거른다.
+function histFiltered(skipJudge){
+  const q=(document.getElementById('hs')?.value||'').toLowerCase();
+  const jdg=document.getElementById('hj')?.value||'';
+  const from=document.getElementById('hf')?.value||'';
+  const to=document.getElementById('ht')?.value||'';
+  return [...RECORDS].filter(r=>{
+    if(q&&!(r.client+r.date+r.author+((r.cols||[]).map(c=>c.ptn).join(''))).toLowerCase().includes(q))return false;
+    if(!skipJudge && jdg){
+      const oj=r.cols?.every(c=>c.judge==='합격')?'합격':r.cols?.some(c=>c.judge==='불합격')?'불합격':'—';
+      if(oj!==jdg)return false;
+    }
+    if(from&&r.date<from)return false;
+    if(to&&r.date>to)return false;
+    return true;
+  });
+}
+
+// 검사 기록 -> 측정 단위 행 목록
+function measRows(){
+  const jdg=document.getElementById('hj')?.value||'';
+  const rows=[];
+  histFiltered(true).forEach(r=>{
+    (r.cols||[]).forEach((c,i)=>{
+      const v=c.vals||{};
+      const wt=(c.wt||[]).map(num).filter(x=>x!==null);
+      rows.push({
+        _id:r.id,
+        date:r.date||'', client:r.client||'', shift:r.shift||'', no:i+1,
+        mach:c.mach||'', lot:c.lot||'', ptn:c.ptn||'', emboss:c.emboss||'',
+        spec:c.spec||'', time:c.time||'', worker:c.worker||'', author:r.author||'',
+        thk:num(v.t1)??num(c.thk), topT:num(c.topT),
+        len:num(v.lm), wid:num(v.wm), sq:num(v.sq1), gap:num(v.gap), lf:num(v.lf1),
+        uv:v.uv||'', ri:num(v.ri),
+        dsl:num(v['ds-l']), dsw:num(v['ds-w']), curl:num(v['ds-c']),
+        gloss:[v.gl1,v.gl2].filter(x=>x!==null&&x!==undefined&&x!=='').join('/'),
+        w1:wt[0]??null, w2:wt[1]??null, w3:wt[2]??null,
+        wavg:wt.length?wt.reduce((a,b)=>a+b)/wt.length:null,
+        judge:c.judge||'—',
+      });
+    });
+  });
+  return jdg ? rows.filter(r=>r.judge===jdg) : rows;   // 측정 단위 판정 필터
+}
+
+// 가열 길이변화율 기록 -> 행 목록 (검색·기간 필터만 적용)
+function hlRows(){
+  const q=(document.getElementById('hs')?.value||'').toLowerCase();
+  const from=document.getElementById('hf')?.value||'';
+  const to=document.getElementById('ht')?.value||'';
+  const pct = t => { const m=String(t??'').match(/-?\d+(\.\d+)?/); return m?Number(m[0]):null; };
+  return (HL_RECORDS||[]).filter(r=>{
+    if(q&&!((r.lot||'')+(r.ptn||'')+(r.spec||'')+(r.date||'')+(r.author||'')).toLowerCase().includes(q))return false;
+    if(from&&(r.date||'')<from)return false;
+    if(to&&(r.date||'')>to)return false;
+    return true;
+  }).map(r=>{
+    const linked=RECORDS.find(x=>x.id===r.linkRecId);
+    return {
+      _id:r.id,
+      date:r.date||'', lot:r.lot||'', ptn:r.ptn||'', spec:r.spec||'', std:r.std||'',
+      lenShr:pct(r.len?.shrinkage), lenJdg:r.len?.judge||'—',
+      widShr:pct(r.wid?.shrinkage), widJdg:r.wid?.judge||'—',
+      link:linked?`${linked.date} ${linked.client}`:'', author:r.author||'', memo:r.memo||'',
+    };
+  }).filter(r=>{
+    // 판정 필터: 종·횡 중 하나라도 해당하면 표시
+    const jdg=document.getElementById('hj')?.value||'';
+    return !jdg || r.lenJdg===jdg || r.widJdg===jdg;
+  });
+}
+
+function sortRows(rows, cols){
+  if(!HIST_SORT.key) return rows;
+  const col=cols.find(c=>c.k===HIST_SORT.key);
+  const d=HIST_SORT.dir;
+  return [...rows].sort((a,b)=>{
+    const x=a[HIST_SORT.key], y=b[HIST_SORT.key];
+    if(x===null||x===''||x===undefined) return 1;      // 빈 값은 항상 뒤로
+    if(y===null||y===''||y===undefined) return -1;
+    if(col&&col.numeric) return (x-y)*d;
+    return String(x).localeCompare(String(y),'ko')*d;
+  });
+}
+
+function histHeadHTML(cols){
+  return cols.map(c=>{
+    const on=HIST_SORT.key===c.k;
+    const arrow=on?(HIST_SORT.dir>0?' ▲':' ▼'):'';
+    return `<th style="min-width:${c.w}px;cursor:pointer;white-space:nowrap;${on?'color:#fff;background:#0d47a1':''}"
+      onclick="QC.sortHist('${c.k}')" title="정렬">${c.t}${arrow}</th>`;
+  }).join('');
+}
+
+function histBodyHTML(rows, cols, onclickAttr){
+  if(!rows.length)
+    return `<tr><td colspan="${cols.length}" style="text-align:center;padding:26px;color:#9e9e9e">결과 없음</td></tr>`;
+  return rows.map(r=>`<tr ${onclickAttr?onclickAttr(r):''}>` + cols.map(c=>{
+    let v=r[c.k];
+    if(c.numeric) v = (v===null||v===undefined) ? '' : (Math.abs(v)>=1000?v.toLocaleString():f3(v));
+    v = (v===null||v===undefined||v==='') ? '<span style="color:#c5cbd3">-</span>' : v;
+    if(c.chip){
+      const raw=r[c.k];
+      const cls = raw==='합격'?'cp':raw==='불합격'?'cf':'cn';
+      v=`<span class="chip ${cls}">${raw}</span>`;
+    }
+    const st=[c.center?'text-align:center':'', c.numeric?'text-align:right':'',
+              c.strong?'font-weight:700;color:#1a3a5c':''].filter(Boolean).join(';');
+    return `<td style="${st};white-space:nowrap">${v}</td>`;
+  }).join('') + '</tr>').join('');
+}
+
+function renderHistMeas(){
+  const rows=sortRows(measRows(), MEAS_COLS);
+  document.getElementById('hist-meas-cnt').textContent=`총 ${rows.length}행`;
+  document.getElementById('hist-meas-head').innerHTML=histHeadHTML(MEAS_COLS);
+  document.getElementById('hist-meas-tbody').innerHTML=
+    histBodyHTML(rows, MEAS_COLS, r=>`onclick="QC.viewCertificate('${r._id}')" style="cursor:pointer" title="검사성적서 보기"`);
+}
+
+function renderHistHL(){
+  const rows=sortRows(hlRows(), HL_COLS);
+  document.getElementById('hist-hl-cnt').textContent=`총 ${rows.length}행`;
+  document.getElementById('hist-hl-head').innerHTML=histHeadHTML(HL_COLS);
+  document.getElementById('hist-hl-tbody').innerHTML=histBodyHTML(rows, HL_COLS, null);
+}
+
+function setHistView(v){
+  HIST_VIEW=v; HIST_SORT={key:null,dir:1};
+  ['sheet','meas','hl'].forEach(k=>{
+    const wrap=document.getElementById('hist-wrap-'+k);
+    const btn=document.getElementById('hv-'+k);
+    if(wrap) wrap.style.display = (k===v)?'':'none';
+    if(btn) btn.classList.toggle('sl', k===v);
+  });
+  renderHist();
+}
+
+function sortHist(key){
+  HIST_SORT = (HIST_SORT.key===key) ? {key, dir:-HIST_SORT.dir} : {key, dir:1};
+  renderHist();
+}
+
+// 지금 보고 있는 표를 그대로 CSV 로 (엑셀에서 바로 열림)
+function exportHistView(){
+  if(HIST_VIEW==='sheet'){ exportAllRaw(); return; }
+  const cols = HIST_VIEW==='meas' ? MEAS_COLS : HL_COLS;
+  const rows = sortRows(HIST_VIEW==='meas'?measRows():hlRows(), cols);
+  if(!rows.length){ alert('내보낼 내용이 없습니다.'); return; }
+  const lines=[cols.map(c=>csvEscape(c.t)).join(',')];
+  rows.forEach(r=>lines.push(cols.map(c=>csvEscape(r[c.k]===null||r[c.k]===undefined?'':r[c.k])).join(',')));
+  const name = HIST_VIEW==='meas' ? '검사이력_측정별' : '가열길이변화율_이력';
+  downloadCSV(String.fromCharCode(0xFEFF)+lines.join('\r\n'),
+              `${name}_${new Date().toISOString().slice(0,10)}.csv`);
+  toast(`${rows.length}행 내보내기 완료`);
+}
 
 // ══════════════════════════════════════════
 // 통계분석 (SPC: I-MR σ, UCL/LCL, Cpk)
@@ -13920,6 +14183,9 @@ window.QC = {
   gp,
   hlCalcTotal,
   renderHist,
+  setHistView,
+  sortHist,
+  exportHistView,
   renderStats,
   printPage,
   clearForm,
