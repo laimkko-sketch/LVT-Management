@@ -1672,29 +1672,29 @@
                       <td style="font-weight:600; color:#334155; font-size:13.5px;">CAL</td>
                       <td><input type="number" id="a-t5" value="1.20" step="0.01" style="width:74px; font-size:13px; " oninput="calcMain()"></td>
                       <td><input type="number" id="a-pvc5" value="100" style="width:60px; font-size:13px;  text-align:center; font-weight:600;" readonly></td>
-                      <td><input type="number" id="a-p5_bak" value="55" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
-                      <td><input type="number" id="a-f5_bak" value="410" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
+                      <td><input type="number" id="a-p5" value="55" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
+                      <td><input type="number" id="a-f5" value="410" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
                     </tr>
                     <tr style="background:#cbd5e1;">
                       <td style="font-weight:600; color:#1e293b; font-size:13.5px;">중지(4)</td>
                       <td><input type="number" id="a-t6" value="1.20" step="0.01" style="width:74px; font-size:13px; " oninput="calcMain()"></td>
                       <td><input type="number" id="a-pvc6" value="100" style="width:60px; font-size:13px;  text-align:center; font-weight:600;" readonly></td>
-                      <td><input type="number" id="a-p6_bak" value="55" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
-                      <td><input type="number" id="a-f6_bak" value="450" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
+                      <td><input type="number" id="a-p6" value="55" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
+                      <td><input type="number" id="a-f6" value="450" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
                     </tr>
                     <tr style="background:#c7d2fe;">
                       <td style="font-weight:600; color:#1e1b4b; font-size:13.5px;">하지</td>
                       <td><input type="number" id="a-t7" value="0.00" step="0.01" style="width:74px; font-size:13px; " oninput="calcMain()"></td>
                       <td><input type="number" id="a-pvc7" value="100" style="width:60px; font-size:13px;  text-align:center; font-weight:600;" readonly></td>
-                      <td><input type="number" id="a-p7_bak" value="42" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
-                      <td><input type="number" id="a-f7_bak" value="200" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
+                      <td><input type="number" id="a-p7" value="42" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
+                      <td><input type="number" id="a-f7" value="200" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
                     </tr>
                     <tr style="background:#334155;">
                       <td style="font-weight:600; color:#f1f5f9; font-size:13.5px;">NS-Sheet</td>
                       <td><input type="number" id="a-t8" value="0.00" step="0.01" style="width:74px; font-size:13px; " oninput="calcMain()"></td>
                       <td><input type="number" id="a-pvc8" value="100" style="width:60px; font-size:13px;  text-align:center; font-weight:600;" readonly></td>
-                      <td><input type="number" id="a-p8_bak" value="50" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
-                      <td><input type="number" id="a-f8_bak" value="80" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
+                      <td><input type="number" id="a-p8" value="50" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
+                      <td><input type="number" id="a-f8" value="80" style="width:64px; font-size:13px;" oninput="calcMain()"></td>
                     </tr>
                   </tbody>
                   <tfoot>
@@ -3885,24 +3885,12 @@ function lcGF(t, p, f) {
   return `<span style="font-weight:700; font-size:13px; color:#6d28d9;">${parseFloat(t).toFixed(2)}</span><span style="color:#a78bfa; font-size:11px;"> ${p||0}/${f||0}</span>`;
 }
 
-// 합산 DOTP / FILLER (두께 가중합)
+// 합산 DOTP / FILLER — PVC 기준량 가중 환산 (structPHR과 동일 계산식)
+// 두께만으로 가중평균하면 PHR이 높은 층의 비중이 과대평가되어 값이 커진다.
 function sumPF(r) {
-  const layers = [
-    {t:r.topT,   p:r.topP,   f:0},
-    {t:r.printT||0.07, p:8,  f:0},
-    {t:r.midT,   p:r.midP,   f:r.midF},
-    {t:r.gfT,    p:r.gfP,    f:r.gfF},
-    {t:r.mid2T,  p:r.mid2P,  f:r.mid2F},
-    {t:r.mid3T,  p:r.mid3P,  f:r.mid3F},
-    {t:r.baseT,  p:r.baseP,  f:r.baseF},
-  ];
-  let totT=0, sumD=0, sumF=0;
-  layers.forEach(l=>{ if(l.t>0){totT+=l.t; sumD+=l.t*(l.p||0); sumF+=l.t*(l.f||0);} });
-  // 두께 가중평균 (전체 두께 기준 PHR 환산)
-  return {
-    dotp:  totT>0 ? (sumD/totT).toFixed(1) : '—',
-    filler:totT>0 ? (sumF/totT).toFixed(1) : '—'
-  };
+  const c = structPHR(r);
+  if(c.totalT === 0) return {dotp:'—', filler:'—'};
+  return { dotp: c.dotp.toFixed(1), filler: c.filler.toFixed(1) };
 }
 
 // ──────────────────────────────────────────────
@@ -4400,7 +4388,8 @@ function calcMain() {
 
   const totalT = layers.reduce((a,l)=>a+l.t, 0);
   const el = document.getElementById('a-total-t');
-  if(el) el.textContent = totalT.toFixed(1)+' mm';
+  // 층 두께를 0.01 단위로 입력하므로 합계도 소수 2자리로 표시한다 (4.37을 4.4로 뭉개지 않게)
+  if(el) el.textContent = totalT.toFixed(2)+' mm';
 
   if(totalT === 0) return;
 
@@ -4730,6 +4719,71 @@ const PHR_DATA = [
   { no:26, type:'HARD', struct:'5/0.5',    gf:'0.30',
     m1:[1.20,33,250], m2:[0.90,40,340], m3:[1.20,55,410], base:[1.00,42,200], density:1.8018 },
 ];
+
+// ============================================================
+// 구조 집계값 단일 계산식 — 엑셀 "종합 제품 분석 계산" 시트와 동일
+// ------------------------------------------------------------
+// 층별 PHR을 PVC 기준량으로 환산해 합산한다. 단순 두께 가중평균이 아니라
+// 각 층이 담고 있는 PVC 양으로 가중해야 한다.
+//   층 두께비   ratio = 층두께 / 총두께 × 100
+//   층 PHR 합   ph    = 100 + DOTP + FILLER
+//   ΣPVC분   = Σ(ratio × 100/ph)
+//   ΣDOTP분  = Σ(ratio × DOTP/ph)     ΣFILLER분 = Σ(ratio × FILLER/ph)
+//   환산 DOTP = ΣDOTP분 / ΣPVC분 × 100      (PVC=100 기준 PHR)
+//   환산 FILLER = ΣFILLER분 / ΣPVC분 × 100
+//   비중 = (100 + DOTP + FILLER) / (100/1.4 + DOTP/1.0 + FILLER/2.5)
+//          (PVC 1.4 · DOTP 1.0 · 경탄 2.5)
+// layerData / PHR_DATA에 적혀 있는 pvc·dotp·filler·density 값은
+// normalizeStructValues()가 로드 시 층 데이터로부터 다시 계산해 덮어쓴다.
+// 따라서 층 두께나 배합만 고치면 집계값은 자동으로 따라온다.
+// ============================================================
+function structPHR(r) {
+  const layers = [
+    {t:r.topT  ||0, p:r.topP ||0, f:r.topF ||0},
+    {t:r.printT||0.07, p:r.printP||8, f:0},
+    {t:r.midT  ||0, p:r.midP ||0, f:r.midF ||0},
+    {t:r.gfT   ||0, p:r.gfP  ||0, f:r.gfF  ||0},
+    {t:r.mid2T ||0, p:r.mid2P||0, f:r.mid2F||0},
+    {t:r.mid3T ||0, p:r.mid3P||0, f:r.mid3F||0},
+    {t:r.baseT ||0, p:r.baseP||0, f:r.baseF||0},
+  ].filter(l=>l.t>0);
+  const totalT = layers.reduce((a,l)=>a+l.t, 0);
+  if(totalT === 0) return {dotp:0, filler:0, density:0, totalT:0, pvcPct:0, dotpPct:0, fillerPct:0};
+  let sP=0, sD=0, sF=0;
+  layers.forEach(l=>{
+    const ratio = l.t/totalT*100, ph = 100 + l.p + l.f;
+    sP += ratio*100/ph; sD += ratio*l.p/ph; sF += ratio*l.f/ph;
+  });
+  const dotp   = sP>0 ? sD/sP*100 : 0;
+  const filler = sP>0 ? sF/sP*100 : 0;
+  const tot = 100 + dotp + filler;
+  const vol = 100/1.4 + dotp/1.0 + filler/2.5;
+  return {
+    dotp, filler, totalT,
+    density: vol>0 ? tot/vol : 0,
+    pvcPct:    100/tot*100,   // 구성비(질량%) — 세 값의 합이 100
+    dotpPct:   dotp/tot*100,
+    fillerPct: filler/tot*100,
+  };
+}
+
+// layerData / PHR_DATA의 집계값을 위 계산식으로 재계산해 덮어쓴다.
+function normalizeStructValues() {
+  layerData.forEach(r=>{
+    const c = structPHR(r);
+    r.dotpPHR   = +c.dotp.toFixed(2);      // PVC=100 기준 환산 PHR
+    r.fillerPHR = +c.filler.toFixed(2);
+    r.density   = +c.density.toFixed(4);
+    r.pvc       = +c.pvcPct.toFixed(2);    // 구성비(%) — 합 100
+    r.dotp      = +c.dotpPct.toFixed(2);
+    r.filler    = +c.fillerPct.toFixed(2);
+  });
+  PHR_DATA.forEach(p=>{
+    const r = layerData.find(x=>x.no===p.no && x.co==='서해테크');
+    if(r) p.density = r.density;
+  });
+}
+normalizeStructValues();
 
 // ============================================================
 // PHR 계산 공통 함수 (PVC=100 기준)
@@ -6032,25 +6086,10 @@ const CM_LAYER_GROUPS = [
 
 // 구조 데이터로 비중 계산
 function cmCalcDensity(r) {
-  const layers = [
-    {t:r.topT||0,   p:r.topP||0,   f:0},
-    {t:r.printT||0.07, p:8,         f:0},
-    {t:r.midT||0,   p:r.midP||0,   f:r.midF||0},
-    {t:r.gfT||0,    p:r.gfP||0,    f:r.gfF||0},
-    {t:r.mid2T||0,  p:r.mid2P||0,  f:r.mid2F||0},
-    {t:r.mid3T||0,  p:r.mid3P||0,  f:r.mid3F||0},
-    {t:r.baseT||0,  p:r.baseP||0,  f:r.baseF||0},
-  ].filter(l=>l.t>0);
-  const totalT = layers.reduce((a,l)=>a+l.t, 0);
-  if(totalT===0) return {dotp:0, filler:0, density:0};
-  let sumP=0,sumD=0,sumF=0;
-  layers.forEach(l=>{
-    const ratio=l.t/totalT*100, ph=100+l.p+l.f;
-    sumP+=ratio*100/ph; sumD+=ratio*l.p/ph; sumF+=ratio*l.f/ph;
-  });
-  const dotp=sumP>0?sumD/sumP*100:0, filler=sumP>0?sumF/sumP*100:0;
-  const tot=100+dotp+filler, vol=100/1.4+dotp+filler/2.5;
-  return {dotp:dotp.toFixed(2), filler:filler.toFixed(2), density:vol>0?(tot/vol).toFixed(4):'—'};
+  const c = structPHR(r);
+  if(c.totalT === 0) return {dotp:0, filler:0, density:0};
+  return {dotp:c.dotp.toFixed(2), filler:c.filler.toFixed(2),
+          density: c.density>0 ? c.density.toFixed(4) : '—'};
 }
 
 // 층 그룹 카드 (읽기 전용)
