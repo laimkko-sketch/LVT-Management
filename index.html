@@ -70,6 +70,20 @@
     gap: 12px;
     min-width: 0;
   }
+  /* 로고 영역을 누르면 처음 화면으로 — 햄버거 버튼은 제외해야 하므로 따로 감쌌다 */
+  .brand-home {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    cursor: pointer;
+    padding: 4px 8px;
+    margin: -4px -8px;
+    border-radius: 8px;
+    transition: background 0.15s;
+  }
+  .brand-home:hover { background: rgba(255,255,255,0.1); }
+  .brand-home:focus-visible { outline: 2px solid rgba(255,255,255,0.6); outline-offset: 1px; }
   .menu-toggle {
     display: none;
     align-items: center;
@@ -1716,10 +1730,14 @@
 <header class="topbar">
   <div class="topbar-brand">
     <button class="menu-toggle" onclick="toggleSidebar()" aria-label="메뉴 열기">☰</button>
-    <div class="brand-icon">T</div>
-    <div>
-      <div class="brand-name">Tile Management System</div>
-      <div class="brand-sub">배합 · 층별구조 · 원가 · 생산 통합관리</div>
+    <div class="brand-home" onclick="goHome()"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goHome();}"
+         role="button" tabindex="0" title="처음 화면(대시보드)으로">
+      <div class="brand-icon">T</div>
+      <div>
+        <div class="brand-name">Tile Management System</div>
+        <div class="brand-sub">배합 · 층별구조 · 원가 · 생산 통합관리</div>
+      </div>
     </div>
   </div>
   <div class="topbar-right">
@@ -5023,6 +5041,13 @@ const layerData = [
 // ============================================================
 // NAVIGATION
 // ============================================================
+// 상단 로고 클릭 → 처음 화면(대시보드)
+// showPage 안에서 모바일 사이드바도 함께 닫힌다
+function goHome() {
+  showPage('dashboard');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function toggleSidebar() {
   const sb = document.querySelector('.sidebar');
   const bd = document.querySelector('.sidebar-backdrop');
