@@ -1206,6 +1206,191 @@
 .pm-scope .fm-card.draft{position:relative}
 .pm-scope .fm-card.draft::before{content:'DRAFT · 미배포';position:absolute;top:42%;left:0;right:0;text-align:center;font-size:44px;font-weight:900;color:rgba(180,35,24,.14);letter-spacing:.3em;transform:rotate(-18deg);pointer-events:none}
 
+
+/* ============================================================
+   생산실적 ERP(PR) 모듈 스타일 — .pr-scope 하위로 격리
+   원본: erp_8.html (TILE 사업부 생산관리 ERP)
+   · 색상 변수는 :root 대신 .pr-scope에 두어 호스트에 영향 없음
+   · body/main/footer/svg text 등 전역 셀렉터도 전부 스코프 안으로
+   · 다크모드 블록은 제거 (호스트가 라이트 전용)
+   ============================================================ */
+  .pr-scope {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --surface-2:      #ffffff;
+    --surface-3:      #f2f1ee;
+    --border-1:       #e4e2dc;
+    --text-primary:   #14181d;
+    --text-secondary: #55606b;
+    --text-muted:     #8a929b;
+    --brand-charcoal: #33414f;
+    --topbar-bg:      #1f2a36;
+    --series-1:       #c00000;   /* IN-LINE 1호기 */
+    --series-2:       #2e5aac;   /* IN-LINE 2호기 */
+    --series-3:       #1baf7a;   /* 중하지 1호 */
+    --series-4:       #eda100;   /* 중하지 2호 */
+    --series-5:       #7a5af8;   /* 투명CAL */
+    --series-plan:    #c7ccd2;
+    --good:           #1baf7a;
+    --warning:        #eda100;
+    --critical:       #e34948;
+    --grid-line:      #eceae4;
+    --axis-line:      #d7d4cc;
+    --heat-low:       #f7d9d6;
+    --heat-mid:       #f4eec9;
+    --heat-high:      #bfe3cf;
+    --seq-1: #e4d9fb; --seq-2: #c7b0f7; --seq-3: #a888f3; --seq-4: #8a68f0; --seq-5: #7248ea; --seq-6: #4f2fb0;
+    --seq2-1: #dbeef4; --seq2-2: #a8d8e8; --seq2-3: #6dbcd8; --seq2-4: #3898bc; --seq2-5: #0891b2; --seq2-6: #065f73;
+    --pos-jungji: #0891b2; --pos-haji: #b45309;
+    --client-1:#c2410c; --client-2:#0d9488; --client-3:#a21caf; --client-4:#65a30d; --client-5:#0369a1; --client-6:#be123c;
+    --cause-1:#b5541c; --cause-2:#1d6fa5; --cause-3:#4f7a1f; --cause-4:#7c3aed; --cause-5:#b8860b;
+  }
+  .pr-scope * { box-sizing: border-box; }
+  .pr-scope { margin:0; padding:0; }
+  .pr-scope {
+    font-family: "Malgun Gothic","맑은 고딕","Noto Sans KR",-apple-system,sans-serif;
+    background: var(--surface-1); color: var(--text-primary); -webkit-font-smoothing:antialiased;
+  }
+  .pr-scope .topbar { position:sticky; top:0; z-index:50; display:flex; align-items:center; gap:16px; padding:12px 24px;
+    background: var(--topbar-bg); color:#fff; border-bottom:3px solid var(--series-1); flex-wrap:wrap; }
+  .pr-scope .topbar .brand { font-weight:700; font-size:16px; }
+  .pr-scope .topbar .brand small { display:block; font-weight:400; font-size:11px; color:#cfd6dd; margin-top:1px;}
+  .pr-scope .tabs { display:flex; gap:3px; margin-left:12px; flex:1; flex-wrap:wrap; }
+  .pr-scope .tab-btn { appearance:none; border:none; cursor:pointer; padding:8px 14px; border-radius:8px 8px 0 0;
+    background:transparent; color:#dfe4e9; font-size:13.5px; font-weight:600; font-family:inherit; }
+  .pr-scope .tab-btn:hover { background:rgba(255,255,255,.08); color:#fff; }
+  .pr-scope .tab-btn.active { background:var(--surface-1); color:var(--series-1); }
+  .pr-scope .theme-toggle { appearance:none; border:1px solid rgba(255,255,255,.35); background:transparent; color:#fff;
+    border-radius:20px; padding:6px 12px; font-size:12px; cursor:pointer; font-family:inherit; white-space:nowrap;}
+  .pr-scope .theme-toggle:hover { background:rgba(255,255,255,.12); }
+  .pr-scope .pr-main { max-width:1320px; margin:0 auto; padding:20px 22px 60px; }
+  .pr-scope .view { display:none; }
+  .pr-scope .view.active { display:block; animation: pr-fade .15s ease; }
+  @keyframes pr-fade { from{opacity:0} to{opacity:1} }
+  .pr-scope .view-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:10px;}
+  .pr-scope .view-header h1 { font-size:20px; margin:0; font-weight:700; }
+  .pr-scope .view-header .sub { color:var(--text-secondary); font-size:12.5px; }
+  .pr-scope .picker { display:flex; align-items:center; gap:8px; }
+  .pr-scope .picker input, .pr-scope .picker select {
+    font-family:inherit; font-size:13px; padding:6px 9px; border-radius:8px; border:1px solid var(--border-1);
+    background:var(--surface-2); color:var(--text-primary);
+  }
+  .pr-scope .picker label { font-size:12.5px; color:var(--text-secondary); font-weight:600; }
+  .pr-scope .kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:11px; margin-bottom:18px; }
+  .pr-scope .kpi { background:var(--surface-2); border:1px solid var(--border-1); border-radius:12px; padding:13px 15px; position:relative; overflow:hidden; }
+  .pr-scope .kpi .accent { position:absolute; left:0; top:0; bottom:0; width:4px; }
+  .pr-scope .kpi .label { font-size:11.5px; color:var(--text-secondary); font-weight:600; margin-bottom:5px; }
+  .pr-scope .kpi .value { font-size:21px; font-weight:700; letter-spacing:-.2px; }
+  .pr-scope .kpi .value .unit { font-size:11.5px; font-weight:600; color:var(--text-muted); margin-left:3px;}
+  .pr-scope .grid-2 { display:grid; grid-template-columns:1.3fr 1fr; gap:14px; margin-bottom:16px; }
+  .pr-scope .grid-2-eq { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; align-items:stretch; }
+  .pr-scope .grid-2-eq .card { display:flex; flex-direction:column; }
+  .pr-scope .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:16px; }
+  @media (max-width: 980px) {
+    .pr-scope .grid-2, .pr-scope .grid-2-eq, .pr-scope .grid-3 { grid-template-columns:1fr; }
+  }
+  .pr-scope .gauge-row { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:18px; }
+  .pr-scope .gauge-card { background:var(--surface-2); border:1px solid var(--border-1); border-radius:12px; padding:12px 14px 10px; display:flex; flex-direction:column; align-items:center; flex:1 1 168px; min-width:158px; }
+  .pr-scope .gauge-name { font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:2px; display:flex; align-items:center; gap:6px; }
+  .pr-scope .gauge-name .dot { width:8px; height:8px; border-radius:50%; display:inline-block; flex-shrink:0; }
+  .pr-scope .card { background:var(--surface-2); border:1px solid var(--border-1); border-radius:12px; padding:16px 18px 12px; }
+  .pr-scope .card h2 { font-size:13.5px; margin:0 0 2px; font-weight:700; }
+  .pr-scope .card .card-sub { font-size:11.5px; color:var(--text-muted); margin-bottom:10px; }
+  .pr-scope .card-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .pr-scope .chart-type-select { font-family:inherit; font-size:11.5px; padding:4px 7px; border-radius:6px; border:1px solid var(--border-1); background:var(--surface-3); color:var(--text-primary); }
+  .pr-scope .chart-scroll { overflow-x:auto; overflow-y:hidden; }
+  .pr-scope .legend { display:flex; gap:13px; flex-wrap:wrap; font-size:11.5px; color:var(--text-secondary); margin-bottom:6px; }
+  .pr-scope .legend .item { display:flex; align-items:center; gap:6px; }
+  .pr-scope .legend .swatch { width:10px; height:10px; border-radius:3px; display:inline-block; }
+  .pr-scope .legend .swatch.line { width:14px; height:3px; border-radius:2px; }
+  .pr-scope .legend .swatch.tick { width:14px; height:3px; border-radius:2px; background:var(--text-primary) !important; position:relative; }
+  .pr-scope table.data-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .pr-scope table.data-table th, .pr-scope table.data-table td { padding:6px 8px; text-align:right; border-bottom:1px solid var(--border-1); white-space:nowrap;}
+  .pr-scope table.data-table th:nth-child(-n+3), .pr-scope table.data-table td:nth-child(-n+3) { text-align:center; }
+  .pr-scope table.data-table thead th { background:var(--brand-charcoal); color:#fff; font-weight:700; position:sticky; top:0; }
+  .pr-scope table.data-table tbody tr:nth-child(even) { background:var(--surface-3); }
+  .pr-scope table.data-table tbody tr.weekend-sat td:nth-child(3) { color:#2e5aac; font-weight:700;}
+  .pr-scope table.data-table tbody tr.weekend-sun td:nth-child(3) { color:#c00000; font-weight:700;}
+  .pr-scope .table-wrap { max-height:400px; overflow:auto; border:1px solid var(--border-1); border-radius:10px; }
+  .pr-scope .pill { display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:700; }
+  .pr-scope .pill.good { background:rgba(27,175,122,.15); color:var(--good); }
+  .pr-scope .pill.warn { background:rgba(237,161,0,.16); color:var(--warning); }
+  .pr-scope .pill.crit { background:rgba(227,73,72,.15); color:var(--critical); }
+  .pr-scope .tag { display:inline-block; padding:1px 7px; border-radius:6px; font-size:10.5px; font-weight:700; color:#fff; }
+  .pr-scope .section-title { font-size:12.5px; font-weight:700; color:var(--text-secondary); margin:20px 0 8px; text-transform:uppercase; letter-spacing:.4px;}
+  .pr-scope .stat-mini { background:var(--surface-2); border:1px solid var(--border-1); border-radius:12px; padding:12px 14px; }
+  .pr-scope .stat-mini .eq { font-weight:700; font-size:12.5px; margin-bottom:2px; }
+  .pr-scope .stat-mini .shift { font-size:11px; color:var(--text-muted); margin-bottom:8px;}
+  .pr-scope .stat-mini .row { display:flex; justify-content:space-between; font-size:11.5px; padding:3px 0; color:var(--text-secondary);}
+  .pr-scope .stat-mini .row b { color:var(--text-primary); }
+  .pr-scope .bar-track { height:6px; border-radius:4px; background:var(--surface-3); overflow:hidden; margin-top:6px;}
+  .pr-scope .bar-fill { height:100%; border-radius:4px; }
+  .pr-scope .tooltip { position:fixed; pointer-events:none; z-index:200; background:var(--brand-charcoal); color:#fff;
+    font-size:12px; line-height:1.5; padding:8px 10px; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,.25);
+    opacity:0; transform:translateY(4px); transition:opacity .1s, transform .1s; max-width:230px; }
+  .pr-scope .tooltip.show { opacity:1; transform:translateY(0); }
+  .pr-scope .tooltip .t-title { font-weight:700; margin-bottom:3px; }
+  .pr-scope .tooltip .t-row { display:flex; justify-content:space-between; gap:14px; }
+  .pr-scope .tooltip .t-row .k { color:#c7ccd2; }
+  .pr-scope footer { text-align:center; color:var(--text-muted); font-size:11px; padding:18px 0 40px; }
+  .pr-scope svg text { font-family: inherit; fill: var(--text-secondary); }
+  .pr-scope .axis-line { stroke: var(--axis-line); stroke-width:1; }
+  .pr-scope .grid-line { stroke: var(--grid-line); stroke-width:1; }
+  .pr-scope .ref-line { stroke: var(--text-muted); stroke-width:1.3; stroke-dasharray:4 4; }
+  /* ---- entry form ---- */
+  .pr-scope .entry-form { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; }
+  .pr-scope .entry-form .field { display:flex; flex-direction:column; gap:4px; }
+  .pr-scope .entry-form .field.span2 { grid-column:span 2; }
+  .pr-scope .entry-form label { font-size:11.5px; font-weight:700; color:var(--text-secondary); }
+  .pr-scope .entry-form input, .pr-scope .entry-form select {
+    font-family:inherit; font-size:13px; padding:8px 10px; border-radius:8px; border:1px solid var(--border-1);
+    background:var(--surface-1); color:var(--text-primary); width:100%;
+  }
+  .pr-scope .entry-form input:focus, .pr-scope .entry-form select:focus { outline:2px solid var(--series-2); outline-offset:1px; }
+  @media (max-width: 980px) {
+    .pr-scope .entry-form { grid-template-columns:repeat(2,1fr); }
+    .pr-scope .entry-form .field.span2 {grid-column:span 2;}
+  }
+  .pr-scope .btn { appearance:none; border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:13px;
+    padding:9px 18px; border-radius:9px; }
+  .pr-scope .btn-primary { background:var(--series-1); color:#fff; }
+  .pr-scope .btn-primary:hover { filter:brightness(1.08); }
+  .pr-scope .btn-ghost { background:var(--surface-3); color:var(--text-primary); border:1px solid var(--border-1); }
+  .pr-scope .btn-ghost:hover { background:var(--border-1); }
+  .pr-scope .btn-sm { padding:4px 10px; font-size:11.5px; border-radius:7px; }
+  .pr-scope .btn-row { display:flex; gap:8px; margin-top:14px; align-items:center; flex-wrap:wrap; }
+  .pr-scope .form-hint { font-size:11.5px; color:var(--text-muted); margin-left:auto; }
+  .pr-scope .filter-row { display:flex; gap:10px; align-items:center; margin-bottom:10px; flex-wrap:wrap;}
+  .pr-scope .filter-row input, .pr-scope .filter-row select { font-family:inherit; font-size:12.5px; padding:6px 9px; border-radius:7px; border:1px solid var(--border-1); background:var(--surface-2); color:var(--text-primary);}
+  .pr-scope .banner {
+    background: linear-gradient(90deg, rgba(192,0,0,.08), rgba(46,90,172,.06));
+    border:1px solid var(--border-1); border-radius:12px; padding:12px 16px; font-size:12.5px;
+    color:var(--text-secondary); margin-bottom:16px; display:flex; gap:10px; align-items:flex-start;
+  }
+  .pr-scope .banner b { color:var(--text-primary); }
+  .pr-scope .heatmap-wrap { overflow-x:auto; }
+  .pr-scope .heat-cell { border-radius:4px; cursor:pointer; }
+  .pr-scope .rank-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .pr-scope .rank-list li { display:flex; align-items:center; gap:10px; font-size:12.5px; }
+  .pr-scope .rank-list .rk { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:700; color:#fff; flex-shrink:0; }
+  .pr-scope .rank-list .bar { flex:1; height:8px; border-radius:5px; background:var(--surface-3); overflow:hidden; }
+  .pr-scope .rank-list .bar > div { height:100%; border-radius:5px; }
+  .pr-scope .rank-list .rv { width:64px; text-align:right; font-weight:700; }
+  /* 사이트 셸 안에 들어가므로 자체 상단바는 고정 해제 */
+  .pr-scope .topbar { position:static; border-radius:10px 10px 0 0; }
+  .pr-scope .pr-main { max-width:100%; padding:18px 0 10px; }
+
+  @media print {
+    /* 사이트 인쇄 CSS가 .table-wrap 의 overflow 를 풀어버리는데
+       ERP 표는 max-height 로 스크롤되고 있어서, 그대로 두면 내용이
+       부모 밖으로 넘쳐 다른 영역을 덮는다. 높이 제한을 같이 풀어준다. */
+    .pr-scope .table-wrap { max-height:none !important; overflow:visible !important; }
+    .pr-scope .chart-scroll,
+    .pr-scope .heatmap-wrap { overflow:visible !important; }
+    /* 탭 바와 자체 상단바는 인쇄에 불필요 */
+    .pr-scope .topbar { display:none !important; }
+  }
 </style>
 </head>
 <body>
@@ -1303,6 +1488,10 @@
       <div class="nav-item" onclick="showPage('pm-stock')">
         <span class="nav-icon">🗄️</span>
         반제품 재고
+      </div>
+      <div class="nav-item" onclick="showPage('pr-main')">
+        <span class="nav-icon">📈</span>
+        생산실적 ERP
       </div>
       <div class="nav-item" onclick="PM.openCompanyModal()">
         <span class="nav-icon">🏢</span>
@@ -3237,6 +3426,316 @@
       <option value="중하지 1호기"><option value="중하지 2호기">
     </datalist>
 
+    <!-- ============================================================ -->
+    <!-- PAGE: 생산실적 ERP (PR 모듈 · 원본 erp_8.html)                -->
+    <!-- ============================================================ -->
+    <div id="page-pr-main" class="page pr-scope">
+      <div class="topbar">
+        <div class="brand">TILE 사업부<small>생산관리 ERP</small></div>
+        <div class="tabs">
+          <button class="tab-btn active" data-view="entry">📝 데이터 입력</button>
+          <button class="tab-btn" data-view="monthly">월간현황</button>
+          <button class="tab-btn" data-view="weekly">주간현황</button>
+          <button class="tab-btn" data-view="daily">일일현황</button>
+          <button class="tab-btn" data-view="analytics">📊 분석</button>
+          <button class="tab-btn" data-view="idle">⏱ 유휴시간 분석</button>
+        </div>
+      </div>
+
+      <div class="tooltip" id="tooltip"></div>
+
+      <div class="pr-main">
+
+      <!-- ============ ENTRY ============ -->
+      <section class="view active" id="view-entry">
+        <div class="view-header"><h1>일일 생산 데이터 입력</h1><div class="sub">완제품(IN-LINE) · 반제품(중하지·투명CAL) 공통 입력</div></div>
+
+        <div class="banner">⚠️ <span><b>브라우저 저장 안내.</b> 이 페이지는 서버/DB 없이 브라우저 메모리에서만 동작합니다 — 입력한 데이터는 <b>창을 닫거나 새로고침하면 사라집니다</b>. 매일 입력을 마친 뒤 아래 <b>"데이터 내보내기"</b>로 JSON 파일을 저장해두고, 다음에 열 때 <b>"데이터 불러오기"</b>로 이어서 사용하세요. (지금은 2022년 5월 원본 데이터가 기본으로 채워져 있습니다)</span>
+        </div>
+
+        <div class="card">
+          <h2>신규 입력 / 수정</h2>
+          <div class="card-sub">같은 날짜 + 설비로 저장하면 기존 값을 덮어씁니다 (매일 실적 갱신에 사용)</div>
+          <form class="entry-form" id="entryForm">
+            <div class="field"><label>날짜</label><input type="date" id="f_date" required></div>
+            <div class="field span2"><label>설비</label>
+              <select id="f_equip" required></select>
+            </div>
+            <div class="field"><label>생산계획 (일일)</label><input type="number" id="f_plan" min="0" step="1" placeholder="0"></div>
+            <div class="field"><label>주간 실적</label><input type="number" id="f_actday" min="0" step="1" placeholder="0"></div>
+            <div class="field"><label>야간 실적</label><input type="number" id="f_actnight" min="0" step="1" placeholder="0"></div>
+
+            <div class="field"><label>담당자</label><input type="text" id="f_worker" placeholder="예: 홍길동"></div>
+            <div class="field span2"><label>규격</label><input type="text" id="f_spec" placeholder="예: 3T / 0.1 x 455 x 455">
+              <div style="font-size:10.5px;color:var(--text-muted);margin-top:3px">두께를 앞에 "숫자+T" 형식으로 적으면(예: 0.1T) 분석 탭의 두께별 생산 기여도에 반영됩니다</div>
+            </div>
+            <div class="field"><label>거래처</label><input type="text" id="f_client" placeholder="예: (주)한빛산업">
+              <div style="font-size:10.5px;color:var(--text-muted);margin-top:3px">분석 탭의 거래처별 생산 기여도에 반영됩니다</div>
+            </div>
+            <div class="field"><label>포지션 (반제품 중하지)</label>
+              <select id="f_position"><option value="">선택 안 함</option><option value="중지">중지</option><option value="하지">하지</option></select>
+              <div style="font-size:10.5px;color:var(--text-muted);margin-top:3px">중하지1·2호 실적에만 해당 — 투명CAL은 자동으로 "투명"으로 분류됩니다</div>
+            </div>
+            <div class="field"><label>시간가동률(%)</label><input type="number" id="f_avail" min="0" max="200" step="0.1" placeholder="선택"></div>
+            <div class="field"><label>성능가동률(%)</label><input type="number" id="f_perf" min="0" max="200" step="0.1" placeholder="선택"></div>
+            <div class="field"><label>수율(%)</label><input type="number" id="f_yield" min="0" max="200" step="0.1" placeholder="선택"></div>
+          </form>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="btnSave">저장</button>
+            <button class="btn btn-ghost" id="btnReset">초기화</button>
+            <span class="form-hint" id="formHint"></span>
+          </div>
+        </div>
+
+        <div class="section-title">데이터 백업 / 복원</div>
+        <div class="card">
+          <div class="btn-row" style="margin-top:0">
+            <button class="btn btn-ghost" id="btnExport">⬇ 데이터 내보내기 (JSON)</button>
+            <button class="btn btn-ghost" id="btnImportTrigger">⬆ 데이터 불러오기 (JSON)</button>
+            <button class="btn btn-ghost" id="btnExportCsv">⬇ 전체 내역 CSV로 내보내기</button>
+            <input type="file" id="fileImport" accept="application/json" style="display:none">
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-ghost" id="btnExportXlsx">⬇ 엑셀로 내보내기 (XLSX)</button>
+            <button class="btn btn-ghost" id="btnImportXlsxTrigger">⬆ 엑셀 불러오기 (XLSX)</button>
+            <input type="file" id="fileImportXlsx" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" style="display:none">
+            <span class="form-hint">엑셀 파일에는 생산실적·유휴시간 시트가 함께 담깁니다. 엑셀에서 값을 수정(예: 거래처 채워넣기)한 뒤 다시 불러오면 그 내용으로 교체됩니다.</span>
+          </div>
+          <div class="btn-row">
+            <span class="form-hint" id="entryCount"></span>
+          </div>
+        </div>
+
+        <div class="section-title">입력 내역 (<span id="entryTotalCount">0</span>건)</div>
+        <div class="filter-row">
+          <label>설비 필터</label>
+          <select id="filterEquip"><option value="">전체</option></select>
+          <label>날짜 필터</label>
+          <input type="date" id="filterDateFrom">
+          <span style="color:var(--text-muted)">~</span>
+          <input type="date" id="filterDateTo">
+          <button class="btn btn-ghost btn-sm" id="btnClearFilter">필터 초기화</button>
+        </div>
+        <div class="table-wrap"><table class="data-table" id="entryTable"></table></div>
+      </section>
+
+      <!-- ============ MONTHLY ============ -->
+      <section class="view" id="view-monthly">
+        <div class="view-header">
+          <h1>월간 생산실적 현황</h1>
+          <div class="picker"><label>대상 월</label><input type="month" id="monthPicker"></div>
+        </div>
+        <div class="section-title" style="margin-top:0">완제품 (IN-LINE 1·2호기)</div>
+        <div class="kpi-row" id="monthlyKpisF"></div>
+        <div class="gauge-row" id="monthlyGaugesF"></div>
+        <div class="card">
+          <div class="card-head"><h2>일별 생산실적 vs 계획 (완제품, Box)</h2>
+            <select class="chart-type-select" id="mChartType1"><option value="combo">누적막대 + 목표선</option><option value="bar">그룹 막대</option><option value="stacked">누적 막대</option><option value="area">누적 영역</option><option value="line">꺾은선</option></select>
+          </div>
+          <div class="legend" id="monthlyLegendF"></div>
+          <div class="chart-scroll" id="monthlyBarChartF"></div>
+        </div>
+        <div class="card">
+          <h2>일별 딜상률 추이</h2><div class="card-sub">점선 = 목표 100%</div>
+          <div class="legend"><span class="item"><span class="swatch line" style="background:var(--series-1)"></span>1호기</span><span class="item"><span class="swatch line" style="background:var(--series-2)"></span>2호기</span></div>
+          <div class="chart-scroll" id="monthlyLineChartF"></div>
+        </div>
+        <div class="table-wrap"><table class="data-table" id="monthlyTableF"></table></div>
+
+        <div class="section-title">반제품 (중하지 1·2호, 투명CAL)</div>
+        <div class="kpi-row" id="monthlyKpisS"></div>
+        <div class="gauge-row" id="monthlyGaugesS"></div>
+        <div class="card">
+          <div class="card-head"><h2>일별 생산실적 vs 계획 (반제품, m)</h2>
+            <select class="chart-type-select" id="mChartType2"><option value="combo">누적막대 + 목표선</option><option value="bar">그룹 막대</option><option value="stacked">누적 막대</option><option value="area">누적 영역</option></select>
+          </div>
+          <div class="legend" id="monthlyLegendS"></div>
+          <div class="chart-scroll" id="monthlyBarChartS"></div>
+        </div>
+        <div class="card">
+          <h2>일별 딜상률 추이 (계획 입력분만 반영)</h2><div class="card-sub">점선 = 목표 100% · 계획이 없으면 표시되지 않습니다</div>
+          <div class="legend"><span class="item"><span class="swatch line" style="background:var(--series-3)"></span>중하지1호</span><span class="item"><span class="swatch line" style="background:var(--series-4)"></span>중하지2호</span><span class="item"><span class="swatch line" style="background:var(--series-5)"></span>투명CAL</span></div>
+          <div class="chart-scroll" id="monthlyLineChartS"></div>
+        </div>
+        <div class="table-wrap"><table class="data-table" id="monthlyTableS"></table></div>
+      </section>
+
+      <!-- ============ WEEKLY ============ -->
+      <section class="view" id="view-weekly">
+        <div class="view-header">
+          <h1>주간 생산실적 현황</h1>
+          <div class="picker"><label>주 시작일 (월요일)</label><input type="date" id="weekPicker"></div>
+        </div>
+        <div class="section-title" style="margin-top:0">완제품</div>
+        <div class="kpi-row" id="weeklyKpisF"></div>
+        <div class="gauge-row" id="weeklyGaugesF"></div>
+        <div class="grid-2-eq">
+          <div class="card">
+            <h2>요일별 생산실적 (Box)</h2>
+            <div class="legend" id="weeklyLegendF"></div>
+            <div class="chart-scroll" id="weeklyBarChartF"></div>
+          </div>
+          <div class="card">
+            <h2>요일별 딜상률 추이</h2>
+            <div class="legend"><span class="item"><span class="swatch line" style="background:var(--series-1)"></span>1호기</span><span class="item"><span class="swatch line" style="background:var(--series-2)"></span>2호기</span></div>
+            <div class="chart-scroll" id="weeklyLineChartF"></div>
+          </div>
+        </div>
+        <div class="table-wrap"><table class="data-table" id="weeklyTableF"></table></div>
+
+        <div class="section-title">반제품</div>
+        <div class="kpi-row" id="weeklyKpisS"></div>
+        <div class="gauge-row" id="weeklyGaugesS"></div>
+        <div class="grid-2-eq">
+          <div class="card">
+            <h2>요일별 생산실적 (m)</h2>
+            <div class="legend" id="weeklyLegendS"></div>
+            <div class="chart-scroll" id="weeklyBarChartS"></div>
+          </div>
+          <div class="card">
+            <h2>요일별 딜상률 추이</h2>
+            <div class="legend"><span class="item"><span class="swatch line" style="background:var(--series-3)"></span>중하지1호</span><span class="item"><span class="swatch line" style="background:var(--series-4)"></span>중하지2호</span><span class="item"><span class="swatch line" style="background:var(--series-5)"></span>투명CAL</span></div>
+            <div class="chart-scroll" id="weeklyLineChartS"></div>
+          </div>
+        </div>
+        <div class="table-wrap"><table class="data-table" id="weeklyTableS"></table></div>
+      </section>
+
+      <!-- ============ DAILY ============ -->
+      <section class="view" id="view-daily">
+        <div class="view-header">
+          <h1>일일 생산현황</h1>
+          <div class="picker"><label>기준일</label><input type="date" id="dayPicker"></div>
+        </div>
+        <div class="section-title" style="margin-top:0">완제품 생산현황 — 설비별 스냅샷</div>
+        <div class="kpi-row" id="dailyStatsF"></div>
+        <div class="section-title">반제품 생산현황 — 설비별 스냅샷</div>
+        <div class="kpi-row" id="dailyStatsS"></div>
+        <div class="section-title">상세 데이터</div>
+        <div class="table-wrap"><table class="data-table" id="dailyTable"></table></div>
+      </section>
+
+      <!-- ============ ANALYTICS ============ -->
+      <section class="view" id="view-analytics">
+        <div class="view-header"><h1>생산 데이터 분석</h1><div class="sub">누적 입력 데이터 전체를 기준으로 계산됩니다</div></div>
+
+        <div class="grid-3">
+          <div class="card"><h2>설비별 생산 기여도 — 완제품</h2><div class="card-sub">전체 기간 실적 합계 비중 (Box)</div><div id="donutF"></div></div>
+          <div class="card"><h2>두께별 생산 기여도 — 반제품</h2><div class="card-sub">설비마다 두께·규격이 달라 직접 비교가 어려워, 설비 대신 두께(T) 기준으로 집계합니다</div><div id="donutS"></div></div>
+          <div class="card"><h2>요일별 평균 딜상률</h2><div class="card-sub">계획이 입력된 기록 기준</div><div id="dowChart"></div></div>
+        </div>
+
+        <div class="grid-3">
+          <div class="card"><h2>두께별 생산계획 비중 — 완제품</h2><div class="card-sub">전체 기간 생산계획 합계 비중 (Box)</div><div id="donutPlanF"></div></div>
+          <div class="card"><h2>포지션별 생산 기여도 — 반제품</h2><div class="card-sub">중하지1·2호를 중지/하지로, 투명CAL은 투명으로 재집계</div><div id="donutPos"></div></div>
+          <div class="card"><h2>거래처별 생산 기여도</h2><div class="card-sub">전체 기간 실적 합계 비중 (완제품+반제품)</div><div id="donutClient"></div></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h2>월 누적 생산실적 vs 누적 계획</h2><div class="card-sub" id="cumSub">완제품 합계 기준</div>
+            <div class="chart-scroll" id="cumChart"></div>
+          </div>
+          <div class="card">
+            <h2>설비 × 날짜 딜상률 히트맵</h2><div class="card-sub">초록 = 목표 초과, 빨강 = 미달 · 회색 = 계획 미입력 · 셀에 마우스를 올려보세요</div>
+            <div class="heatmap-wrap" id="heatmap"></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card"><h2>🏆 최고 딜상률 TOP 5</h2><div class="card-sub">계획 대비 실적 기준 (계획이 입력된 기록만 집계)</div><ul class="rank-list" id="rankTop"></ul></div>
+          <div class="card"><h2>⚠️ 최저 딜상률 BOTTOM 5</h2><div class="card-sub">개선이 필요한 일자 (계획이 입력된 기록만 집계)</div><ul class="rank-list" id="rankBottom"></ul></div>
+        </div>
+      </section>
+
+      <!-- ============ IDLE TIME ANALYSIS ============ -->
+      <section class="view" id="view-idle">
+        <div class="view-header">
+          <h1>설비 유휴시간 분석</h1>
+          <div class="picker">
+            <label>기간 유형</label>
+            <select id="idlePeriodType">
+              <option value="month">월간</option>
+              <option value="week">주간</option>
+              <option value="day">일간</option>
+            </select>
+            <input type="month" id="idleMonthPicker">
+            <input type="date" id="idleWeekPicker" style="display:none">
+            <input type="date" id="idleDayPicker" style="display:none">
+          </div>
+        </div>
+        <div class="banner">⏱ <span><b>유휴시간</b>은 계획정지·돌발고장 등으로 설비가 멈춘 시간을 말합니다. 아래 KPI·추이 차트는 위에서 고른 <b>기간</b> 기준이며, 원인유형·설비·작업자 비중과 히트맵은 <b>누적 입력된 전체 이력</b> 기준입니다.</span>
+        </div>
+
+        <div class="kpi-row" id="idleKpis"></div>
+
+        <div class="card">
+          <div class="card-head"><h2>기간별 유휴시간 추이 (원인유형별)</h2></div>
+          <div class="legend" id="idleTrendLegend"></div>
+          <div class="chart-scroll" id="idleTrendChart"></div>
+        </div>
+
+        <div class="section-title">누적 이력 기준 통계</div>
+        <div class="grid-3">
+          <div class="card"><h2>원인유형별 비중</h2><div class="card-sub">전체 기간 유휴시간 합계 비중</div><div id="idleDonutCause"></div></div>
+          <div class="card"><h2>설비별 비중</h2><div class="card-sub">전체 기간 유휴시간 합계 비중</div><div id="idleDonutEquip"></div></div>
+          <div class="card"><h2>작업자별 유휴시간 TOP 5</h2><div class="card-sub">전체 기간 합계 기준</div><ul class="rank-list" id="idleRankWorker"></ul></div>
+        </div>
+
+        <div class="card">
+          <h2>설비 × 원인유형 히트맵</h2><div class="card-sub">전체 기간 유휴시간 합계 (분) · 셀에 마우스를 올려보세요</div>
+          <div class="heatmap-wrap" id="idleHeatmap"></div>
+        </div>
+
+        <div class="section-title">유휴시간 신규 입력 / 수정</div>
+        <div class="card">
+          <div class="card-sub">저장하면 이력에 새 항목으로 추가됩니다 (이력 목록의 "수정"으로 불러와 저장하면 해당 항목이 갱신됩니다)</div>
+          <form class="entry-form" id="idleForm">
+            <div class="field"><label>날짜</label><input type="date" id="i_date" required></div>
+            <div class="field"><label>시작</label><input type="time" id="i_start"></div>
+            <div class="field"><label>종료</label><input type="time" id="i_end"></div>
+            <div class="field"><label>소요시간(분)</label><input type="number" id="i_minutes" min="0" step="1" placeholder="시작·종료 입력 시 자동계산"></div>
+            <div class="field"><label>주간/야간</label>
+              <select id="i_shift"><option value="">선택 안 함</option><option value="주간">주간</option><option value="야간">야간</option></select>
+            </div>
+            <div class="field"><label>설비</label><select id="i_equip" required></select></div>
+            <div class="field"><label>담당자</label><input type="text" id="i_worker" placeholder="예: 홍길동"></div>
+            <div class="field"><label>원인유형</label>
+              <select id="i_cause" required>
+                <option value="설비">설비</option><option value="방법">방법</option><option value="소재">소재</option><option value="사람">사람</option><option value="환경">환경</option>
+              </select>
+            </div>
+            <div class="field span2"><label>내용</label><input type="text" id="i_content" placeholder="예: 압출기 청소 / 경탄 계량기 오류"></div>
+          </form>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="btnIdleSave">저장</button>
+            <button class="btn btn-ghost" id="btnIdleReset">초기화</button>
+            <span class="form-hint" id="idleFormHint"></span>
+          </div>
+        </div>
+
+        <div class="section-title">유휴시간 이력 (<span id="idleTotalCount">0</span>건)</div>
+        <div class="filter-row">
+          <label>설비 필터</label>
+          <select id="idleFilterEquip"><option value="">전체</option></select>
+          <label>원인유형 필터</label>
+          <select id="idleFilterCause"><option value="">전체</option><option value="설비">설비</option><option value="방법">방법</option><option value="소재">소재</option><option value="사람">사람</option><option value="환경">환경</option></select>
+          <label>날짜 필터</label>
+          <input type="date" id="idleFilterDateFrom">
+          <span style="color:var(--text-muted)">~</span>
+          <input type="date" id="idleFilterDateTo">
+          <button class="btn btn-ghost btn-sm" id="btnIdleClearFilter">필터 초기화</button>
+          <button class="btn btn-ghost btn-sm" id="btnExportIdleCsv" style="margin-left:auto">⬇ 유휴시간 CSV로 내보내기</button>
+        </div>
+        <div class="table-wrap"><table class="data-table" id="idleTable"></table></div>
+      </section>
+
+      <footer>TILE 사업부 생산관리 ERP · 브라우저 메모리 기반 프로토타입 · 데이터는 내보내기/불러오기로 관리하세요</footer>
+      </div>
+
+      <!-- SheetJS (xlsx) — Apache-2.0, bundled inline for offline/CSP-safe use: https://sheetjs.com -->
+    </div>
+
   </main>
 </div>
 
@@ -3844,6 +4343,7 @@ function showPage(id) {
   if(id === 'change-mgmt') { renderChangeMgmt(); }
   if(id && id.indexOf('pm-') === 0 && window.PM) PM.onShow(id);
   if(id && id.indexOf('fm-') === 0 && window.FM) FM.onShow(id);
+  if(id === 'pr-main' && window.PR) PR.onShow();
   markPrintTabs();
 }
 
@@ -7949,6 +8449,1476 @@ window.FM = {
 };
 })();
 
+</script>
+<script>
+/* ============================================================
+   생산실적 ERP(PR) 모듈 — IIFE 격리, window.PR 노출
+   원본: erp_8.html (TILE 사업부 생산관리 ERP)
+   · 전역을 만들지 않도록 전체를 즉시실행 함수로 감쌌다
+   · 화면이 숨겨진 상태에서 차트를 그리면 폭이 0으로 잡히므로
+     최초 렌더는 페이지가 처음 열릴 때(PR.onShow) 수행한다
+   · XLSX(SheetJS)는 사이트에 이미 로드된 것을 그대로 사용
+   ============================================================ */
+(function(){
+const PRROOT = document.getElementById('page-pr-main');
+if(!PRROOT) return;
+
+/* =========================================================
+   CONSTANTS
+========================================================= */
+const EQUIP = [
+  {key:'line1', name:'IN-LINE 1호기', unit:'Box', group:'완제품', color:'var(--series-1)', hex:{light:'#c00000',dark:'#e15759'}},
+  {key:'line2', name:'IN-LINE 2호기', unit:'Box', group:'완제품', color:'var(--series-2)', hex:{light:'#2e5aac',dark:'#4c8be0'}},
+  {key:'jh1',   name:'중하지 1호',     unit:'m',   group:'반제품', color:'var(--series-3)', hex:{light:'#1baf7a',dark:'#199e70'}},
+  {key:'jh2',   name:'중하지 2호',     unit:'m',   group:'반제품', color:'var(--series-4)', hex:{light:'#eda100',dark:'#c98500'}},
+  {key:'cal',   name:'투명CAL',        unit:'m',   group:'반제품', color:'var(--series-5)', hex:{light:'#7a5af8',dark:'#8172e8'}},
+];
+const EQ = Object.fromEntries(EQUIP.map(e=>[e.key,e]));
+const DOW_KR = ['일','월','화','수','목','금','토'];
+
+/* =========================================================
+   STATE  (in-memory only — no localStorage per platform policy)
+========================================================= */
+let entries = [{"id": 1, "date": "2022-05-02", "equip": "line1", "plan": 8650, "actDay": 3178, "actNight": 3982, "actTotal": 7160, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 2, "date": "2022-05-02", "equip": "line2", "plan": 7000, "actDay": 2999, "actNight": 4200, "actTotal": 7199, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 3, "date": "2022-05-03", "equip": "line1", "plan": 8250, "actDay": 4092, "actNight": 3093, "actTotal": 7185, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 4, "date": "2022-05-03", "equip": "line2", "plan": 7000, "actDay": 4110, "actNight": 2235, "actTotal": 6345, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 5, "date": "2022-05-04", "equip": "line1", "plan": 8628, "actDay": 2766, "actNight": 1946, "actTotal": 4712, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 6, "date": "2022-05-04", "equip": "line2", "plan": 9000, "actDay": 0, "actNight": 0, "actTotal": 0, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 7, "date": "2022-05-05", "equip": "line1", "plan": 6344, "actDay": 835, "actNight": 4398, "actTotal": 5233, "worker": "", "spec": "5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 8, "date": "2022-05-05", "equip": "line2", "plan": 8000, "actDay": 3630, "actNight": 4180, "actTotal": 7810, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 9, "date": "2022-05-06", "equip": "line1", "plan": 8024, "actDay": 3766, "actNight": 3872, "actTotal": 7638, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 10, "date": "2022-05-06", "equip": "line2", "plan": 6000, "actDay": 3740, "actNight": 1534, "actTotal": 5274, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 11, "date": "2022-05-07", "equip": "line1", "plan": 7488, "actDay": 3660, "actNight": 4196, "actTotal": 7856, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 12, "date": "2022-05-07", "equip": "line2", "plan": 0, "actDay": 3800, "actNight": 4030, "actTotal": 7830, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 13, "date": "2022-05-08", "equip": "line1", "plan": 9248, "actDay": 3744, "actNight": 3960, "actTotal": 7704, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 14, "date": "2022-05-09", "equip": "line1", "plan": 7550, "actDay": 2584, "actNight": 3561, "actTotal": 6145, "worker": "", "spec": "5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 15, "date": "2022-05-09", "equip": "line2", "plan": 8000, "actDay": 3160, "actNight": 4130, "actTotal": 7290, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 16, "date": "2022-05-10", "equip": "line1", "plan": 9705, "actDay": 3647, "actNight": 3247, "actTotal": 6894, "worker": "", "spec": "5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 17, "date": "2022-05-10", "equip": "line2", "plan": 8000, "actDay": 4260, "actNight": 4140, "actTotal": 8400, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 18, "date": "2022-05-11", "equip": "line1", "plan": 9161, "actDay": 4231, "actNight": 2880, "actTotal": 7111, "worker": "", "spec": "5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 19, "date": "2022-05-11", "equip": "line2", "plan": 7406, "actDay": 4160, "actNight": 4660, "actTotal": 8820, "worker": "", "spec": "2.5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 20, "date": "2022-05-12", "equip": "line1", "plan": 7500, "actDay": 2865, "actNight": 3504, "actTotal": 6369, "worker": "", "spec": "5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 21, "date": "2022-05-12", "equip": "line2", "plan": 6000, "actDay": 3359, "actNight": 3460, "actTotal": 6819, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 22, "date": "2022-05-13", "equip": "line1", "plan": 8000, "actDay": 3135, "actNight": 3110, "actTotal": 6245, "worker": "", "spec": "2.5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 23, "date": "2022-05-13", "equip": "line2", "plan": 6500, "actDay": 3617, "actNight": 3604, "actTotal": 7221, "worker": "", "spec": "2.5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 24, "date": "2022-05-14", "equip": "line1", "plan": 7000, "actDay": 2540, "actNight": 3990, "actTotal": 6530, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 25, "date": "2022-05-15", "equip": "line1", "plan": 7000, "actDay": 2550, "actNight": 3472, "actTotal": 6022, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 26, "date": "2022-05-16", "equip": "line1", "plan": 8000, "actDay": 3380, "actNight": 3370, "actTotal": 6750, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 27, "date": "2022-05-16", "equip": "line2", "plan": 8000, "actDay": 3310, "actNight": 4157, "actTotal": 7467, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 28, "date": "2022-05-17", "equip": "line1", "plan": 8000, "actDay": 3260, "actNight": 3520, "actTotal": 6780, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 29, "date": "2022-05-17", "equip": "line2", "plan": 7500, "actDay": 3868, "actNight": 4300, "actTotal": 8168, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 30, "date": "2022-05-18", "equip": "line1", "plan": 7648, "actDay": 2465, "actNight": 3492, "actTotal": 5957, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 31, "date": "2022-05-18", "equip": "line2", "plan": 8500, "actDay": 2600, "actNight": 4975, "actTotal": 7575, "worker": "", "spec": "2.5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 32, "date": "2022-05-19", "equip": "line1", "plan": 8744, "actDay": 2436, "actNight": 1315, "actTotal": 3751, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 33, "date": "2022-05-19", "equip": "line2", "plan": 9000, "actDay": 4680, "actNight": 4245, "actTotal": 8925, "worker": "", "spec": "2.5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 34, "date": "2022-05-20", "equip": "line1", "plan": 5460, "actDay": 149, "actNight": 1914, "actTotal": 2063, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 35, "date": "2022-05-20", "equip": "line2", "plan": 6406, "actDay": 3498, "actNight": 2840, "actTotal": 6338, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 36, "date": "2022-05-21", "equip": "line1", "plan": 8595, "actDay": 4192, "actNight": 4714, "actTotal": 8906, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 37, "date": "2022-05-22", "equip": "line1", "plan": 10062, "actDay": 3328, "actNight": 3343, "actTotal": 6671, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 38, "date": "2022-05-23", "equip": "line1", "plan": 10427, "actDay": 4365, "actNight": 4055, "actTotal": 8420, "worker": "", "spec": "5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 39, "date": "2022-05-23", "equip": "line2", "plan": 8000, "actDay": 4290, "actNight": 4005, "actTotal": 8295, "worker": "", "spec": "2.5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 40, "date": "2022-05-24", "equip": "line1", "plan": 7971, "actDay": 3782, "actNight": 3168, "actTotal": 6950, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 41, "date": "2022-05-24", "equip": "line2", "plan": 6000, "actDay": 3460, "actNight": 3613, "actTotal": 7073, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 42, "date": "2022-05-25", "equip": "line1", "plan": 8310, "actDay": 3813, "actNight": 2158, "actTotal": 5971, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 43, "date": "2022-05-25", "equip": "line2", "plan": 6340, "actDay": 3215, "actNight": 3091, "actTotal": 6306, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 44, "date": "2022-05-26", "equip": "line1", "plan": 6900, "actDay": 2685, "actNight": 2200, "actTotal": 4885, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 45, "date": "2022-05-26", "equip": "line2", "plan": 7488, "actDay": 3090, "actNight": 3520, "actTotal": 6610, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 46, "date": "2022-05-27", "equip": "line1", "plan": 10580, "actDay": 2020, "actNight": 2830, "actTotal": 4850, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 47, "date": "2022-05-27", "equip": "line2", "plan": 4680, "actDay": 2080, "actNight": 1536, "actTotal": 3616, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 48, "date": "2022-05-28", "equip": "line1", "plan": 9397, "actDay": 3439, "actNight": 3265, "actTotal": 6704, "worker": "", "spec": "5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 49, "date": "2022-05-29", "equip": "line1", "plan": 11061, "actDay": 4657, "actNight": 4605, "actTotal": 9262, "worker": "", "spec": "5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 50, "date": "2022-05-30", "equip": "line1", "plan": 8000, "actDay": 4720, "actNight": 4179, "actTotal": 8899, "worker": "", "spec": "2.5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 51, "date": "2022-05-30", "equip": "line2", "plan": 6280, "actDay": 1722, "actNight": 2942, "actTotal": 4664, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 52, "date": "2022-05-31", "equip": "line1", "plan": 9040, "actDay": 2680, "actNight": 2537, "actTotal": 5217, "worker": "", "spec": "2.5T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 53, "date": "2022-05-31", "equip": "line2", "plan": 8000, "actDay": 3909, "actNight": 3520, "actTotal": 7429, "worker": "", "spec": "2T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 54, "date": "2022-06-02", "equip": "line1", "plan": 8750, "actDay": 1200, "actNight": 3864, "actTotal": 5064, "worker": "", "spec": "3T", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 55, "date": "2022-06-02", "equip": "line2", "plan": 7000, "actDay": 0, "actNight": 0, "actTotal": 0, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 56, "date": "2022-06-03", "equip": "line1", "plan": 9234, "actDay": 0, "actNight": 0, "actTotal": 0, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 57, "date": "2022-06-03", "equip": "line2", "plan": 8680, "actDay": 0, "actNight": 0, "actTotal": 0, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 58, "date": "2022-06-04", "equip": "line1", "plan": 8692, "actDay": 0, "actNight": 0, "actTotal": 0, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 59, "date": "2022-06-05", "equip": "line1", "plan": 6125, "actDay": 0, "actNight": 0, "actTotal": 0, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 60, "date": "2022-05-02", "equip": "jh1", "plan": 0, "actDay": 20650, "actNight": 16700, "actTotal": 37350, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 61, "date": "2022-05-03", "equip": "jh1", "plan": 0, "actDay": 11600, "actNight": 15900, "actTotal": 27500, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 62, "date": "2022-05-04", "equip": "jh1", "plan": 0, "actDay": 14500, "actNight": 15600, "actTotal": 30100, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 63, "date": "2022-05-05", "equip": "jh1", "plan": 0, "actDay": 18000, "actNight": 20900, "actTotal": 38900, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 64, "date": "2022-05-06", "equip": "jh1", "plan": 0, "actDay": 22800, "actNight": 21600, "actTotal": 44400, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 65, "date": "2022-05-07", "equip": "jh1", "plan": 0, "actDay": 22500, "actNight": 19000, "actTotal": 41500, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 66, "date": "2022-05-08", "equip": "jh1", "plan": 0, "actDay": 20700, "actNight": 23200, "actTotal": 43900, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 67, "date": "2022-05-09", "equip": "jh1", "plan": 0, "actDay": 16200, "actNight": 20500, "actTotal": 36700, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 68, "date": "2022-05-10", "equip": "jh1", "plan": 0, "actDay": 17200, "actNight": 21400, "actTotal": 38600, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 69, "date": "2022-05-11", "equip": "jh1", "plan": 0, "actDay": 25200, "actNight": 15600, "actTotal": 40800, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 70, "date": "2022-05-12", "equip": "jh1", "plan": 0, "actDay": 19000, "actNight": 17000, "actTotal": 36000, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 71, "date": "2022-05-13", "equip": "jh1", "plan": 0, "actDay": 17200, "actNight": 18000, "actTotal": 35200, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 72, "date": "2022-05-14", "equip": "jh1", "plan": 0, "actDay": 19500, "actNight": 19900, "actTotal": 39400, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 73, "date": "2022-05-15", "equip": "jh1", "plan": 0, "actDay": 18750, "actNight": 21000, "actTotal": 39750, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 74, "date": "2022-05-16", "equip": "jh1", "plan": 0, "actDay": 23100, "actNight": 22700, "actTotal": 45800, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 75, "date": "2022-05-17", "equip": "jh1", "plan": 0, "actDay": 22500, "actNight": 21100, "actTotal": 43600, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 76, "date": "2022-05-18", "equip": "jh1", "plan": 0, "actDay": 22500, "actNight": 21300, "actTotal": 43800, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 77, "date": "2022-05-19", "equip": "jh1", "plan": 0, "actDay": 18800, "actNight": 21100, "actTotal": 39900, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 78, "date": "2022-05-20", "equip": "jh1", "plan": 0, "actDay": 20100, "actNight": 16400, "actTotal": 36500, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 79, "date": "2022-05-21", "equip": "jh1", "plan": 0, "actDay": 17100, "actNight": 18100, "actTotal": 35200, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 80, "date": "2022-05-22", "equip": "jh1", "plan": 0, "actDay": 18900, "actNight": 21600, "actTotal": 40500, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 81, "date": "2022-05-23", "equip": "jh1", "plan": 0, "actDay": 17200, "actNight": 10100, "actTotal": 27300, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 82, "date": "2022-05-24", "equip": "jh1", "plan": 0, "actDay": 18800, "actNight": 18900, "actTotal": 37700, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 83, "date": "2022-05-25", "equip": "jh1", "plan": 0, "actDay": 19600, "actNight": 14800, "actTotal": 34400, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 84, "date": "2022-05-26", "equip": "jh1", "plan": 0, "actDay": 16400, "actNight": 16900, "actTotal": 33300, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 85, "date": "2022-05-27", "equip": "jh1", "plan": 0, "actDay": 18200, "actNight": 18600, "actTotal": 36800, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 86, "date": "2022-05-28", "equip": "jh1", "plan": 0, "actDay": 16900, "actNight": 15800, "actTotal": 32700, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 87, "date": "2022-05-29", "equip": "jh1", "plan": 0, "actDay": 17500, "actNight": 21900, "actTotal": 39400, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 88, "date": "2022-05-30", "equip": "jh1", "plan": 0, "actDay": 22350, "actNight": 22550, "actTotal": 44900, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 89, "date": "2022-05-31", "equip": "jh1", "plan": 0, "actDay": 24000, "actNight": 20900, "actTotal": 44900, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 90, "date": "2022-05-02", "equip": "jh2", "plan": 0, "actDay": 18250, "actNight": 24400, "actTotal": 42650, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 91, "date": "2022-05-03", "equip": "jh2", "plan": 0, "actDay": 26600, "actNight": 28000, "actTotal": 54600, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 92, "date": "2022-05-04", "equip": "jh2", "plan": 0, "actDay": 22700, "actNight": 30800, "actTotal": 53500, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 93, "date": "2022-05-05", "equip": "jh2", "plan": 0, "actDay": 29400, "actNight": 30700, "actTotal": 60100, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 94, "date": "2022-05-06", "equip": "jh2", "plan": 0, "actDay": 26600, "actNight": 24350, "actTotal": 50950, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 95, "date": "2022-05-09", "equip": "jh2", "plan": 0, "actDay": 13400, "actNight": 28000, "actTotal": 41400, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 96, "date": "2022-05-10", "equip": "jh2", "plan": 0, "actDay": 30800, "actNight": 27450, "actTotal": 58250, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 97, "date": "2022-05-11", "equip": "jh2", "plan": 0, "actDay": 30800, "actNight": 32100, "actTotal": 62900, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 98, "date": "2022-05-12", "equip": "jh2", "plan": 0, "actDay": 33500, "actNight": 24700, "actTotal": 58200, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 99, "date": "2022-05-13", "equip": "jh2", "plan": 0, "actDay": 24000, "actNight": 22000, "actTotal": 46000, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 100, "date": "2022-05-16", "equip": "jh2", "plan": 0, "actDay": 19500, "actNight": 27400, "actTotal": 46900, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 101, "date": "2022-05-17", "equip": "jh2", "plan": 0, "actDay": 23500, "actNight": 22470, "actTotal": 45970, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 102, "date": "2022-05-18", "equip": "jh2", "plan": 0, "actDay": 29400, "actNight": 27900, "actTotal": 57300, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 103, "date": "2022-05-19", "equip": "jh2", "plan": 0, "actDay": 32200, "actNight": 33600, "actTotal": 65800, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 104, "date": "2022-05-20", "equip": "jh2", "plan": 0, "actDay": 30900, "actNight": 29750, "actTotal": 60650, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 105, "date": "2022-05-23", "equip": "jh2", "plan": 0, "actDay": 20600, "actNight": 25200, "actTotal": 45800, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 106, "date": "2022-05-24", "equip": "jh2", "plan": 0, "actDay": 29000, "actNight": 30300, "actTotal": 59300, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 107, "date": "2022-05-25", "equip": "jh2", "plan": 0, "actDay": 33100, "actNight": 26050, "actTotal": 59150, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 108, "date": "2022-05-26", "equip": "jh2", "plan": 0, "actDay": 28600, "actNight": 24850, "actTotal": 53450, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 109, "date": "2022-05-27", "equip": "jh2", "plan": 0, "actDay": 18850, "actNight": 18650, "actTotal": 37500, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 110, "date": "2022-05-30", "equip": "jh2", "plan": 0, "actDay": 16600, "actNight": 32200, "actTotal": 48800, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 111, "date": "2022-05-31", "equip": "jh2", "plan": 0, "actDay": 28900, "actNight": 22650, "actTotal": 51550, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 112, "date": "2022-05-02", "equip": "cal", "plan": 0, "actDay": 33500, "actNight": 46000, "actTotal": 79500, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 113, "date": "2022-05-03", "equip": "cal", "plan": 0, "actDay": 47000, "actNight": 51200, "actTotal": 98200, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 114, "date": "2022-05-04", "equip": "cal", "plan": 0, "actDay": 62500, "actNight": 58000, "actTotal": 120500, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 115, "date": "2022-05-05", "equip": "cal", "plan": 0, "actDay": 45700, "actNight": 31000, "actTotal": 76700, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 116, "date": "2022-05-06", "equip": "cal", "plan": 0, "actDay": 30000, "actNight": 26200, "actTotal": 56200, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 117, "date": "2022-05-08", "equip": "cal", "plan": 0, "actDay": 0, "actNight": 28000, "actTotal": 28000, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 118, "date": "2022-05-09", "equip": "cal", "plan": 0, "actDay": 24300, "actNight": 34000, "actTotal": 58300, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 119, "date": "2022-05-10", "equip": "cal", "plan": 0, "actDay": 30800, "actNight": 60000, "actTotal": 90800, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 120, "date": "2022-05-11", "equip": "cal", "plan": 0, "actDay": 61000, "actNight": 31800, "actTotal": 92800, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 121, "date": "2022-05-12", "equip": "cal", "plan": 0, "actDay": 52500, "actNight": 55500, "actTotal": 108000, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 122, "date": "2022-05-13", "equip": "cal", "plan": 0, "actDay": 42000, "actNight": 40700, "actTotal": 82700, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 123, "date": "2022-05-16", "equip": "cal", "plan": 0, "actDay": 43500, "actNight": 59600, "actTotal": 103100, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 124, "date": "2022-05-17", "equip": "cal", "plan": 0, "actDay": 59900, "actNight": 37100, "actTotal": 97000, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 125, "date": "2022-05-18", "equip": "cal", "plan": 0, "actDay": 33000, "actNight": 28750, "actTotal": 61750, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 126, "date": "2022-05-19", "equip": "cal", "plan": 0, "actDay": 33500, "actNight": 44700, "actTotal": 78200, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 127, "date": "2022-05-20", "equip": "cal", "plan": 0, "actDay": 30000, "actNight": 31800, "actTotal": 61800, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 128, "date": "2022-05-23", "equip": "cal", "plan": 0, "actDay": 27000, "actNight": 43000, "actTotal": 70000, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 129, "date": "2022-05-24", "equip": "cal", "plan": 0, "actDay": 56500, "actNight": 48000, "actTotal": 104500, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 130, "date": "2022-05-25", "equip": "cal", "plan": 0, "actDay": 45700, "actNight": 33000, "actTotal": 78700, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 131, "date": "2022-05-26", "equip": "cal", "plan": 0, "actDay": 30800, "actNight": 31000, "actTotal": 61800, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 132, "date": "2022-05-27", "equip": "cal", "plan": 0, "actDay": 27000, "actNight": 28500, "actTotal": 55500, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 133, "date": "2022-05-30", "equip": "cal", "plan": 0, "actDay": 29000, "actNight": 40500, "actTotal": 69500, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}, {"id": 134, "date": "2022-05-31", "equip": "cal", "plan": 0, "actDay": 51000, "actNight": 46500, "actTotal": 97500, "worker": "", "spec": "", "oee": null, "avail": null, "perf": null, "yieldPct": null}];
+let nextId = Math.max(0, ...entries.map(e=>e.id)) + 1;
+let idleEntries = [{"id": 1, "date": "2022-05-02", "start": "08:00", "end": "10:20", "minutes": 140, "shift": "주간", "equip": "line1", "worker": "윤학수", "cause": "소재", "content": "반제품(투명)부족으로 작업계획 변경으로 인한 지연"}, {"id": 2, "date": "2022-05-02", "start": "20:00", "end": "21:30", "minutes": 90, "shift": "야간", "equip": "jh1", "worker": "전성태", "cause": "설비", "content": "압출기 청소 / 경탄 계량기 오류"}, {"id": 3, "date": "2022-05-02", "start": "08:00", "end": "09:30", "minutes": 90, "shift": "주간", "equip": "line2", "worker": "한명선", "cause": "방법", "content": "작업준비 / 예열체크 / 라인정리 정돈"}, {"id": 4, "date": "2022-05-02", "start": "15:30", "end": "15:50", "minutes": 20, "shift": "주간", "equip": "line2", "worker": "한명선", "cause": "설비", "content": "카렌다(#1,#2,#3) 흠집 그라인더 보수 (임시조치)"}, {"id": 5, "date": "2022-05-02", "start": "08:00", "end": "12:00", "minutes": 240, "shift": "주간", "equip": "cal", "worker": "박판조", "cause": "사람", "content": "예열작업 누락으로 작업지연"}, {"id": 6, "date": "2022-05-02", "start": "08:00", "end": "09:00", "minutes": 60, "shift": "주간", "equip": "jh2", "worker": "원장희", "cause": "방법", "content": "예열 및 작업준비"}, {"id": 7, "date": "2022-05-03", "start": "05:30", "end": "08:00", "minutes": 150, "shift": "야간", "equip": "line1", "worker": "원종수", "cause": "설비", "content": "4라미 열선히터 파손수리 / 스폰지롤 교체 / UV스폰지롤 교체"}, {"id": 8, "date": "2022-05-03", "start": "13:00", "end": "20:00", "minutes": 420, "shift": "주간", "equip": "jh1", "worker": "김영추", "cause": "환경", "content": "적재장소 부족으로 작업중단"}, {"id": 9, "date": "2022-05-03", "start": "20:00", "end": "22:00", "minutes": 120, "shift": "야간", "equip": "jh1", "worker": "전성태", "cause": "환경", "content": "적재장소 부족으로 작업중단"}, {"id": 10, "date": "2022-05-03", "start": "02:10", "end": "08:00", "minutes": 350, "shift": "야간", "equip": "line2", "worker": "한은섭", "cause": "설비", "content": "IN-CAL 롤교체로 작업중단 / 라인정비 및 청소"}, {"id": 11, "date": "2022-05-04", "start": "01:15", "end": "03:00", "minutes": 105, "shift": "야간", "equip": "line1", "worker": "원종수", "cause": "방법", "content": "층별구성 변경(3.0/0.07-->3.0/0.5) / 포장부 금형교체 / 6라미 체인이탈로 인한 정비"}, {"id": 12, "date": "2022-05-04", "start": "13:00", "end": "14:00", "minutes": 60, "shift": "주간", "equip": "jh1", "worker": "김정호", "cause": "설비", "content": "엠보 냉각조인트 교체"}, {"id": 13, "date": "2022-05-04", "start": "21:00", "end": "22:30", "minutes": 90, "shift": "야간", "equip": "jh1", "worker": "전성태", "cause": "설비", "content": "압출기 청소 / 경탄 계량기 오류"}, {"id": 14, "date": "2022-05-05", "start": "08:00", "end": "16:30", "minutes": 510, "shift": "주간", "equip": "line1", "worker": "김영한", "cause": "방법", "content": "36\" x 36\" 포장작업(포장부)"}, {"id": 15, "date": "2022-05-05", "start": "01:30", "end": "02:00", "minutes": 30, "shift": "야간", "equip": "line1", "worker": "원종수", "cause": "방법", "content": "층별구성 변경(5T-->3T)"}, {"id": 16, "date": "2022-05-05", "start": "08:00", "end": "08:40", "minutes": 40, "shift": "주간", "equip": "line2", "worker": "한명선", "cause": "방법", "content": "샘플 생산준비 및 생산"}, {"id": 17, "date": "2022-05-05", "start": "21:00", "end": "22:00", "minutes": 60, "shift": "주간", "equip": "cal", "worker": "박판조", "cause": "방법", "content": "배합/두께 변경 (0.3 --> 0.5)"}, {"id": 18, "date": "2022-05-06", "start": "05:30", "end": "06:45", "minutes": 75, "shift": "야간", "equip": "line1", "worker": "윤학수", "cause": "소재", "content": "원료(Dotp)부족으로 Line 가동중지"}, {"id": 19, "date": "2022-05-06", "start": "06:00", "end": "07:00", "minutes": 60, "shift": "야간", "equip": "jh1", "worker": "방현수", "cause": "소재", "content": "원료(Dotp)부족으로 Line 가동중지"}, {"id": 20, "date": "2022-05-06", "start": "11:40", "end": "12:10", "minutes": 30, "shift": "주간", "equip": "line2", "worker": "한명선", "cause": "설비", "content": "압출기 스윙 컨베어 벨트 수리"}, {"id": 21, "date": "2022-05-06", "start": "23:00", "end": "", "minutes": 60, "shift": "야간", "equip": "line2", "worker": "한은섭", "cause": "설비", "content": "카렌다 안전 와이어 수리"}, {"id": 22, "date": "2022-05-06", "start": "00:40", "end": "08:00", "minutes": 440, "shift": "야간", "equip": "line2", "worker": "한은섭", "cause": "설비", "content": "하지드럼 베어링 고장으로 가동중단"}, {"id": 23, "date": "2022-05-06", "start": "06:00", "end": "08:00", "minutes": 120, "shift": "야간", "equip": "jh2", "worker": "변우식", "cause": "소재", "content": "원료(Dotp)부족으로 Line 가동중지"}, {"id": 24, "date": "2022-05-06", "start": "18:00", "end": "19:00", "minutes": 60, "shift": "주간", "equip": "cal", "worker": "박판조", "cause": "설비", "content": "쿨링드럼 가소제 흡수종이 교체"}, {"id": 25, "date": "2022-05-07", "start": "", "end": "", "minutes": 120, "shift": "야간", "equip": "jh1", "worker": "방현수", "cause": "설비", "content": "압출기 청소"}, {"id": 26, "date": "2022-05-07", "start": "08:00", "end": "08:30", "minutes": 30, "shift": "주간", "equip": "line2", "worker": "한명선", "cause": "방법", "content": "EF 샘플생산 후 양산작업"}, {"id": 27, "date": "2022-05-08", "start": "22:00", "end": "23:00", "minutes": 60, "shift": "야간", "equip": "cal", "worker": "박판조", "cause": "설비", "content": "엠보 유압 고장으로 작업지연"}, {"id": 28, "date": "2022-05-08", "start": "02:00", "end": "02:30", "minutes": 30, "shift": "야간", "equip": "line1", "worker": "윤학수", "cause": "방법", "content": "배합변경 및 압출기 청소(30/80 -->44/400)"}, {"id": 29, "date": "2022-05-09", "start": "08:00", "end": "09:10", "minutes": 70, "shift": "주간", "equip": "line1", "worker": "원종수", "cause": "방법", "content": "층별구성 변경 / 스폰지롤 교체"}, {"id": 30, "date": "2022-05-09", "start": "21:00", "end": "23:35", "minutes": 155, "shift": "야간", "equip": "line1", "worker": "윤학수", "cause": "설비", "content": "5라미(투명) 드럼 벨브 터짐 및 수리"}, {"id": 31, "date": "2022-05-09", "start": "10:30", "end": "12:00", "minutes": 90, "shift": "주간", "equip": "jh1", "worker": "전성태", "cause": "설비", "content": "압출기 청소"}, {"id": 32, "date": "2022-05-09", "start": "14:00", "end": "15:00", "minutes": 60, "shift": "주간", "equip": "jh1", "worker": "전성태", "cause": "설비", "content": "카렌다 2번롤 고장"}, {"id": 33, "date": "2022-05-09", "start": "08:00", "end": "08:30", "minutes": 30, "shift": "주간", "equip": "line2", "worker": "한은섭", "cause": "방법", "content": "라인정비 및 준비"}, {"id": 34, "date": "2022-05-09", "start": "14:30", "end": "16:10", "minutes": 100, "shift": "주간", "equip": "line2", "worker": "한은섭", "cause": "소재", "content": "가소제 부족으로 가동중단"}, {"id": 35, "date": "2022-05-09", "start": "13:50", "end": "15:50", "minutes": 120, "shift": "주간", "equip": "cal", "worker": "박석찬", "cause": "소재", "content": "가소제 부족으로 가동중단"}, {"id": 36, "date": "2022-05-09", "start": "08:00", "end": "09:00", "minutes": 60, "shift": "주간", "equip": "jh1", "worker": "김찬범", "cause": "방법", "content": "작업준비 / 예열체크"}, {"id": 37, "date": "2022-05-09", "start": "13:00", "end": "18:00", "minutes": 300, "shift": "주간", "equip": "jh1", "worker": "김찬범", "cause": "사람", "content": "압출기 원료 탄화 발생으로 청소 및 작업준비"}, {"id": 38, "date": "2022-05-10", "start": "11:30", "end": "12:00", "minutes": 30, "shift": "주간", "equip": "line1", "worker": "원종수", "cause": "방법", "content": "포장부 금형교체 (18\"x36\" -->7\"x48\")"}, {"id": 39, "date": "2022-05-10", "start": "02:40", "end": "08:00", "minutes": 320, "shift": "야간", "equip": "line1", "worker": "김영한", "cause": "설비", "content": "열탕 Chain 끊김"}, {"id": 40, "date": "2022-05-10", "start": "14:00", "end": "15:30", "minutes": 90, "shift": "주간", "equip": "jh1", "worker": "전성태", "cause": "설비", "content": "압출기 청소"}, {"id": 41, "date": "2022-05-10", "start": "18:00", "end": "19:00", "minutes": 60, "shift": "주간", "equip": "cal", "worker": "박석찬", "cause": "방법", "content": "쿨링드럼 가소제 흡수종이 교체"}, {"id": 42, "date": "2022-05-11", "start": "12:20", "end": "12:50", "minutes": 30, "shift": "주간", "equip": "line1", "worker": "원종수", "cause": "설비", "content": "열탕 상부 Chain 텐션 설정 오류"}, {"id": 43, "date": "2022-05-11", "start": "22:50", "end": "23:50", "minutes": 60, "shift": "야간", "equip": "line1", "worker": "김영한", "cause": "방법", "content": "금형교체(18\"x36\"-->7\"x48\") 및 적재기 세팅 변경"}, {"id": 44, "date": "2022-05-11", "start": "05:00", "end": "08:00", "minutes": 180, "shift": "야간", "equip": "line1", "worker": "김영한", "cause": "사람", "content": "라인트러블로 인한 작업중단"}, {"id": 45, "date": "2022-05-11", "start": "21:00", "end": "23:00", "minutes": 120, "shift": "야간", "equip": "jh1", "worker": "김정호", "cause": "설비", "content": "압출기 청소"}, {"id": 46, "date": "2022-05-12", "start": "08:00", "end": "10:00", "minutes": 120, "shift": "주간", "equip": "line1", "worker": "윤학수", "cause": "방법", "content": "불량발생 (카펫 반짝임)으로 인한 작업중단"}, {"id": 47, "date": "2022-05-12", "start": "17:20", "end": "19:40", "minutes": 140, "shift": "주간", "equip": "line1", "worker": "윤학수", "cause": "설비", "content": "재단기 배출컨베어 부하걸림으로 작업중단, 컨베어 교체 , 실린더 정비"}, {"id": 48, "date": "2022-05-12", "start": "21:50", "end": "22:30", "minutes": 40, "shift": "야간", "equip": "line1", "worker": "김영한", "cause": "방법", "content": "금형교체(18\"x36\"-->7\"x48\"), 펀칭기 가변드라이브 교체"}, {"id": 49, "date": "2022-05-12", "start": "05:00", "end": "06:00", "minutes": 60, "shift": "야간", "equip": "jh2", "worker": "김정호", "cause": "설비", "content": "압출기 청소"}, {"id": 50, "date": "2022-05-12", "start": "08:40", "end": "09:20", "minutes": 40, "shift": "주간", "equip": "line2", "worker": "한은섭", "cause": "방법", "content": "금형교체(6폭-->5폭) 및 세팅"}, {"id": 51, "date": "2022-05-13", "start": "12:00", "end": "12:10", "minutes": 10, "shift": "주간", "equip": "line2", "worker": "한은섭", "cause": "방법", "content": "샘플 생산"}, {"id": 52, "date": "2022-05-13", "start": "21:40", "end": "22:00", "minutes": 20, "shift": "야간", "equip": "line2", "worker": "한명선", "cause": "사람", "content": "하지 트러블"}, {"id": 53, "date": "2022-05-13", "start": "06:50", "end": "08:00", "minutes": 70, "shift": "야간", "equip": "line2", "worker": "한명선", "cause": "방법", "content": "작업종료 및 라인 정리정돈"}, {"id": 54, "date": "2022-05-13", "start": "08:30", "end": "10:00", "minutes": 90, "shift": "주간", "equip": "line1", "worker": "윤학수", "cause": "설비", "content": "미미 받침 컨베어 교체, 베어링 교체 , 양쪽 칼날 교체"}, {"id": 55, "date": "2022-05-13", "start": "14:30", "end": "15:30", "minutes": 60, "shift": "주간", "equip": "jh1", "worker": "방현수", "cause": "설비", "content": "압출기 청소"}, {"id": 56, "date": "2022-05-14", "start": "08:00", "end": "09:00", "minutes": 60, "shift": "주간", "equip": "line1", "worker": "윤학수", "cause": "설비", "content": "고무롤 교체 및 샘플준비"}, {"id": 57, "date": "2022-05-14", "start": "09:00", "end": "10:30", "minutes": 90, "shift": "주간", "equip": "line1", "worker": "윤학수", "cause": "방법", "content": "층별구성 개선 3종 샘플생산"}, {"id": 58, "date": "2022-05-14", "start": "15:30", "end": "17:00", "minutes": 90, "shift": "주간", "equip": "line1", "worker": "윤학수", "cause": "설비", "content": "민자 O/S 측 스톱바 수리후 스타트"}, {"id": 59, "date": "2022-05-15", "start": "08:20", "end": "10:00", "minutes": 100, "shift": "주간", "equip": "jh1", "worker": "방현수", "cause": "설비", "content": "반바리 몽키부시 조임"}, {"id": 60, "date": "2022-05-15", "start": "11:00", "end": "14:40", "minutes": 220, "shift": "주간", "equip": "line1", "worker": "윤학수", "cause": "설비", "content": "카렌다 2번 부하로 인한 라인가종 중단(중지 권치로 대체작업)"}, {"id": 61, "date": "2022-05-16", "start": "08:00", "end": "09:10", "minutes": 70, "shift": "주간", "equip": "line2", "worker": "한명선", "cause": "방법", "content": "층별구성 교체(소폭-->장폭) 1라미 히터 교체, 엠보롤 온도센서 교체"}, {"id": 62, "date": "2022-05-16", "start": "16:40", "end": "17:30", "minutes": 50, "shift": "주간", "equip": "line2", "worker": "한명선", "cause": "방법", "content": "3.5T Acoustic Sample 제작 및 작업준비"}, {"id": 63, "date": "2022-05-16", "start": "08:00", "end": "08:30", "minutes": 30, "shift": "주간", "equip": "cal", "worker": "박판조", "cause": "방법", "content": "오전 조회"}, {"id": 64, "date": "2022-05-16", "start": "08:00", "end": "09:00", "minutes": 60, "shift": "주간", "equip": "jh2", "worker": "원장희", "cause": "설비", "content": "액상안정제 계량 오류롤 넘침"}, {"id": 65, "date": "2022-05-16", "start": "12:00", "end": "13:20", "minutes": 80, "shift": "주간", "equip": "jh2", "worker": "원장희", "cause": "방법", "content": "샘플 생산 (Acoustic Foam Sheet 합지)"}, {"id": 66, "date": "2022-05-17", "start": "08:40", "end": "09:00", "minutes": 20, "shift": "주간", "equip": "line2", "worker": "한명선", "cause": "사람", "content": "중하지 라인트러블"}, {"id": 67, "date": "2022-05-17", "start": "01:00", "end": "01:40", "minutes": 40, "shift": "야간", "equip": "jh2", "worker": "변우식", "cause": "설비", "content": "압출기 컨베어 벨트 터짐 / 연결"}, {"id": 68, "date": "2022-05-17", "start": "04:00", "end": "06:30", "minutes": 150, "shift": "야간", "equip": "jh2", "worker": "변우식", "cause": "소재", "content": "PVC 원료 수분 함유되어 작업 중단 / 호퍼에 잔량 PVC 수동으로 퍼냄"}, {"id": 69, "date": "2022-05-17", "start": "14:00", "end": "15:00", "minutes": 60, "shift": "주간", "equip": "cal", "worker": "박판조", "cause": "방법", "content": "배합 및 두께 변경(0.20 --> 0.07) 및 작업준비"}, {"id": 70, "date": "2022-05-18", "start": "09:10", "end": "14:00", "minutes": 290, "shift": "주간", "equip": "line2", "worker": "한명선", "cause": "방법", "content": "1500폭 TEST 작업및 금형교체 (6폭-->8폭) , M社 샘플생산, 본 양산준비 (8폭-->6폭)"}, {"id": 71, "date": "2022-05-18", "start": "02:00", "end": "03:00", "minutes": 60, "shift": "야간", "equip": "cal", "worker": "박석찬", "cause": "방법", "content": "쿨링드럼 가소제 흡수종이 교체"}, {"id": 72, "date": "2022-05-19", "start": "20:20", "end": "", "minutes": 400, "shift": "야간", "equip": "line1", "worker": "윤학수", "cause": "설비", "content": "3라미 드럼 Out밸브 후레쉬밸브 파손으로 보일러 off 후 스팀배출 후 교체"}, {"id": 73, "date": "2022-05-19", "start": "04:15", "end": "05:15", "minutes": 60, "shift": "야간", "equip": "jh1", "worker": "방현수", "cause": "설비", "content": "압출기 청소"}, {"id": 74, "date": "2022-05-19", "start": "04:00", "end": "05:00", "minutes": 60, "shift": "야간", "equip": "line2", "worker": "한은섭", "cause": "방법", "content": "층별구성 변경(2.5T-->2.0T) 금형교체 및 작업준비"}, {"id": 75, "date": "2022-05-19", "start": "03:30", "end": "04:30", "minutes": 60, "shift": "야간", "equip": "cal", "worker": "박석찬", "cause": "방법", "content": "배합변경 및 쿨링드럼 종이 교체"}, {"id": 76, "date": "2022-05-20", "start": "08:00", "end": "20:00", "minutes": 720, "shift": "주간", "equip": "line1", "worker": "원종수", "cause": "설비", "content": "열탕 상부 용접, 생산라인 정비, 미러 및 U턴 컨베어 청소"}, {"id": 77, "date": "2022-05-20", "start": "20:00", "end": "", "minutes": 380, "shift": "야간", "equip": "line1", "worker": "윤학수", "cause": "설비", "content": "기계 정비 및 예열 작업"}, {"id": 78, "date": "2022-05-20", "start": "01:00", "end": "02:30", "minutes": 90, "shift": "야간", "equip": "jh1", "worker": "방현수", "cause": "설비", "content": "압출기 청소"}, {"id": 79, "date": "2022-05-22", "start": "08:00", "end": "08:30", "minutes": 30, "shift": "주간", "equip": "line1", "worker": "원종수", "cause": "설비", "content": "미미 컨베어 벨트 고장으로 UV 공정 트러블 발생"}, {"id": 80, "date": "2022-05-23", "start": "04:30", "end": "07:00", "minutes": 150, "shift": "야간", "equip": "jh1", "worker": "김정호", "cause": "설비", "content": "압출기 청소"}, {"id": 81, "date": "2022-05-23", "start": "08:00", "end": "08:30", "minutes": 30, "shift": "주간", "equip": "line2", "worker": "한은섭", "cause": "방법", "content": "예열 및 작업준비"}, {"id": 82, "date": "2022-05-23", "start": "00:10", "end": "00:50", "minutes": 40, "shift": "야간", "equip": "line2", "worker": "한명선", "cause": "방법", "content": "금형교체 (6폭-->5폭)"}, {"id": 83, "date": "2022-05-23", "start": "08:00", "end": "08:30", "minutes": 30, "shift": "주간", "equip": "jh2", "worker": "변우식", "cause": "방법", "content": "예열 및 작업준비"}, {"id": 84, "date": "2022-05-23", "start": "10:30", "end": "11:30", "minutes": 60, "shift": "주간", "equip": "jh2", "worker": "변우식", "cause": "설비", "content": "이송 에러"}, {"id": 85, "date": "2022-05-24", "start": "12:10", "end": "12:30", "minutes": 20, "shift": "주간", "equip": "line1", "worker": "윤학수", "cause": "방법", "content": "층별구성 변경(5T-->2T)"}, {"id": 86, "date": "2022-05-24", "start": "03:00", "end": "04:20", "minutes": 80, "shift": "야간", "equip": "cal", "worker": "박판조", "cause": "방법", "content": "쿨링드럼 가소제 흡수종이 교체, 장폭 작업준비"}, {"id": 87, "date": "2022-05-24", "start": "20:00", "end": "21:00", "minutes": 60, "shift": "주간", "equip": "jh2", "worker": "원장희", "cause": "사람", "content": "PVC 비닐 혼입으로 정리 후 가동"}, {"id": 88, "date": "2022-05-25", "start": "08:00", "end": "08:55", "minutes": 55, "shift": "주간", "equip": "line1", "worker": "윤학수", "cause": "설비", "content": "열탕상부 스팀 고장으로 인해 작업지연"}, {"id": 89, "date": "2022-05-25", "start": "15:10", "end": "15:25", "minutes": 15, "shift": "주간", "equip": "line2", "worker": "한은섭", "cause": "방법", "content": "TAJ 긴급샘플 생산"}, {"id": 90, "date": "2022-05-25", "start": "16:00", "end": "17:00", "minutes": 60, "shift": "주간", "equip": "line2", "worker": "한은섭", "cause": "설비", "content": "반바리 슬라이드 고장 및 수리"}, {"id": 91, "date": "2022-05-25", "start": "17:20", "end": "18:20", "minutes": 60, "shift": "주간", "equip": "line2", "worker": "한은섭", "cause": "방법", "content": "층별구성 교체(2T-->3T) 및금형교체 (7\"x48\"-->9\"x48\")"}, {"id": 92, "date": "2022-05-25", "start": "14:00", "end": "15:00", "minutes": 60, "shift": "주간", "equip": "cal", "worker": "박석찬", "cause": "방법", "content": "배합교체(0.1-->0.5) 및 쿨링종이 교체"}, {"id": 93, "date": "2022-05-26", "start": "09:00", "end": "10:30", "minutes": 90, "shift": "주간", "equip": "line2", "worker": "한은섭", "cause": "방법", "content": "압출기 이상으로 카렌다 2봉세탕 작업"}, {"id": 94, "date": "2022-05-27", "start": "20:00", "end": "22:30", "minutes": 150, "shift": "야간", "equip": "line1", "worker": "원종수", "cause": "방법", "content": "원장 펀칭작업"}, {"id": 95, "date": "2022-05-27", "start": "05:35", "end": "06:45", "minutes": 70, "shift": "야간", "equip": "line1", "worker": "원종수", "cause": "방법", "content": "금형교체 (6\"x36\" -->18\"x36\")"}, {"id": 96, "date": "2022-05-27", "start": "17:10", "end": "20:00", "minutes": 170, "shift": "주간", "equip": "line1", "worker": "윤학수", "cause": "방법", "content": "600 x 600 반제품 포화상태로 펀칭작업 지원"}, {"id": 97, "date": "2022-05-27", "start": "09:20", "end": "13:00", "minutes": 220, "shift": "주간", "equip": "line2", "worker": "한은섭", "cause": "방법", "content": "5T 샘플생산 및 작업준비"}, {"id": 98, "date": "2022-05-27", "start": "15:40", "end": "16:00", "minutes": 20, "shift": "주간", "equip": "line2", "worker": "한은섭", "cause": "방법", "content": "압출기 작업방법 변경"}, {"id": 99, "date": "2022-05-27", "start": "23:30", "end": "", "minutes": 60, "shift": "야간", "equip": "line2", "worker": "한명선", "cause": "설비", "content": "경탄 계량 오작동"}, {"id": 100, "date": "2022-05-27", "start": "06:20", "end": "08:00", "minutes": 100, "shift": "야간", "equip": "line2", "worker": "한명선", "cause": "방법", "content": "금형교체 (9\"x48\" --> 7\"x48\")"}, {"id": 101, "date": "2022-05-27", "start": "08:30", "end": "09:30", "minutes": 60, "shift": "주간", "equip": "jh2", "worker": "변우식", "cause": "방법", "content": "엠보교체"}, {"id": 102, "date": "2022-05-27", "start": "20:00", "end": "21:00", "minutes": 60, "shift": "주간", "equip": "jh2", "worker": "원장희", "cause": "방법", "content": "엠보교체"}, {"id": 103, "date": "2022-05-27", "start": "13:00", "end": "14:30", "minutes": 90, "shift": "주간", "equip": "cal", "worker": "박석찬", "cause": "설비", "content": "와인더 핀치롤 모터고장"}, {"id": 104, "date": "2022-05-27", "start": "04:00", "end": "05:30", "minutes": 90, "shift": "야간", "equip": "cal", "worker": "박판조", "cause": "방법", "content": "쿨링 종이 교체 및 청소"}, {"id": 105, "date": "2022-05-28", "start": "20:00", "end": "21:00", "minutes": 60, "shift": "야간", "equip": "line1", "worker": "원종수", "cause": "환경", "content": "정전(모터수리)"}, {"id": 106, "date": "2022-05-28", "start": "01:00", "end": "02:00", "minutes": 60, "shift": "야간", "equip": "line1", "worker": "원종수", "cause": "설비", "content": "UV롤교체 , 스폰지롤 교체"}, {"id": 107, "date": "2022-05-28", "start": "17:30", "end": "21:00", "minutes": 210, "shift": "주간", "equip": "jh1", "worker": "김정호", "cause": "설비", "content": "반바리 감속기 오일펌프 모터교체"}, {"id": 108, "date": "2022-05-29", "start": "23:30", "end": "", "minutes": 90, "shift": "야간", "equip": "line1", "worker": "원종수", "cause": "방법", "content": "금형교체(9\" x 48\"-->7\"x48\")"}, {"id": 109, "date": "2022-05-29", "start": "08:00", "end": "09:30", "minutes": 90, "shift": "주간", "equip": "jh1", "worker": "김정호", "cause": "설비", "content": "반바리 Door 고장"}, {"id": 110, "date": "2022-05-30", "start": "23:00", "end": "23:30", "minutes": 30, "shift": "주간", "equip": "line1", "worker": "윤학수", "cause": "방법", "content": "층별구성 변경(5T-->2.5T)"}, {"id": 111, "date": "2022-05-30", "start": "08:00", "end": "10:10", "minutes": 130, "shift": "주간", "equip": "line2", "worker": "한명선", "cause": "방법", "content": "8폭 Test 작업준비 및 라인 정리정돈"}, {"id": 112, "date": "2022-05-30", "start": "10:10", "end": "12:50", "minutes": 160, "shift": "주간", "equip": "line2", "worker": "한명선", "cause": "방법", "content": "층별구성 변경 (2T-->4.5T) / 금형 변경"}, {"id": 113, "date": "2022-05-30", "start": "21:10", "end": "", "minutes": 170, "shift": "야간", "equip": "line2", "worker": "한은섭", "cause": "방법", "content": "금형교체 및 라인폭 세팅"}, {"id": 114, "date": "2022-05-30", "start": "08:00", "end": "09:00", "minutes": 60, "shift": "주간", "equip": "cal", "worker": "박판조", "cause": "방법", "content": "예열 및 작업준비"}, {"id": 115, "date": "2022-05-30", "start": "22:30", "end": "23:30", "minutes": 60, "shift": "야간", "equip": "cal", "worker": "박석찬", "cause": "방법", "content": "배합견경(35-->30) 쿨링종이 교체"}, {"id": 116, "date": "2022-05-30", "start": "08:00", "end": "09:00", "minutes": 60, "shift": "주간", "equip": "jh1", "worker": "원장희", "cause": "방법", "content": "고무롤 교체"}, {"id": 117, "date": "2022-05-31", "start": "06:00", "end": "08:00", "minutes": 120, "shift": "야간", "equip": "line2", "worker": "한은섭", "cause": "방법", "content": "작업종료 및 라인 정리정돈"}, {"id": 118, "date": "2022-05-31", "start": "02:00", "end": "03:00", "minutes": 60, "shift": "야간", "equip": "cal", "worker": "박석찬", "cause": "방법", "content": "배합견경(30-->25)"}, {"id": 119, "date": "2022-05-31", "start": "03:00", "end": "04:00", "minutes": 60, "shift": "야간", "equip": "cal", "worker": "박석찬", "cause": "설비", "content": "슈퍼믹서 배출 고장"}];
+let nextIdleId = Math.max(0, ...idleEntries.map(e=>e.id)) + 1;
+let editingKey = null; // "date|equip" currently loaded for edit
+
+function total(e){ return (e.actDay||0) + (e.actNight||0); }
+function rate(e){ return e.plan>0 ? total(e)/e.plan : null; }
+
+/* =========================================================
+   THEME + TABS
+========================================================= */
+// (테마 토글은 호스트 사이트가 라이트 전용이라 제거됨)
+
+PRROOT.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    PRROOT.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    PRROOT.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+    prRenderView(btn.dataset.view);
+  });
+});
+
+function curHex(equipKey){
+  const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  return EQ[equipKey].hex[t];
+}
+
+/* =========================================================
+   FORMAT HELPERS
+========================================================= */
+const fmtInt = n => (n===null||n===undefined||isNaN(n)) ? '-' : Math.round(n).toLocaleString('ko-KR');
+const fmtPct = n => (n===null||n===undefined||isNaN(n)) ? '-' : (n*100).toFixed(1)+'%';
+function rateClass(n){
+  if (n===null||n===undefined||isNaN(n)) return '';
+  if (n >= 0.9) return 'good';
+  if (n >= 0.7) return 'warn';
+  return 'crit';
+}
+function rateColorVar(n){
+  if (n===null||n===undefined||isNaN(n)) return 'var(--text-muted)';
+  if (n >= 0.9) return 'var(--good)';
+  if (n >= 0.7) return 'var(--warning)';
+  return 'var(--critical)';
+}
+function dowOf(dateStr){ return DOW_KR[new Date(dateStr+'T00:00:00').getDay()]; }
+// "규격" 필드 앞부분의 두께 표기(예: "0.1T / 100 x 200", "3T")를 파싱합니다.
+function parseThickness(spec){
+  if (!spec) return null;
+  const m = String(spec).match(/(\d+(?:\.\d+)?)\s*[Tt]\b/);
+  return m ? m[1]+'T' : null;
+}
+// 반제품 포지션: 투명CAL은 항상 "투명", 중하지1·2호는 입력된 포지션(중지/하지)을 그대로 사용합니다.
+function positionOf(e){
+  if (e.equip==='cal') return '투명';
+  return e.position || '';
+}
+
+/* =========================================================
+   IDLE TIME (유휴시간) HELPERS  — 4M1E 원인유형 분류: 설비/방법/소재/사람/환경
+========================================================= */
+const CAUSE_TYPES = ['설비','방법','소재','사람','환경'];
+const CAUSE_COLOR = {'설비':'var(--cause-1)','방법':'var(--cause-2)','소재':'var(--cause-3)','사람':'var(--cause-4)','환경':'var(--cause-5)'};
+function fmtMin(n){
+  if (n===null||n===undefined||isNaN(n)) return '-';
+  const v = Math.round(n);
+  const h = Math.floor(v/60), m = v%60;
+  return h>0 ? `${h}시간 ${m}분` : `${m}분`;
+}
+function idleInRange(from, to){ return idleEntries.filter(e=>e.date>=from && e.date<=to); }
+
+/* =========================================================
+   TOOLTIP
+========================================================= */
+const tipEl = document.getElementById('tooltip');
+function showTip(x, y, html){
+  tipEl.innerHTML = html;
+  tipEl.classList.add('show');
+  const rect = tipEl.getBoundingClientRect();
+  let left = x + 14, top = y - rect.height/2;
+  if (left + rect.width > window.innerWidth - 8) left = x - rect.width - 14;
+  top = Math.max(8, Math.min(top, window.innerHeight - rect.height - 8));
+  tipEl.style.left = left + 'px'; tipEl.style.top = top + 'px';
+}
+function hideTip(){ tipEl.classList.remove('show'); }
+
+/* =========================================================
+   SVG CHART ENGINE
+========================================================= */
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs){
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+function niceMax(v){
+  if (v <= 0) return 1;
+  const mag = Math.pow(10, Math.floor(Math.log10(v)));
+  const n = v / mag;
+  let f; if (n <= 1) f=1; else if (n<=2) f=2; else if (n<=5) f=5; else f=10;
+  return f * mag;
+}
+function axes(svg, w,h,padL,padR,padT,padB, maxV, yFormat){
+  const y0 = h-padB, y1 = padT;
+  const yScale = v => y0 - (v/maxV)*(y0-y1);
+  const ticks=4;
+  for (let i=0;i<=ticks;i++){
+    const v = maxV*i/ticks, yy = yScale(v);
+    svg.appendChild(el('line',{x1:padL,x2:w-padR,y1:yy,y2:yy,class:'grid-line'}));
+    const t = el('text',{x:padL-8,y:yy+4,'text-anchor':'end','font-size':10.5}); t.textContent=yFormat(v); svg.appendChild(t);
+  }
+  svg.appendChild(el('line',{x1:padL,x2:padL,y1:padT,y2:y0,class:'axis-line'}));
+  svg.appendChild(el('line',{x1:padL,x2:w-padR,y1:y0,y2:y0,class:'axis-line'}));
+  return {y0,y1,yScale};
+}
+
+function trendChart(container, {type, categories, series, height=250, yFormat=fmtInt, perCat=32, tooltipFmt, target, targetLabel}){
+  if (type==='combo') return comboChart(container, {categories, series, target, targetLabel, height, yFormat, perCat, tooltipFmt});
+  if (type==='line') return lineChart(container, {categories, series, height, yFormat, perCat});
+  if (type==='area') return areaChart(container, {categories, series, height, yFormat, perCat, stacked:true});
+  if (type==='stacked') return barChart(container, {categories, series, height, yFormat, perCat, stacked:true, tooltipFmt});
+  return barChart(container, {categories, series, height, yFormat, perCat, stacked:false, tooltipFmt});
+}
+
+/* stacked bar (actual, split by equipment) + a target tick/line overlay (plan) — a bullet-style
+   combo chart: one glance shows whether the actual stack clears the plan mark for that day. */
+function comboChart(container, {categories, series, target, targetLabel='생산계획', height=250, yFormat=fmtInt, perCat=32, tooltipFmt}){
+  container.innerHTML = '';
+  const padL=54, padR=12, padT=14, padB=28;
+  const plotW = Math.max(categories.length*perCat, 260);
+  const w = plotW+padL+padR, h = height;
+  const svg = el('svg',{viewBox:`0 0 ${w} ${h}`, width:w, height:h, style:'display:block'});
+  container.appendChild(svg);
+
+  let maxV = 0;
+  categories.forEach((c,ci)=>{ let s=0; series.forEach(sr=>{ s += sr.values[ci]||0; }); maxV=Math.max(maxV,s); });
+  (target||[]).forEach(v=>{ if (v!=null) maxV=Math.max(maxV,v); });
+  maxV = niceMax(maxV||1);
+  const {y0,y1,yScale} = axes(svg,w,h,padL,padR,padT,padB,maxV,yFormat);
+
+  const groupW = perCat, barW = Math.max(8, groupW-12);
+  const hasTarget = (target||[]).some(v=>v!=null && v>0);
+
+  categories.forEach((cat,ci)=>{
+    const gx = padL + ci*groupW;
+    const showLabel = categories.length<=20 || ci % Math.ceil(categories.length/20)===0;
+    if (showLabel){ const t=el('text',{x:gx+groupW/2,y:h-8,'text-anchor':'middle','font-size':10}); t.textContent=cat; svg.appendChild(t); }
+
+    const bx = gx + (groupW-barW)/2;
+    let acc = 0;
+    const stackTotal = series.reduce((a,s)=>a+(s.values[ci]||0),0);
+    series.forEach((s,si)=>{
+      const v = s.values[ci]||0;
+      if (v>0){
+        const yTop = y0 - ((acc+v)/maxV)*(y0-y1);
+        const yBottom = y0 - (acc/maxV)*(y0-y1);
+        const bh = Math.max(0, yBottom-yTop);
+        const isTopSeg = Math.abs(acc+v-stackTotal) < 0.001;
+        const r = isTopSeg ? Math.min(4, barW/2, bh) : 0;
+        const path = bh>0 ? (r>0
+          ? `M${bx},${yTop+r} Q${bx},${yTop} ${bx+r},${yTop} L${bx+barW-r},${yTop} Q${bx+barW},${yTop} ${bx+barW},${yTop+r} L${bx+barW},${yBottom} L${bx},${yBottom} Z`
+          : `M${bx},${yTop} L${bx+barW},${yTop} L${bx+barW},${yBottom} L${bx},${yBottom} Z`) : '';
+        const rect = el('path',{d:path, fill:s.color});
+        rect.style.cursor='pointer';
+        rect.addEventListener('mousemove',(ev)=>{
+          const html = tooltipFmt ? tooltipFmt(cat,s,v) : `<div class="t-title">${cat}</div><div class="t-row"><span class="k">${s.name}</span><b>${yFormat(v)}</b></div>`;
+          showTip(ev.clientX, ev.clientY, html);
+        });
+        rect.addEventListener('mouseleave', hideTip);
+        svg.appendChild(rect);
+      }
+      acc += v;
+    });
+
+    if (hasTarget){
+      const tv = target[ci];
+      if (tv!=null){
+        const ty = yScale(Math.min(tv,maxV));
+        const tick = el('line',{x1:bx-4, x2:bx+barW+4, y1:ty, y2:ty, stroke:'var(--text-primary)', 'stroke-width':2.5, 'stroke-linecap':'round'});
+        tick.style.cursor='pointer';
+        tick.addEventListener('mousemove',(ev)=>{
+          showTip(ev.clientX, ev.clientY, `<div class="t-title">${cat}</div><div class="t-row"><span class="k">${targetLabel}</span><b>${yFormat(tv)}</b></div><div class="t-row"><span class="k">실적 합계</span><b>${yFormat(stackTotal)}</b></div>`);
+        });
+        tick.addEventListener('mouseleave', hideTip);
+        svg.appendChild(tick);
+      }
+    }
+  });
+  return svg;
+}
+
+function barChart(container, {categories, series, height=250, yFormat=fmtInt, perCat=32, stacked=false, tooltipFmt}){
+  container.innerHTML = '';
+  const padL=54, padR=12, padT=14, padB=28;
+  const plotW = Math.max(categories.length*perCat, 260);
+  const w = plotW+padL+padR, h = height;
+  const svg = el('svg',{viewBox:`0 0 ${w} ${h}`, width:w, height:h, style:'display:block'});
+  container.appendChild(svg);
+
+  let maxV = 0;
+  if (stacked){
+    categories.forEach((c,ci)=>{ let s=0; series.forEach(sr=>{ s += sr.values[ci]||0; }); maxV=Math.max(maxV,s); });
+  } else {
+    series.forEach(s=>s.values.forEach(v=>{ if (v!=null) maxV=Math.max(maxV,v); }));
+  }
+  maxV = niceMax(maxV||1);
+  const {y0,yScale} = axes(svg,w,h,padL,padR,padT,padB,maxV,yFormat);
+
+  const groupW = perCat, nS = series.length, barGap=2;
+  const barW = stacked ? Math.max(6, groupW-10) : Math.max(3,(groupW-8)/nS - barGap);
+
+  categories.forEach((cat,ci)=>{
+    const gx = padL + ci*groupW;
+    const showLabel = categories.length<=20 || ci % Math.ceil(categories.length/20)===0;
+    if (showLabel){ const t=el('text',{x:gx+groupW/2,y:h-8,'text-anchor':'middle','font-size':10}); t.textContent=cat; svg.appendChild(t); }
+    if (stacked){
+      let acc = 0;
+      series.forEach(s=>{
+        const v = s.values[ci]||0;
+        if (v<=0) return;
+        const bx = gx + (groupW-barW)/2;
+        const y1v = y0 - yScale2(acc); const y2v = y0 - yScale2(acc+v);
+        function yScale2(val){ return (val/maxV)*(y0-14); }
+        const by = y0 - yScale2(acc+v), bh = yScale2(v);
+        const rect = el('rect',{x:bx,y:by,width:barW,height:Math.max(0,bh),fill:s.color});
+        rect.style.cursor='pointer';
+        rect.addEventListener('mousemove',(ev)=>{
+          const html = tooltipFmt ? tooltipFmt(cat,s,v) : `<div class="t-title">${cat}</div><div class="t-row"><span class="k">${s.name}</span><b>${yFormat(v)}</b></div>`;
+          showTip(ev.clientX, ev.clientY, html);
+        });
+        rect.addEventListener('mouseleave', hideTip);
+        svg.appendChild(rect);
+        acc += v;
+      });
+    } else {
+      series.forEach((s,si)=>{
+        const v = s.values[ci];
+        if (v==null) return;
+        const bx = gx + 4 + si*(barW+barGap);
+        const bh = Math.max(0, y0 - yScale(v));
+        const by = y0 - bh;
+        const r = Math.min(4, barW/2, bh);
+        const path = bh>0 ? `M${bx},${by+r} Q${bx},${by} ${bx+r},${by} L${bx+barW-r},${by} Q${bx+barW},${by} ${bx+barW},${by+r} L${bx+barW},${y0} L${bx},${y0} Z` : '';
+        const rect = el('path',{d:path, fill:s.color, opacity: s.muted?0.9:1});
+        rect.style.cursor='pointer';
+        rect.addEventListener('mousemove',(ev)=>{
+          const html = tooltipFmt ? tooltipFmt(cat,s,v) : `<div class="t-title">${cat}</div><div class="t-row"><span class="k">${s.name}</span><b>${yFormat(v)}</b></div>`;
+          showTip(ev.clientX, ev.clientY, html);
+        });
+        rect.addEventListener('mouseleave', hideTip);
+        svg.appendChild(rect);
+      });
+    }
+  });
+  return svg;
+}
+
+function lineChart(container, {categories, series, height=250, yFormat=fmtPct, perCat=32, yMax, refLine}){
+  container.innerHTML = '';
+  const padL=50, padR=14, padT=16, padB=28;
+  const plotW = Math.max((categories.length-1)*perCat, 220);
+  const w = plotW+padL+padR, h=height;
+  const svg = el('svg',{viewBox:`0 0 ${w} ${h}`, width:w, height:h, style:'display:block'});
+  container.appendChild(svg);
+
+  let maxV = yMax || 0;
+  if (!yMax){ series.forEach(s=>s.values.forEach(v=>{ if (v!=null) maxV=Math.max(maxV,v); })); maxV = Math.max(niceMax(maxV||1), refLine?refLine*1.1:0); }
+  const {y0,y1,yScale} = axes(svg,w,h,padL,padR,padT,padB,maxV,yFormat);
+  const xScale = i => padL + i*(plotW/Math.max(1,categories.length-1));
+  if (refLine){ const yy=yScale(refLine); svg.appendChild(el('line',{x1:padL,x2:w-padR,y1:yy,y2:yy,class:'ref-line'})); }
+
+  categories.forEach((cat,ci)=>{
+    const showLabel = categories.length<=20 || ci % Math.ceil(categories.length/20)===0;
+    if (showLabel){ const t=el('text',{x:xScale(ci),y:h-8,'text-anchor':'middle','font-size':10}); t.textContent=cat; svg.appendChild(t); }
+  });
+
+  series.forEach(s=>{
+    let d='';
+    s.values.forEach((v,ci)=>{ if (v==null) return; const x=xScale(ci), y=yScale(Math.min(v,maxV)); d += (d===''?'M':'L')+x+','+y+' '; });
+    svg.appendChild(el('path',{d, fill:'none', stroke:s.color, 'stroke-width':2, 'stroke-linejoin':'round','stroke-linecap':'round'}));
+    s.values.forEach((v,ci)=>{
+      if (v==null) return;
+      const x=xScale(ci), y=yScale(Math.min(v,maxV));
+      const hit = el('circle',{cx:x,cy:y,r:8,fill:'transparent',style:'cursor:pointer'});
+      hit.addEventListener('mousemove',(ev)=>{ showTip(ev.clientX, ev.clientY, `<div class="t-title">${categories[ci]}</div><div class="t-row"><span class="k">${s.name}</span><b>${yFormat(v)}</b></div>`); });
+      hit.addEventListener('mouseleave', hideTip);
+      svg.appendChild(hit);
+      svg.appendChild(el('circle',{cx:x,cy:y,r:3,fill:s.color}));
+    });
+  });
+  return svg;
+}
+
+function areaChart(container, {categories, series, height=250, yFormat=fmtInt, perCat=32, stacked=true}){
+  container.innerHTML = '';
+  const padL=54, padR=12, padT=14, padB=28;
+  const plotW = Math.max((categories.length-1)*perCat, 260);
+  const w = plotW+padL+padR, h=height;
+  const svg = el('svg',{viewBox:`0 0 ${w} ${h}`, width:w, height:h, style:'display:block'});
+  container.appendChild(svg);
+
+  let maxV=0;
+  categories.forEach((c,ci)=>{ let s=0; series.forEach(sr=>{ s+=sr.values[ci]||0; }); maxV=Math.max(maxV,s); });
+  maxV = niceMax(maxV||1);
+  const {y0,yScale} = axes(svg,w,h,padL,padR,padT,padB,maxV,yFormat);
+  const xScale = i => padL + i*(plotW/Math.max(1,categories.length-1));
+
+  categories.forEach((cat,ci)=>{
+    const showLabel = categories.length<=20 || ci % Math.ceil(categories.length/20)===0;
+    if (showLabel){ const t=el('text',{x:xScale(ci),y:h-8,'text-anchor':'middle','font-size':10}); t.textContent=cat; svg.appendChild(t); }
+  });
+
+  const cum = categories.map(()=>0);
+  series.forEach((s,si)=>{
+    const top = categories.map((c,ci)=>{ cum[ci]+= (s.values[ci]||0); return cum[ci]; });
+    const bottom = categories.map((c,ci)=>cum[ci]-(s.values[ci]||0));
+    let d = '';
+    top.forEach((v,ci)=>{ const x=xScale(ci), y=yScale(v); d += (ci===0?'M':'L')+x+','+y+' '; });
+    for (let ci=bottom.length-1; ci>=0; ci--){ const x=xScale(ci), y=yScale(bottom[ci]); d += 'L'+x+','+y+' '; }
+    d += 'Z';
+    svg.appendChild(el('path',{d, fill:s.color, opacity:0.75}));
+    top.forEach((v,ci)=>{
+      const x=xScale(ci), y=yScale(v);
+      const hit = el('circle',{cx:x,cy:y,r:7,fill:'transparent',style:'cursor:pointer'});
+      hit.addEventListener('mousemove',(ev)=>{ showTip(ev.clientX,ev.clientY, `<div class="t-title">${categories[ci]}</div><div class="t-row"><span class="k">${s.name}</span><b>${yFormat(s.values[ci]||0)}</b></div>`); });
+      hit.addEventListener('mouseleave', hideTip);
+      svg.appendChild(hit);
+    });
+  });
+  return svg;
+}
+
+function donutChart(container, {items, size=180, yFormat=fmtInt}){
+  container.innerHTML = '';
+  const total = items.reduce((a,b)=>a+b.value,0);
+  const r = size/2, ir = r*0.6, cx=r, cy=r;
+  const svgWrap = document.createElement('div');
+  svgWrap.style.cssText = 'display:flex; align-items:center; gap:16px; flex-wrap:wrap;';
+  const svg = el('svg',{viewBox:`0 0 ${size} ${size}`, width:size, height:size});
+  let angle = -Math.PI/2;
+  if (total<=0){
+    svg.appendChild(el('circle',{cx,cy,r:ir+ (r-ir)/2, fill:'none', stroke:'var(--border-1)', 'stroke-width':r-ir}));
+  } else {
+    items.forEach(it=>{
+      const frac = it.value/total;
+      const a0 = angle, a1 = angle + frac*Math.PI*2;
+      angle = a1;
+      const x0=cx+r*Math.cos(a0), y0=cy+r*Math.sin(a0);
+      const x1=cx+r*Math.cos(a1), y1=cy+r*Math.sin(a1);
+      const xi0=cx+ir*Math.cos(a1), yi0=cy+ir*Math.sin(a1);
+      const xi1=cx+ir*Math.cos(a0), yi1=cy+ir*Math.sin(a0);
+      const large = (a1-a0) > Math.PI ? 1 : 0;
+      const d = frac>=0.9995
+        ? `M${cx-r},${cy} A${r},${r} 0 1 1 ${cx+r-0.01},${cy} L${cx+ir-0.01},${cy} A${ir},${ir} 0 1 0 ${cx-ir},${cy} Z`
+        : `M${x0},${y0} A${r},${r} 0 ${large} 1 ${x1},${y1} L${xi0},${yi0} A${ir},${ir} 0 ${large} 0 ${xi1},${yi1} Z`;
+      const path = el('path',{d, fill:it.color, stroke:'var(--surface-2)', 'stroke-width':2});
+      path.style.cursor='pointer';
+      path.addEventListener('mousemove',(ev)=>{ showTip(ev.clientX,ev.clientY, `<div class="t-title">${it.name}</div><div class="t-row"><span class="k">실적</span><b>${yFormat(it.value)}</b></div><div class="t-row"><span class="k">비중</span><b>${(frac*100).toFixed(1)}%</b></div>`); });
+      path.addEventListener('mouseleave', hideTip);
+      svg.appendChild(path);
+    });
+  }
+  const centerText1 = el('text',{x:cx,y:cy-3,'text-anchor':'middle','font-size':15,'font-weight':700, fill:'var(--text-primary)'});
+  centerText1.textContent = yFormat(total);
+  const centerText2 = el('text',{x:cx,y:cy+14,'text-anchor':'middle','font-size':10, fill:'var(--text-muted)'});
+  centerText2.textContent = '합계';
+  svg.appendChild(centerText1); svg.appendChild(centerText2);
+
+  const legend = document.createElement('div');
+  legend.style.cssText='display:flex; flex-direction:column; gap:6px; font-size:12px;';
+  legend.innerHTML = items.map(it=>{
+    const pct = total>0 ? (it.value/total*100).toFixed(1) : '0.0';
+    return `<div style="display:flex;align-items:center;gap:7px;"><span style="width:10px;height:10px;border-radius:3px;background:${it.color};display:inline-block;flex-shrink:0;"></span><span style="color:var(--text-secondary)">${it.name}</span><b style="margin-left:auto">${pct}%</b></div>`;
+  }).join('');
+  svgWrap.appendChild(svg); svgWrap.appendChild(legend);
+  container.appendChild(svgWrap);
+}
+
+/* semicircular speedometer-style gauge for 딜상률(달성률) — gapped rounded zone-bands
+   (미달/보통/양호/우수), a 100% reference tick, and an animated needle that sweeps in
+   to the current value on each render, with a large center percentage readout. */
+let __gaugeUid = 0;
+function gaugeChart(container, {value, size=168, zones, domainMax=1.1, tooltipLabel}){
+  container.innerHTML = '';
+  const uid = ++__gaugeUid;
+  const w = size, h = Math.round(size*0.6);
+  const cx = w/2, cy = h - 4;
+  const r = Math.min(cx, h) - 10;
+  const strokeW = Math.max(10, size*0.082);
+  const v = value==null ? null : Math.max(0, Math.min(value, domainMax));
+  const angleFor = frac => Math.PI - frac*Math.PI; // frac 0 -> 180°(left), frac 1 -> 0°(right)
+  const clockDeg = frac => 90 - angleFor(frac)*180/Math.PI; // rotation from "pointing up" reference
+
+  const svg = el('svg',{viewBox:`0 0 ${w} ${h+34}`, width:w, height:h+34, style:'display:block;overflow:visible'});
+
+  const defs = el('defs',{});
+  const filter = el('filter',{id:`gaugeShadow${uid}`, x:'-60%', y:'-60%', width:'220%', height:'220%'});
+  filter.appendChild(el('feDropShadow',{dx:0, dy:1, stdDeviation:1.1, 'flood-opacity':0.4}));
+  defs.appendChild(filter);
+  svg.appendChild(defs);
+
+  const bands = zones || [
+    {to:0.7,  color:'var(--critical)'},
+    {to:0.9,  color:'var(--warning)'},
+    {to:1.0,  color:'var(--good)'},
+    {to:domainMax, color:'var(--series-3)'}
+  ];
+  const gapFrac = 2.4/180; // small visual gap between adjacent zone segments
+  let from = 0;
+  bands.forEach((b,i)=>{
+    const to = Math.min(b.to, domainMax);
+    if (to<=from){ from=to; return; }
+    const isFirst = from<=0;
+    const isLast = to>=domainMax-0.0001;
+    let f0 = from/domainMax, f1 = to/domainMax;
+    if (!isFirst) f0 += gapFrac/2;
+    if (!isLast) f1 -= gapFrac/2;
+    if (f1>f0){
+      const a0=angleFor(f0), a1=angleFor(f1);
+      const x0=cx+r*Math.cos(a0), y0=cy-r*Math.sin(a0);
+      const x1=cx+r*Math.cos(a1), y1=cy-r*Math.sin(a1);
+      const large = (a0-a1) > Math.PI ? 1 : 0;
+      svg.appendChild(el('path',{d:`M${x0},${y0} A${r},${r} 0 ${large} 1 ${x1},${y1}`, fill:'none', stroke:b.color, 'stroke-width':strokeW, 'stroke-linecap':'round'}));
+    }
+    from = to;
+  });
+
+  // 100% reference tick — shows exactly where "목표 달성" sits on the arc
+  if (domainMax > 1){
+    const at = angleFor(1/domainMax);
+    const tx0=cx+(r-strokeW/2-1)*Math.cos(at), ty0=cy-(r-strokeW/2-1)*Math.sin(at);
+    const tx1=cx+(r+strokeW/2+3)*Math.cos(at), ty1=cy-(r+strokeW/2+3)*Math.sin(at);
+    svg.appendChild(el('line',{x1:tx0,y1:ty0,x2:tx1,y2:ty1, stroke:'var(--surface-2)', 'stroke-width':2.5, 'stroke-linecap':'round'}));
+  }
+
+  if (v!=null){
+    const targetDeg = clockDeg(v/domainMax);
+    const startDeg = -92;
+    const tipY = cy-(r-strokeW*0.35);
+    const tailY = cy + r*0.24;
+    const needle = el('g',{transform:`rotate(${startDeg} ${cx} ${cy})`, filter:`url(#gaugeShadow${uid})`});
+    needle.appendChild(el('line',{x1:cx,y1:tailY,x2:cx,y2:tipY, stroke:'var(--text-primary)', 'stroke-width':3, 'stroke-linecap':'round'}));
+    needle.appendChild(el('circle',{cx,cy,r:6, fill:'var(--text-primary)'}));
+    needle.appendChild(el('circle',{cx,cy,r:2.2, fill:'var(--surface-2)'}));
+    needle.appendChild(el('animateTransform',{attributeName:'transform', type:'rotate', from:`${startDeg} ${cx} ${cy}`, to:`${targetDeg} ${cx} ${cy}`, dur:'0.9s', begin:'0.03s', fill:'freeze', calcMode:'spline', keySplines:'0.22 0.9 0.24 1', keyTimes:'0;1'}));
+    svg.appendChild(needle);
+  }
+
+  const valText = el('text',{x:cx,y:h+24,'text-anchor':'middle','font-size':19,'font-weight':700, fill:'var(--text-primary)'});
+  valText.textContent = value==null ? '데이터 없음' : fmtPct(value);
+  svg.appendChild(valText);
+
+  const hit = el('rect',{x:0,y:0,width:w,height:h+34,fill:'transparent',style:'cursor:pointer'});
+  hit.addEventListener('mousemove',(ev)=>{
+    showTip(ev.clientX, ev.clientY, `<div class="t-title">${tooltipLabel||'달성률'}</div><div class="t-row"><span class="k">딜상률</span><b>${value==null?'-':fmtPct(value)}</b></div>`);
+  });
+  hit.addEventListener('mouseleave', hideTip);
+  svg.appendChild(hit);
+
+  container.appendChild(svg);
+  return svg;
+}
+
+/* =========================================================
+   AGGREGATION
+========================================================= */
+function inRange(dateStr, from, to){ return dateStr >= from && dateStr <= to; }
+function entriesForEquipRange(equip, from, to){
+  return entries.filter(e=>e.equip===equip && inRange(e.date, from, to)).sort((a,b)=>a.date.localeCompare(b.date));
+}
+function dateRange(from, to){
+  const out=[]; let d = new Date(from+'T00:00:00'); const end = new Date(to+'T00:00:00');
+  while (d<=end){ out.push(d.toISOString().slice(0,10)); d.setDate(d.getDate()+1); }
+  return out;
+}
+function monthRange(monthStr){
+  const [y,m] = monthStr.split('-').map(Number);
+  const from = `${monthStr}-01`;
+  const lastDay = new Date(y, m, 0).getDate();
+  const to = `${monthStr}-${String(lastDay).padStart(2,'0')}`;
+  return {from,to};
+}
+function weekRange(startStr){
+  const d = new Date(startStr+'T00:00:00');
+  const to = new Date(d); to.setDate(d.getDate()+6);
+  return {from: startStr, to: to.toISOString().slice(0,10)};
+}
+
+/* generic renderer for a plan/actual/rate section covering N equipment keys over a date range */
+function buildSeriesForDates(dates, equipKeys){
+  const byEquip = {};
+  equipKeys.forEach(k=>{
+    const map = Object.fromEntries(entriesForEquipRange(k, dates[0], dates[dates.length-1]).map(e=>[e.date,e]));
+    byEquip[k] = dates.map(d=> map[d] || null);
+  });
+  return byEquip;
+}
+
+/* =========================================================
+   RENDER: ENTRY TAB
+========================================================= */
+function populateEquipSelect(sel, withAll){
+  sel.innerHTML = (withAll?'<option value="">전체</option>':'') +
+    ['완제품','반제품'].map(g=>`<optgroup label="${g}">${EQUIP.filter(e=>e.group===g).map(e=>`<option value="${e.key}">${e.name} (${e.unit})</option>`).join('')}</optgroup>`).join('');
+}
+populateEquipSelect(document.getElementById('f_equip'), false);
+populateEquipSelect(document.getElementById('filterEquip'), true);
+populateEquipSelect(document.getElementById('i_equip'), false);
+populateEquipSelect(document.getElementById('idleFilterEquip'), true);
+
+document.getElementById('f_date').value = '2022-05-31';
+
+function resetForm(){
+  document.getElementById('entryForm').reset();
+  document.getElementById('f_date').value = '2022-05-31';
+  document.getElementById('f_equip').selectedIndex = 0;
+  editingKey = null;
+  document.getElementById('formHint').textContent = '';
+}
+document.getElementById('btnReset').addEventListener('click', resetForm);
+
+document.getElementById('btnSave').addEventListener('click', (ev)=>{
+  ev.preventDefault();
+  const date = document.getElementById('f_date').value;
+  const equip = document.getElementById('f_equip').value;
+  if (!date || !equip){ alert('날짜와 설비를 선택해주세요.'); return; }
+  const num = id => { const v = document.getElementById(id).value; return v===''? null : Number(v); };
+  const plan = num('f_plan') || 0;
+  const actDay = num('f_actday') || 0;
+  const actNight = num('f_actnight') || 0;
+  const worker = document.getElementById('f_worker').value;
+  const spec = document.getElementById('f_spec').value;
+  const client = document.getElementById('f_client').value;
+  const position = document.getElementById('f_position').value || null;
+  const avail = num('f_avail'); const perf = num('f_perf'); const yieldPct = num('f_yield');
+  const oee = (avail!=null && perf!=null && yieldPct!=null) ? (avail/100)*(perf/100)*(yieldPct/100) : null;
+
+  const existingIdx = entries.findIndex(e=>e.date===date && e.equip===equip);
+  const rec = {
+    id: existingIdx>=0 ? entries[existingIdx].id : nextId++,
+    date, equip, plan, actDay, actNight, worker, spec, client, position,
+    avail: avail!=null?avail/100:null, perf: perf!=null?perf/100:null, yieldPct: yieldPct!=null?yieldPct/100:null, oee
+  };
+  if (existingIdx>=0) entries[existingIdx] = rec; else entries.push(rec);
+  document.getElementById('formHint').textContent = (existingIdx>=0?'기존 항목을 수정했습니다: ':'새로 저장했습니다: ') + date + ' · ' + EQ[equip].name;
+  renderAll();
+});
+
+function editEntry(id){
+  const e = entries.find(x=>x.id===id); if (!e) return;
+  document.getElementById('f_date').value = e.date;
+  document.getElementById('f_equip').value = e.equip;
+  document.getElementById('f_plan').value = e.plan || '';
+  document.getElementById('f_actday').value = e.actDay || '';
+  document.getElementById('f_actnight').value = e.actNight || '';
+  document.getElementById('f_worker').value = e.worker || '';
+  document.getElementById('f_spec').value = e.spec || '';
+  document.getElementById('f_client').value = e.client || '';
+  document.getElementById('f_position').value = e.position || '';
+  document.getElementById('f_avail').value = e.avail!=null? (e.avail*100).toFixed(1) : '';
+  document.getElementById('f_perf').value = e.perf!=null? (e.perf*100).toFixed(1) : '';
+  document.getElementById('f_yield').value = e.yieldPct!=null? (e.yieldPct*100).toFixed(1) : '';
+  document.getElementById('formHint').textContent = '수정 중: ' + e.date + ' · ' + EQ[e.equip].name;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function deleteEntry(id){
+  if (!confirm('이 입력 내역을 삭제할까요?')) return;
+  entries = entries.filter(e=>e.id!==id);
+  renderAll();
+}
+window.editEntry = editEntry;
+window.deleteEntry = deleteEntry;
+
+function renderEntryTable(){
+  const fEquip = document.getElementById('filterEquip').value;
+  const fFrom = document.getElementById('filterDateFrom').value;
+  const fTo = document.getElementById('filterDateTo').value;
+  let rows = entries.slice().sort((a,b)=> b.date.localeCompare(a.date) || a.equip.localeCompare(b.equip));
+  if (fEquip) rows = rows.filter(e=>e.equip===fEquip);
+  if (fFrom) rows = rows.filter(e=>e.date>=fFrom);
+  if (fTo) rows = rows.filter(e=>e.date<=fTo);
+  document.getElementById('entryTotalCount').textContent = rows.length;
+  document.getElementById('entryCount').textContent = `현재 총 ${entries.length}건 저장됨 (메모리)`;
+
+  const body = rows.map(e=>{
+    const r = rate(e);
+    return `<tr>
+      <td>${e.date}</td><td>${dowOf(e.date)}</td>
+      <td><span class="tag" style="background:${EQ[e.equip].hex[document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light']}">${EQ[e.equip].name}</span></td>
+      <td>${fmtInt(e.plan)}</td><td>${fmtInt(e.actDay)}</td><td>${fmtInt(e.actNight)}</td><td><b>${fmtInt(total(e))}</b></td>
+      <td><span class="pill ${rateClass(r)}">${fmtPct(r)}</span></td>
+      <td style="text-align:left">${e.worker||'-'}</td>
+      <td style="text-align:left">${e.client||'-'}</td>
+      <td style="text-align:left">${positionOf(e)||'-'}</td>
+      <td style="text-align:right">
+        <button class="btn btn-ghost btn-sm" onclick="editEntry(${e.id})">수정</button>
+        <button class="btn btn-ghost btn-sm" onclick="deleteEntry(${e.id})">삭제</button>
+      </td>
+    </tr>`;
+  }).join('');
+  document.getElementById('entryTable').innerHTML = `
+    <thead><tr><th>날짜</th><th>요일</th><th>설비</th><th>계획</th><th>주간실적</th><th>야간실적</th><th>합계</th><th>딜상률</th><th style="text-align:left">담당자</th><th style="text-align:left">거래처</th><th style="text-align:left">포지션</th><th></th></tr></thead>
+    <tbody>${body || '<tr><td colspan="12" style="text-align:center;color:var(--text-muted);padding:20px">입력된 데이터가 없습니다</td></tr>'}</tbody>`;
+}
+['filterEquip','filterDateFrom','filterDateTo'].forEach(id=>document.getElementById(id).addEventListener('input', renderEntryTable));
+document.getElementById('btnClearFilter').addEventListener('click', ()=>{
+  document.getElementById('filterEquip').value='';
+  document.getElementById('filterDateFrom').value='';
+  document.getElementById('filterDateTo').value='';
+  renderEntryTable();
+});
+
+/* 파일 저장 — claude.ai에 게시된 아티팩트로 열렸을 때는 downloads 런타임 권한을 통해 저장하고,
+   내려받은 단일 HTML 파일로 직접 열었을 때는 일반 브라우저 다운로드로 저장합니다. */
+let __downloadsCap;
+async function getDownloadsCap(){
+  if (__downloadsCap !== undefined) return __downloadsCap;
+  try {
+    __downloadsCap = (window.claude && typeof window.claude.use==='function') ? await window.claude.use('downloads') : null;
+  } catch(err){ __downloadsCap = null; }
+  return __downloadsCap;
+}
+async function saveFile(filename, content, mime){
+  const cap = await getDownloadsCap();
+  if (cap && typeof cap.save==='function'){
+    try { await cap.save({filename, data: content}); return; }
+    catch(err){ if (err && err.code==='declined') return; /* other errors: fall back below */ }
+  }
+  const blob = new Blob([content], {type: mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+document.getElementById('btnExport').addEventListener('click', ()=>{
+  const payload = {version:2, entries, idleEntries};
+  saveFile('tile_production_data_'+new Date().toISOString().slice(0,10)+'.json', JSON.stringify(payload, null, 1), 'application/json');
+});
+document.getElementById('btnExportCsv').addEventListener('click', ()=>{
+  const header = ['날짜','요일','설비','단위','계획','주간실적','야간실적','합계실적','딜상률(%)','담당자','규격','거래처','포지션'];
+  const lines = [header.join(',')];
+  entries.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(e=>{
+    const r = rate(e);
+    lines.push([e.date, dowOf(e.date), EQ[e.equip].name, EQ[e.equip].unit, e.plan, e.actDay, e.actNight, total(e), r!=null?(r*100).toFixed(1):'', e.worker||'', (e.spec||'').replace(/,/g,' '), (e.client||'').replace(/,/g,' '), positionOf(e)].join(','));
+  });
+  saveFile('tile_production_data.csv', '﻿'+lines.join('\n'), 'text/csv;charset=utf-8');
+});
+document.getElementById('btnImportTrigger').addEventListener('click', ()=> document.getElementById('fileImport').click());
+document.getElementById('fileImport').addEventListener('change', (ev)=>{
+  const file = ev.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (Array.isArray(data)){
+        entries = data; // 이전 버전(배열만) 파일과의 호환
+      } else if (data && Array.isArray(data.entries)){
+        entries = data.entries;
+        if (Array.isArray(data.idleEntries)) idleEntries = data.idleEntries;
+      } else {
+        throw new Error('알 수 없는 형식입니다');
+      }
+      nextId = Math.max(0, ...entries.map(e=>e.id||0)) + 1;
+      nextIdleId = Math.max(0, ...idleEntries.map(e=>e.id||0)) + 1;
+      alert(`생산 데이터 ${entries.length}건, 유휴시간 데이터 ${idleEntries.length}건을 불러왔습니다.`);
+      renderAll();
+    } catch(err){ alert('불러오기 실패: 올바른 JSON 파일인지 확인해주세요.\\n'+err.message); }
+  };
+  reader.readAsText(file);
+  ev.target.value = '';
+});
+
+/* =========================================================
+   EXCEL (XLSX) 내보내기 / 불러오기 — SheetJS(XLSX) 라이브러리를 이 파일 안에 내장해
+   인터넷 연결 없이도 동작합니다. 생산실적·유휴시간을 시트 2개짜리 워크북 하나로 주고받습니다.
+========================================================= */
+function equipKeyByName(name){
+  const n = String(name||'').trim();
+  const found = EQUIP.find(eq=>eq.name===n);
+  return found ? found.key : null;
+}
+// 엑셀에서 날짜 셀이 텍스트("2022-05-15")든, 실제 날짜로 바뀐 값(라이브러리가 ISO 문자열로 반환)이든 모두 "YYYY-MM-DD"로 정규화합니다.
+function xlsxDateToStr(v){
+  if (v===null || v===undefined || v==='') return '';
+  const s = String(v).trim();
+  let m = s.match(/^(\d{4})-(\d{2})-(\d{2})T/); // Date 객체가 ISO 문자열로 변환된 경우
+  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  m = s.match(/^(\d{4})[-./](\d{1,2})[-./](\d{1,2})/);
+  if (m) return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  return '';
+}
+// "09:00" 형태 텍스트, 또는 엑셀이 시간으로 인식해 하루의 소수(0~1)로 바꾼 값을 모두 "HH:MM"으로 정규화합니다.
+function xlsxTimeToStr(v){
+  if (v===null || v===undefined || v==='') return '';
+  const s = String(v).trim();
+  let m = s.match(/^(\d{1,2}):(\d{2})/);
+  if (m) return `${m[1].padStart(2,'0')}:${m[2]}`;
+  const num = Number(s);
+  if (!isNaN(num) && num>=0 && num<1){
+    const totalMin = Math.round(num*24*60);
+    return `${String(Math.floor(totalMin/60)%24).padStart(2,'0')}:${String(totalMin%60).padStart(2,'0')}`;
+  }
+  return '';
+}
+function sheetHeaderIndex(header, name){ return header.findIndex(h=>String(h||'').trim()===name); }
+
+document.getElementById('btnExportXlsx').addEventListener('click', ()=>{
+  const header = ['날짜','요일','설비','단위','계획','주간실적','야간실적','합계실적','딜상률(%)','담당자','규격','거래처','포지션'];
+  const rows = [header];
+  entries.slice().sort((a,b)=>a.date.localeCompare(b.date) || a.equip.localeCompare(b.equip)).forEach(e=>{
+    const r = rate(e);
+    rows.push([e.date, dowOf(e.date), EQ[e.equip].name, EQ[e.equip].unit, e.plan||0, e.actDay||0, e.actNight||0, total(e), r!=null?Number((r*100).toFixed(1)):'', e.worker||'', e.spec||'', e.client||'', positionOf(e)||'']);
+  });
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch:11},{wch:5},{wch:14},{wch:6},{wch:9},{wch:9},{wch:9},{wch:10},{wch:9},{wch:10},{wch:22},{wch:16},{wch:8}];
+  XLSX.utils.book_append_sheet(wb, ws, '생산실적');
+
+  const iheader = ['날짜','요일','시작','종료','소요시간(분)','주간/야간','설비','담당자','원인유형','내용'];
+  const irows = [iheader];
+  idleEntries.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(e=>{
+    irows.push([e.date, dowOf(e.date), e.start||'', e.end||'', e.minutes||0, e.shift||'', EQ[e.equip]?EQ[e.equip].name:e.equip, e.worker||'', e.cause||'', e.content||'']);
+  });
+  const iws = XLSX.utils.aoa_to_sheet(irows);
+  iws['!cols'] = [{wch:11},{wch:5},{wch:7},{wch:7},{wch:12},{wch:9},{wch:14},{wch:10},{wch:9},{wch:38}];
+  XLSX.utils.book_append_sheet(wb, iws, '유휴시간');
+
+  const buf = XLSX.write(wb, {type:'array', bookType:'xlsx'});
+  saveFile('tile_production_data_'+new Date().toISOString().slice(0,10)+'.xlsx', buf, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+});
+
+document.getElementById('btnImportXlsxTrigger').addEventListener('click', ()=> document.getElementById('fileImportXlsx').click());
+document.getElementById('fileImportXlsx').addEventListener('change', (ev)=>{
+  const file = ev.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const wb = XLSX.read(reader.result, {type:'array', cellDates:true});
+      let newEntries = null, newIdle = null;
+
+      const prodName = wb.SheetNames.find(n=>n==='생산실적') || wb.SheetNames[0];
+      if (prodName){
+        const rows = XLSX.utils.sheet_to_json(wb.Sheets[prodName], {header:1, raw:true, defval:''});
+        const header = rows[0]||[];
+        const iDate=sheetHeaderIndex(header,'날짜'), iEquip=sheetHeaderIndex(header,'설비'), iPlan=sheetHeaderIndex(header,'계획'),
+              iDay=sheetHeaderIndex(header,'주간실적'), iNight=sheetHeaderIndex(header,'야간실적'), iWorker=sheetHeaderIndex(header,'담당자'),
+              iSpec=sheetHeaderIndex(header,'규격'), iClient=sheetHeaderIndex(header,'거래처'), iPos=sheetHeaderIndex(header,'포지션');
+        if (iDate>=0 && iEquip>=0){
+          newEntries = [];
+          for (let r=1;r<rows.length;r++){
+            const row = rows[r]; if (!row || row.length===0) continue;
+            const date = xlsxDateToStr(row[iDate]);
+            const equipKey = equipKeyByName(row[iEquip]);
+            if (!date || !equipKey) continue;
+            newEntries.push({
+              id: newEntries.length+1, date, equip: equipKey,
+              plan: Number(row[iPlan])||0, actDay: Number(row[iDay])||0, actNight: Number(row[iNight])||0,
+              worker: iWorker>=0?String(row[iWorker]||''):'', spec: iSpec>=0?String(row[iSpec]||''):'',
+              client: iClient>=0?String(row[iClient]||''):'', position: iPos>=0?(String(row[iPos]||'')||null):null,
+              avail:null, perf:null, yieldPct:null, oee:null
+            });
+          }
+        }
+      }
+
+      const idleName = wb.SheetNames.find(n=>n==='유휴시간');
+      if (idleName){
+        const rows = XLSX.utils.sheet_to_json(wb.Sheets[idleName], {header:1, raw:true, defval:''});
+        const header = rows[0]||[];
+        const iDate=sheetHeaderIndex(header,'날짜'), iStart=sheetHeaderIndex(header,'시작'), iEnd=sheetHeaderIndex(header,'종료'),
+              iMin=sheetHeaderIndex(header,'소요시간(분)'), iShift=sheetHeaderIndex(header,'주간/야간'), iEquip=sheetHeaderIndex(header,'설비'),
+              iWorker=sheetHeaderIndex(header,'담당자'), iCause=sheetHeaderIndex(header,'원인유형'), iContent=sheetHeaderIndex(header,'내용');
+        if (iDate>=0 && iEquip>=0){
+          newIdle = [];
+          for (let r=1;r<rows.length;r++){
+            const row = rows[r]; if (!row || row.length===0) continue;
+            const date = xlsxDateToStr(row[iDate]);
+            const equipKey = equipKeyByName(row[iEquip]);
+            if (!date || !equipKey) continue;
+            newIdle.push({
+              id: newIdle.length+1, date,
+              start: iStart>=0?xlsxTimeToStr(row[iStart]):'', end: iEnd>=0?xlsxTimeToStr(row[iEnd]):'',
+              minutes: iMin>=0?(Number(row[iMin])||0):0, shift: iShift>=0?String(row[iShift]||''):'',
+              equip: equipKey, worker: iWorker>=0?String(row[iWorker]||''):'',
+              cause: iCause>=0?String(row[iCause]||''):'', content: iContent>=0?String(row[iContent]||''):''
+            });
+          }
+        }
+      }
+
+      if (!newEntries && !newIdle){ throw new Error('"생산실적" 시트를 찾지 못했습니다. 내보내기 한 형식(헤더: 날짜, 설비 ...)을 유지해주세요.'); }
+      if (newEntries){ entries = newEntries; nextId = entries.length+1; }
+      if (newIdle){ idleEntries = newIdle; nextIdleId = idleEntries.length+1; }
+      alert(`엑셀에서 생산 데이터 ${newEntries?newEntries.length:0}건${newIdle?`, 유휴시간 데이터 ${newIdle.length}건`:''}을 불러왔습니다.`);
+      renderAll();
+    } catch(err){ alert('엑셀 불러오기 실패: '+err.message); }
+  };
+  reader.readAsArrayBuffer(file);
+  ev.target.value = '';
+});
+
+/* =========================================================
+   RENDER: IDLE TIME ENTRY TAB
+========================================================= */
+function idleDuration(){
+  const s = document.getElementById('i_start').value, e = document.getElementById('i_end').value;
+  if (!s || !e) return null;
+  const [sh,sm] = s.split(':').map(Number), [eh,em] = e.split(':').map(Number);
+  let mins = (eh*60+em) - (sh*60+sm);
+  if (mins < 0) mins += 24*60; // 자정을 넘기는 경우
+  return mins;
+}
+['i_start','i_end'].forEach(id=>document.getElementById(id).addEventListener('change', ()=>{
+  const d = idleDuration();
+  if (d!=null) document.getElementById('i_minutes').value = d;
+}));
+
+function resetIdleForm(){
+  document.getElementById('idleForm').reset();
+  document.getElementById('i_date').value = '2022-05-31';
+  document.getElementById('i_equip').selectedIndex = 0;
+  editingIdleId = null;
+  document.getElementById('idleFormHint').textContent = '';
+}
+let editingIdleId = null;
+document.getElementById('i_date').value = '2022-05-31';
+document.getElementById('btnIdleReset').addEventListener('click', resetIdleForm);
+
+document.getElementById('btnIdleSave').addEventListener('click', (ev)=>{
+  ev.preventDefault();
+  const date = document.getElementById('i_date').value;
+  const equip = document.getElementById('i_equip').value;
+  const cause = document.getElementById('i_cause').value;
+  if (!date || !equip || !cause){ alert('날짜, 설비, 원인유형을 선택해주세요.'); return; }
+  const start = document.getElementById('i_start').value;
+  const end = document.getElementById('i_end').value;
+  const minutesInput = document.getElementById('i_minutes').value;
+  const minutes = minutesInput!=='' ? Number(minutesInput) : (idleDuration()||0);
+  const shift = document.getElementById('i_shift').value;
+  const worker = document.getElementById('i_worker').value;
+  const content = document.getElementById('i_content').value;
+
+  const rec = { id: editingIdleId!=null ? editingIdleId : nextIdleId++, date, start, end, minutes, shift, equip, worker, cause, content };
+  const idx = idleEntries.findIndex(e=>e.id===rec.id);
+  if (idx>=0) idleEntries[idx] = rec; else idleEntries.push(rec);
+  document.getElementById('idleFormHint').textContent = (idx>=0?'기존 항목을 수정했습니다: ':'새로 저장했습니다: ') + date + ' · ' + EQ[equip].name + ' · ' + fmtMin(minutes);
+  editingIdleId = null;
+  renderAll();
+});
+
+function editIdleEntry(id){
+  const e = idleEntries.find(x=>x.id===id); if (!e) return;
+  document.getElementById('i_date').value = e.date;
+  document.getElementById('i_start').value = e.start||'';
+  document.getElementById('i_end').value = e.end||'';
+  document.getElementById('i_minutes').value = e.minutes||'';
+  document.getElementById('i_shift').value = e.shift||'';
+  document.getElementById('i_equip').value = e.equip;
+  document.getElementById('i_worker').value = e.worker||'';
+  document.getElementById('i_cause').value = e.cause;
+  document.getElementById('i_content').value = e.content||'';
+  editingIdleId = id;
+  document.getElementById('idleFormHint').textContent = '수정 중: ' + e.date + ' · ' + EQ[e.equip].name;
+  window.scrollTo({top:0, behavior:'smooth'});
+  document.getElementById('idleForm').scrollIntoView({behavior:'smooth', block:'center'});
+}
+function deleteIdleEntry(id){
+  if (!confirm('이 유휴시간 이력을 삭제할까요?')) return;
+  idleEntries = idleEntries.filter(e=>e.id!==id);
+  renderAll();
+}
+window.editIdleEntry = editIdleEntry;
+window.deleteIdleEntry = deleteIdleEntry;
+
+function renderIdleTable(){
+  const fEquip = document.getElementById('idleFilterEquip').value;
+  const fCause = document.getElementById('idleFilterCause').value;
+  const fFrom = document.getElementById('idleFilterDateFrom').value;
+  const fTo = document.getElementById('idleFilterDateTo').value;
+  let rows = idleEntries.slice().sort((a,b)=> b.date.localeCompare(a.date) || (b.start||'').localeCompare(a.start||''));
+  if (fEquip) rows = rows.filter(e=>e.equip===fEquip);
+  if (fCause) rows = rows.filter(e=>e.cause===fCause);
+  if (fFrom) rows = rows.filter(e=>e.date>=fFrom);
+  if (fTo) rows = rows.filter(e=>e.date<=fTo);
+  document.getElementById('idleTotalCount').textContent = rows.length;
+
+  const theme = document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light';
+  const body = rows.map(e=>`<tr>
+      <td>${e.date}</td><td>${dowOf(e.date)}</td><td>${e.start||'-'}~${e.end||'-'}</td><td><b>${fmtMin(e.minutes)}</b></td>
+      <td>${e.shift||'-'}</td>
+      <td><span class="tag" style="background:${EQ[e.equip]?EQ[e.equip].hex[theme]:'#888'}">${EQ[e.equip]?EQ[e.equip].name:e.equip}</span></td>
+      <td style="text-align:left">${e.worker||'-'}</td>
+      <td><span class="tag" style="background:${CAUSE_COLOR[e.cause]||'var(--text-muted)'}">${e.cause||'-'}</span></td>
+      <td style="text-align:left;white-space:normal;max-width:260px">${e.content||'-'}</td>
+      <td style="text-align:right">
+        <button class="btn btn-ghost btn-sm" onclick="editIdleEntry(${e.id})">수정</button>
+        <button class="btn btn-ghost btn-sm" onclick="deleteIdleEntry(${e.id})">삭제</button>
+      </td>
+    </tr>`).join('');
+  document.getElementById('idleTable').innerHTML = `
+    <thead><tr><th>날짜</th><th>요일</th><th>시간</th><th>소요시간</th><th>주/야간</th><th>설비</th><th style="text-align:left">담당자</th><th>원인유형</th><th style="text-align:left">내용</th><th></th></tr></thead>
+    <tbody>${body || '<tr><td colspan="10" style="text-align:center;color:var(--text-muted);padding:20px">입력된 유휴시간 이력이 없습니다</td></tr>'}</tbody>`;
+}
+['idleFilterEquip','idleFilterCause','idleFilterDateFrom','idleFilterDateTo'].forEach(id=>document.getElementById(id).addEventListener('input', renderIdleTable));
+document.getElementById('btnIdleClearFilter').addEventListener('click', ()=>{
+  document.getElementById('idleFilterEquip').value='';
+  document.getElementById('idleFilterCause').value='';
+  document.getElementById('idleFilterDateFrom').value='';
+  document.getElementById('idleFilterDateTo').value='';
+  renderIdleTable();
+});
+document.getElementById('btnExportIdleCsv').addEventListener('click', ()=>{
+  const header = ['날짜','요일','시작','종료','소요시간(분)','주간/야간','설비','담당자','원인유형','내용'];
+  const lines = [header.join(',')];
+  idleEntries.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(e=>{
+    lines.push([e.date, dowOf(e.date), e.start||'', e.end||'', e.minutes, e.shift||'', EQ[e.equip]?EQ[e.equip].name:e.equip, e.worker||'', e.cause||'', (e.content||'').replace(/,/g,' ')].join(','));
+  });
+  saveFile('tile_idle_time_data.csv', '﻿'+lines.join('\n'), 'text/csv;charset=utf-8');
+});
+
+/* =========================================================
+   RENDER: MONTHLY / WEEKLY  (shared builder)
+========================================================= */
+function renderPeriodSection(base, dates, equipKeys, chartType, unit, xLabelFn, isMonthLike, suffix){
+  suffix = suffix || '';
+  const idFor = part => document.getElementById(base+part+suffix);
+  const data = buildSeriesForDates(dates, equipKeys);
+  const cats = dates.map(xLabelFn);
+
+  // KPIs
+  const kpiHtml = equipKeys.map(k=>{
+    const arr = data[k].filter(Boolean);
+    const plan = arr.reduce((a,e)=>a+e.plan,0);
+    const act = arr.reduce((a,e)=>a+total(e),0);
+    const r = plan>0 ? act/plan : null;
+    return `<div class="kpi"><div class="accent" style="background:${EQ[k].color}"></div>
+      <div class="label">${EQ[k].name} 계획/실적</div>
+      <div class="value">${fmtInt(act)}<span class="unit">/${fmtInt(plan)} ${unit}</span></div>
+      <div style="margin-top:4px"><span class="pill ${rateClass(r)}">${fmtPct(r)}</span></div>
+    </div>`;
+  }).join('');
+  idFor('Kpis').innerHTML = kpiHtml;
+
+  // achievement-rate gauges (Excel 계기판 스타일: 미달/보통/양호/우수 구간 + 바늘)
+  const gaugeEl = idFor('Gauges');
+  if (gaugeEl){
+    gaugeEl.innerHTML = '';
+    equipKeys.forEach(k=>{
+      const arr = data[k].filter(Boolean);
+      const plan = arr.reduce((a,e)=>a+e.plan,0);
+      const act = arr.reduce((a,e)=>a+total(e),0);
+      const r = plan>0 ? act/plan : null;
+      const card = document.createElement('div');
+      card.className = 'gauge-card';
+      card.innerHTML = `<div class="gauge-name"><span class="dot" style="background:${EQ[k].color}"></span>${EQ[k].name} 달성률</div>`;
+      const box = document.createElement('div');
+      card.appendChild(box);
+      gaugeEl.appendChild(card);
+      gaugeChart(box, {value:r, tooltipLabel:`${EQ[k].name} 달성률`});
+    });
+  }
+
+  // bar (plan vs actual per equip) — several chart-type variants
+  const planValues = dates.map((d,i)=>{
+    let s=0, any=false; equipKeys.forEach(k=>{ const e=data[k][i]; if (e){ s+=e.plan; any=true; } }); return any?s:null;
+  });
+  const actualSeries = equipKeys.map(k=>({name:EQ[k].name, color:EQ[k].color, values:data[k].map(e=>e?total(e):null)}));
+  const groupedSeries = [];
+  if (equipKeys.length<=2){
+    groupedSeries.push({name:'생산계획', color:'var(--series-plan)', muted:true, values:planValues});
+  }
+  groupedSeries.push(...actualSeries);
+  const hasAnyTarget = planValues.some(v=>v!=null && v>0);
+
+  const barTooltip = (cat,s,v)=>{
+    const idx = cats.indexOf(cat);
+    const d = dates[idx];
+    let html = `<div class="t-title">${d} (${dowOf(d)})</div>`;
+    equipKeys.forEach(k=>{ const e=data[k][idx]; if (e) html += `<div class="t-row"><span class="k">${EQ[k].name}</span><b>${fmtInt(total(e))} / 계획 ${fmtInt(e.plan)}</b></div>`; });
+    return html;
+  };
+  const useActualOnly = (chartType==='stacked' || chartType==='area' || chartType==='combo');
+  trendChart(idFor('BarChart'), {
+    type: chartType, categories:cats,
+    series: useActualOnly ? actualSeries : groupedSeries,
+    target: planValues, targetLabel:'생산계획',
+    perCat: isMonthLike?30:56, yFormat:fmtInt,
+    tooltipFmt: barTooltip
+  });
+
+  // legend — adapts to the selected chart type so it always matches what's actually drawn
+  const equipSwatches = equipKeys.map(k=>`<span class="item"><span class="swatch" style="background:${EQ[k].color}"></span>${EQ[k].name} 실적</span>`).join('');
+  let barLegendHtml = equipSwatches;
+  if (chartType==='combo'){
+    if (hasAnyTarget) barLegendHtml = `<span class="item"><span class="swatch tick"></span>생산계획 (목표)</span>` + equipSwatches;
+  } else if ((chartType==='bar'||chartType==='line') && equipKeys.length<=2){
+    barLegendHtml = `<span class="item"><span class="swatch" style="background:var(--series-plan)"></span>계획</span>` + equipSwatches;
+  }
+  const barLegendEl = idFor('Legend');
+  if (barLegendEl) barLegendEl.innerHTML = barLegendHtml;
+
+  // line (rate trend) — only if not the stacked-only case
+  const lineSeries = equipKeys.map(k=>({name:EQ[k].name, color:EQ[k].color, values:data[k].map(e=> e && e.plan>0 ? rate(e) : null)}));
+  const hasAnyRate = lineSeries.some(s=>s.values.some(v=>v!=null));
+  const lineContainer = idFor('LineChart');
+  if (hasAnyRate){
+    lineChart(lineContainer, {categories:cats, series:lineSeries, perCat: isMonthLike?30:56, yMax:1.6, refLine:1.0});
+  } else {
+    lineContainer.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text-muted);font-size:12.5px">계획이 입력되지 않아 딜상률을 계산할 수 없습니다. 데이터 입력 탭에서 계획을 입력해주세요.</div>';
+  }
+
+  // table
+  const rows = dates.map((d,i)=>{
+    const cells = equipKeys.map(k=>{ const e=data[k][i]; const r = e?rate(e):null;
+      return `<td>${e?fmtInt(e.plan):'-'}</td><td>${e?fmtInt(total(e)):'-'}</td><td><span class="pill ${rateClass(r)}">${fmtPct(r)}</span></td>`; }).join('');
+    const dw = dowOf(d);
+    return `<tr class="${dw==='토'?'weekend-sat':dw==='일'?'weekend-sun':''}"><td>${d}</td><td>${dw}</td>${cells}</tr>`;
+  }).join('');
+  const head = '<th>날짜</th><th>요일</th>' + equipKeys.map(k=>`<th>${EQ[k].name} 계획</th><th>${EQ[k].name} 실적</th><th>${EQ[k].name} 딜상률</th>`).join('');
+  const totalsRow = (() => {
+    const cells = equipKeys.map(k=>{ const arr=data[k].filter(Boolean); const p=arr.reduce((a,e)=>a+e.plan,0); const a=arr.reduce((a,e)=>a+total(e),0); const r=p>0?a/p:null;
+      return `<td>${fmtInt(p)}</td><td>${fmtInt(a)}</td><td>${fmtPct(r)}</td>`; }).join('');
+    return `<tr style="font-weight:700;background:var(--surface-3)"><td colspan="2">계</td>${cells}</tr>`;
+  })();
+  idFor('Table').innerHTML = `<thead><tr>${head}</tr></thead><tbody>${rows}</tbody><tfoot>${totalsRow}</tfoot>`;
+}
+
+function renderMonthly(){
+  const month = document.getElementById('monthPicker').value || '2022-05';
+  const {from,to} = monthRange(month);
+  const dates = dateRange(from,to);
+  const xLabel = d => d.slice(5).replace('-','/');
+  renderPeriodSection('monthly', dates, ['line1','line2'], document.getElementById('mChartType1').value, 'Box', xLabel, true, 'F');
+  renderPeriodSection('monthly', dates, ['jh1','jh2','cal'], document.getElementById('mChartType2').value, 'm', xLabel, true, 'S');
+}
+
+function renderWeekly(){
+  const start = document.getElementById('weekPicker').value || '2022-05-23';
+  const {from,to} = weekRange(start);
+  const dates = dateRange(from,to);
+  const xLabel = d => dowOf(d);
+  renderPeriodSection('weekly', dates, ['line1','line2'], 'combo', 'Box', xLabel, false, 'F');
+  renderPeriodSection('weekly', dates, ['jh1','jh2','cal'], 'combo', 'm', xLabel, false, 'S');
+}
+
+/* =========================================================
+   RENDER: DAILY
+========================================================= */
+function statCard(e, unit){
+  if (!e) return '';
+  const r = rate(e);
+  const color = rateColorVar(r);
+  return `<div class="stat-mini">
+    <div class="eq">${EQ[e.equip].name} <span style="color:var(--text-muted);font-weight:400">· ${e.worker||'담당자 미입력'}</span></div>
+    <div class="shift">${e.spec||''}</div>
+    <div class="row"><span>계획</span><b>${fmtInt(e.plan)} ${unit}</b></div>
+    <div class="row"><span>주간실적</span><b>${fmtInt(e.actDay)} ${unit}</b></div>
+    <div class="row"><span>야간실적</span><b>${fmtInt(e.actNight)} ${unit}</b></div>
+    <div class="row"><span>합계실적</span><b>${fmtInt(total(e))} ${unit}</b></div>
+    <div class="row"><span>딜상률</span><b style="color:${color}">${fmtPct(r)}</b></div>
+    <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(r||0)*100)}%; background:${color}"></div></div>
+    ${e.oee!=null?`<div class="row" style="margin-top:6px"><span>설비종합효율</span><b>${fmtPct(e.oee)}</b></div>`:''}
+  </div>`;
+}
+function renderDaily(){
+  const date = document.getElementById('dayPicker').value || '2022-05-31';
+  const finished = EQUIP.filter(e=>e.group==='완제품').map(eq=> entries.find(e=>e.date===date && e.equip===eq.key));
+  const semi = EQUIP.filter(e=>e.group==='반제품').map(eq=> entries.find(e=>e.date===date && e.equip===eq.key));
+  document.getElementById('dailyStatsF').innerHTML = EQUIP.filter(e=>e.group==='완제품').map((eq,i)=> finished[i] ? statCard(finished[i], eq.unit) :
+    `<div class="stat-mini" style="opacity:.45"><div class="eq">${eq.name}</div><div class="row"><span>데이터 없음</span></div></div>`).join('');
+  document.getElementById('dailyStatsS').innerHTML = EQUIP.filter(e=>e.group==='반제품').map((eq,i)=> semi[i] ? statCard(semi[i], eq.unit) :
+    `<div class="stat-mini" style="opacity:.45"><div class="eq">${eq.name}</div><div class="row"><span>데이터 없음</span></div></div>`).join('');
+
+  const dayEntries = entries.filter(e=>e.date===date).sort((a,b)=> EQUIP.findIndex(x=>x.key===a.equip) - EQUIP.findIndex(x=>x.key===b.equip));
+  const rows = dayEntries.map(e=>{
+    const r = rate(e);
+    return `<tr><td><span class="tag" style="background:${curHex(e.equip)}">${EQ[e.equip].name}</span></td><td>${fmtInt(e.plan)}</td><td>${fmtInt(e.actDay)}</td><td>${fmtInt(e.actNight)}</td><td><b>${fmtInt(total(e))}</b></td><td><span class="pill ${rateClass(r)}">${fmtPct(r)}</span></td><td style="text-align:left">${e.worker||'-'}</td><td style="text-align:left">${e.spec||'-'}</td></tr>`;
+  }).join('');
+  document.getElementById('dailyTable').innerHTML = `<thead><tr><th>설비</th><th>계획</th><th>주간실적</th><th>야간실적</th><th>합계</th><th>딜상률</th><th style="text-align:left">담당자</th><th style="text-align:left">규격</th></tr></thead><tbody>${rows || '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px">해당일 데이터가 없습니다</td></tr>'}</tbody>`;
+}
+
+/* 두께별 생산 기여도(공용) — 설비가 다르면 두께·생산 특성도 달라 설비 기준 비교는 오해를
+   줄 수 있어, "규격" 입력값에서 두께(T)를 추출해 두께 기준으로 집계합니다.
+   groupFilter로 완제품/반제품을, valueFn으로 실적(actual)/계획(plan) 중 무엇을 합산할지 고릅니다. */
+const SEQ_VIOLET = ['var(--seq-1)','var(--seq-2)','var(--seq-3)','var(--seq-4)','var(--seq-5)','var(--seq-6)'];
+const SEQ_TEAL   = ['var(--seq2-1)','var(--seq2-2)','var(--seq2-3)','var(--seq2-4)','var(--seq2-5)','var(--seq2-6)'];
+function renderThicknessDonut(container, groupFilter, valueFn, ramp, emptyLabel){
+  const list = entries.filter(e=> EQ[e.equip] && EQ[e.equip].group===groupFilter);
+  const buckets = {};
+  list.forEach(e=>{
+    const th = parseThickness(e.spec);
+    const key = th || '__unclassified__';
+    buckets[key] = (buckets[key]||0) + valueFn(e);
+  });
+  const realKeys = Object.keys(buckets).filter(k=>k!=='__unclassified__').sort((a,b)=>parseFloat(a)-parseFloat(b));
+
+  if (realKeys.length===0){
+    container.innerHTML = `<div style="padding:22px 8px;text-align:center;color:var(--text-muted);font-size:12.5px;line-height:1.7">아직 두께(T) 정보가 입력되지 않았습니다.<br>"데이터 입력" 탭의 <b>규격</b>란에 <b>0.1T</b>, <b>3T</b>처럼 두께를 앞에 적어 저장하면<br>여기에 ${emptyLabel}이(가) 표시됩니다.</div>`;
+    return;
+  }
+
+  const shown = realKeys.slice(0,5);
+  const items = shown.map((k,i)=>({name:k, color:ramp[i], value:buckets[k]}));
+  if (realKeys.length>5){
+    const restSum = realKeys.slice(5).reduce((a,k)=>a+buckets[k],0);
+    items.push({name:'기타 두께', color:ramp[5], value:restSum});
+  }
+  if (buckets['__unclassified__']){
+    items.push({name:'두께 미입력', color:'var(--text-muted)', value:buckets['__unclassified__']});
+  }
+  donutChart(container, {items, yFormat:fmtInt});
+}
+
+/* 반제품 포지션별(중지/하지/투명) 생산 기여도 — 중하지1·2호는 입력된 포지션을, 투명CAL은
+   항상 "투명"으로 자동 분류합니다. */
+function renderPositionDonut(container){
+  const semiEntries = entries.filter(e=> EQ[e.equip] && EQ[e.equip].group==='반제품');
+  const buckets = {'중지':0, '하지':0, '투명':0};
+  let unclassified = 0;
+  semiEntries.forEach(e=>{
+    const pos = positionOf(e);
+    if (pos==='중지'||pos==='하지'||pos==='투명') buckets[pos]+=total(e);
+    else unclassified += total(e);
+  });
+  const items = [
+    {name:'중지', color:'var(--pos-jungji)', value:buckets['중지']},
+    {name:'하지', color:'var(--pos-haji)',   value:buckets['하지']},
+    {name:'투명', color:'var(--series-5)',   value:buckets['투명']},
+  ];
+  if (unclassified>0) items.push({name:'포지션 미입력', color:'var(--text-muted)', value:unclassified});
+  const hasAny = items.some(it=>it.value>0);
+  if (!hasAny){
+    container.innerHTML = '<div style="padding:22px 8px;text-align:center;color:var(--text-muted);font-size:12.5px;line-height:1.7">아직 포지션 정보가 없습니다.</div>';
+    return;
+  }
+  donutChart(container, {items, yFormat:fmtInt});
+}
+
+/* 거래처별 생산 기여도 — 완제품+반제품 전체 실적을 "거래처" 입력값 기준으로 집계합니다. */
+const CLIENT_PALETTE = ['var(--client-1)','var(--client-2)','var(--client-3)','var(--client-4)','var(--client-5)','var(--client-6)'];
+function renderClientDonut(container){
+  const buckets = {};
+  entries.forEach(e=>{
+    const key = (e.client && e.client.trim()) ? e.client.trim() : '__unclassified__';
+    buckets[key] = (buckets[key]||0) + total(e);
+  });
+  const realKeys = Object.keys(buckets).filter(k=>k!=='__unclassified__').sort((a,b)=>buckets[b]-buckets[a]);
+
+  if (realKeys.length===0){
+    container.innerHTML = '<div style="padding:22px 8px;text-align:center;color:var(--text-muted);font-size:12.5px;line-height:1.7">아직 거래처 정보가 입력되지 않았습니다.<br>"데이터 입력" 탭의 <b>거래처</b>란에 입력하면<br>여기에 거래처별 생산 기여도가 표시됩니다.</div>';
+    return;
+  }
+
+  const shown = realKeys.slice(0,5);
+  const items = shown.map((k,i)=>({name:k, color:CLIENT_PALETTE[i], value:buckets[k]}));
+  if (realKeys.length>5){
+    const restSum = realKeys.slice(5).reduce((a,k)=>a+buckets[k],0);
+    items.push({name:'기타 거래처', color:CLIENT_PALETTE[5], value:restSum});
+  }
+  if (buckets['__unclassified__']){
+    items.push({name:'거래처 미입력', color:'var(--text-muted)', value:buckets['__unclassified__']});
+  }
+  donutChart(container, {items, yFormat:fmtInt});
+}
+
+/* =========================================================
+   RENDER: ANALYTICS
+========================================================= */
+function renderAnalytics(){
+  const finishedTotals = EQUIP.filter(e=>e.group==='완제품').map(eq=>({name:eq.name, color:EQ[eq.key].color, value: entries.filter(e=>e.equip===eq.key).reduce((a,e)=>a+total(e),0)}));
+  donutChart(document.getElementById('donutF'), {items:finishedTotals, yFormat:fmtInt});
+
+  // 반제품은 설비마다 두께·규격이 달라 설비 기준 비교가 오해를 줄 수 있어, 두께(T) 기준으로 집계합니다.
+  renderThicknessDonut(document.getElementById('donutS'), '반제품', e=>total(e), SEQ_VIOLET, '두께별 생산 기여도');
+  // 완제품 두께별 생산계획 비중 — 실적이 아닌 계획(plan) 수량 기준
+  renderThicknessDonut(document.getElementById('donutPlanF'), '완제품', e=>e.plan||0, SEQ_TEAL, '두께별 생산계획 비중');
+  // 반제품 포지션별(중지/하지/투명) 생산 기여도
+  renderPositionDonut(document.getElementById('donutPos'));
+  // 거래처별 생산 기여도 (완제품+반제품 전체)
+  renderClientDonut(document.getElementById('donutClient'));
+
+  // day-of-week avg rate (완제품 평균)
+  const dowBuckets = {'월':[],'화':[],'수':[],'목':[],'금':[],'토':[],'일':[]};
+  entries.forEach(e=>{ if (e.plan>0){ const d=dowOf(e.date); dowBuckets[d].push(rate(e)); } });
+  const dowCats = ['월','화','수','목','금','토','일'];
+  const dowVals = dowCats.map(d=> dowBuckets[d].length ? dowBuckets[d].reduce((a,b)=>a+b,0)/dowBuckets[d].length : null);
+  barChart(document.getElementById('dowChart'), {
+    categories: dowCats, series:[{name:'평균 딜상률', color:'var(--series-2)', values:dowVals}],
+    perCat: 44, yFormat: v=>(v*100).toFixed(0)+'%', height:220,
+    tooltipFmt: (cat,s,v)=> `<div class="t-title">${cat}요일</div><div class="t-row"><span class="k">평균 딜상률</span><b>${fmtPct(v)}</b></div>`
+  });
+
+  // cumulative actual vs plan (완제품, most recent month present in data)
+  const allDates = entries.map(e=>e.date).sort();
+  const lastMonth = allDates.length ? allDates[allDates.length-1].slice(0,7) : '2022-05';
+  const {from,to} = monthRange(lastMonth);
+  const dates = dateRange(from,to);
+  document.getElementById('cumSub').textContent = `완제품 합계 기준 · ${lastMonth}`;
+  let accPlan=0, accAct=0;
+  const cumPlan=[], cumAct=[];
+  dates.forEach(d=>{
+    const es = entries.filter(e=>e.date===d && (e.equip==='line1'||e.equip==='line2'));
+    accPlan += es.reduce((a,e)=>a+e.plan,0);
+    accAct += es.reduce((a,e)=>a+total(e),0);
+    cumPlan.push(accPlan); cumAct.push(accAct);
+  });
+  lineChart(document.getElementById('cumChart'), {
+    categories: dates.map(d=>d.slice(5).replace('-','/')),
+    series:[{name:'누적계획', color:'var(--series-plan)', values:cumPlan}, {name:'누적실적', color:'var(--series-1)', values:cumAct}],
+    perCat:30, yFormat:fmtInt, yMax: niceMax(Math.max(...cumPlan,...cumAct,1))
+  });
+
+  // heatmap: equip x date (last 21 days present)
+  const uniqDates = [...new Set(entries.map(e=>e.date))].sort();
+  const heatDates = uniqDates.slice(-21);
+  const heatWrap = document.getElementById('heatmap');
+  heatWrap.innerHTML = '';
+  const cell = 26, labelW = 90;
+  const svgH = labelW===0?0:0;
+  const table = document.createElement('div');
+  table.style.cssText = 'display:inline-block';
+  let html = '<div style="display:flex;"><div style="width:'+labelW+'px;flex-shrink:0;"></div>' + heatDates.map(d=>`<div style="width:${cell}px;flex-shrink:0;font-size:9px;text-align:center;color:var(--text-muted);transform:rotate(-45deg);height:30px;">${d.slice(5)}</div>`).join('') + '</div>';
+  EQUIP.forEach(eq=>{
+    html += `<div style="display:flex;align-items:center;">`;
+    html += `<div style="width:${labelW}px;flex-shrink:0;font-size:11.5px;color:var(--text-secondary);">${eq.name}</div>`;
+    heatDates.forEach(d=>{
+      const e = entries.find(x=>x.date===d && x.equip===eq.key);
+      const r = e ? rate(e) : null;
+      let bg = 'var(--surface-3)';
+      if (r!=null){
+        if (r<0.7) bg='var(--heat-low)'; else if (r<0.9) bg='var(--heat-mid)'; else bg='var(--heat-high)';
+      }
+      html += `<div class="heat-cell" data-date="${d}" data-eq="${eq.key}" style="width:${cell-2}px;height:${cell-2}px;margin:1px;background:${bg};display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-secondary);">${r!=null?Math.round(r*100):''}</div>`;
+    });
+    html += `</div>`;
+  });
+  heatWrap.innerHTML = html;
+  heatWrap.querySelectorAll('.heat-cell').forEach(c=>{
+    c.addEventListener('mousemove',(ev)=>{
+      const d=c.dataset.date, k=c.dataset.eq;
+      const e = entries.find(x=>x.date===d && x.equip===k);
+      if (!e) return;
+      const r = rate(e);
+      showTip(ev.clientX, ev.clientY, `<div class="t-title">${d} · ${EQ[k].name}</div><div class="t-row"><span class="k">계획</span><b>${fmtInt(e.plan)}</b></div><div class="t-row"><span class="k">실적</span><b>${fmtInt(total(e))}</b></div><div class="t-row"><span class="k">딜상률</span><b>${fmtPct(r)}</b></div>`);
+    });
+    c.addEventListener('mouseleave', hideTip);
+  });
+
+  // rankings
+  const withRate = entries.filter(e=>e.plan>0).map(e=>({e, r: rate(e)}));
+  const top = withRate.slice().sort((a,b)=>b.r-a.r).slice(0,5);
+  const bottom = withRate.slice().sort((a,b)=>a.r-b.r).slice(0,5);
+  function rankHtml(list, kind){
+    return list.map((it,i)=>{
+      const pct = Math.min(100, it.r*100);
+      const color = kind==='top' ? 'var(--good)' : 'var(--critical)';
+      return `<li><span class="rk" style="background:${color}">${i+1}</span>
+        <span style="width:150px;flex-shrink:0;">${it.e.date} · ${EQ[it.e.equip].name}</span>
+        <span class="bar"><div style="width:${pct}%;background:${color}"></div></span>
+        <span class="rv" style="color:${color}">${fmtPct(it.r)}</span></li>`;
+    }).join('') || '<li style="color:var(--text-muted)">계획이 입력된 데이터가 없습니다</li>';
+  }
+  document.getElementById('rankTop').innerHTML = rankHtml(top,'top');
+  document.getElementById('rankBottom').innerHTML = rankHtml(bottom,'bottom');
+}
+
+/* =========================================================
+   RENDER: IDLE TIME ANALYSIS TAB
+========================================================= */
+function idleRangeFor(){
+  const type = document.getElementById('idlePeriodType').value;
+  if (type==='month'){
+    const m = document.getElementById('idleMonthPicker').value || '2022-05';
+    const r = monthRange(m); return {from:r.from, to:r.to, type};
+  }
+  if (type==='week'){
+    const w = document.getElementById('idleWeekPicker').value || '2022-05-23';
+    const r = weekRange(w); return {from:r.from, to:r.to, type};
+  }
+  const d = document.getElementById('idleDayPicker').value || '2022-05-31';
+  return {from:d, to:d, type};
+}
+
+function renderIdleKpisAndTrend(){
+  const {from,to,type} = idleRangeFor();
+  const rangeEntries = idleInRange(from,to);
+  const totalMin = rangeEntries.reduce((a,e)=>a+(e.minutes||0),0);
+  const cnt = rangeEntries.length;
+  const avg = cnt>0 ? totalMin/cnt : null;
+  const causeCount={}; rangeEntries.forEach(e=>{ causeCount[e.cause]=(causeCount[e.cause]||0)+(e.minutes||0); });
+  const topCause = Object.entries(causeCount).sort((a,b)=>b[1]-a[1])[0];
+  const equipCount={}; rangeEntries.forEach(e=>{ equipCount[e.equip]=(equipCount[e.equip]||0)+(e.minutes||0); });
+  const topEquip = Object.entries(equipCount).sort((a,b)=>b[1]-a[1])[0];
+
+  const kpis = [
+    {label:'총 유휴시간', value:fmtMin(totalMin), accent:'var(--critical)'},
+    {label:'발생 건수', value:cnt+'건', accent:'var(--series-2)'},
+    {label:'건당 평균 소요시간', value:avg!=null?fmtMin(avg):'-', accent:'var(--warning)'},
+    {label:'최다 원인유형', value: topCause ? `${topCause[0]} (${fmtMin(topCause[1])})` : '-', accent:'var(--cause-1)'},
+    {label:'최다 발생 설비', value: topEquip ? `${EQ[topEquip[0]]?EQ[topEquip[0]].name:topEquip[0]} (${fmtMin(topEquip[1])})` : '-', accent:'var(--series-3)'},
+  ];
+  document.getElementById('idleKpis').innerHTML = kpis.map(k=>`<div class="kpi"><div class="accent" style="background:${k.accent}"></div><div class="label">${k.label}</div><div class="value">${k.value}</div></div>`).join('');
+
+  const dates = dateRange(from,to);
+  let categories;
+  if (type==='month') categories = dates.map(d=>String(Number(d.slice(8,10))));
+  else if (type==='week') categories = dates.map(dowOf);
+  else categories = dates.map(d=>d.slice(5));
+  const series = CAUSE_TYPES.map(c=>({
+    name:c, color:CAUSE_COLOR[c],
+    values: dates.map(d=> idleEntries.filter(e=>e.date===d && e.cause===c).reduce((a,e)=>a+(e.minutes||0),0))
+  }));
+  document.getElementById('idleTrendLegend').innerHTML = CAUSE_TYPES.map(c=>`<span class="item"><span class="swatch" style="background:${CAUSE_COLOR[c]}"></span>${c}</span>`).join('');
+  barChart(document.getElementById('idleTrendChart'), {
+    categories, series, stacked:true, height:230, yFormat:fmtInt, perCat: type==='day'?90:32,
+    tooltipFmt: (cat,s,v)=> `<div class="t-title">${cat}</div><div class="t-row"><span class="k">${s.name}</span><b>${fmtMin(v)}</b></div>`
+  });
+}
+
+function renderIdleDonuts(){
+  const causeTotals = CAUSE_TYPES.map(c=>({name:c, color:CAUSE_COLOR[c], value: idleEntries.filter(e=>e.cause===c).reduce((a,e)=>a+(e.minutes||0),0)}));
+  donutChart(document.getElementById('idleDonutCause'), {items:causeTotals, yFormat:fmtMin});
+
+  const equipTotals = EQUIP.map(eq=>({name:eq.name, color:eq.color, value: idleEntries.filter(e=>e.equip===eq.key).reduce((a,e)=>a+(e.minutes||0),0)}));
+  donutChart(document.getElementById('idleDonutEquip'), {items:equipTotals, yFormat:fmtMin});
+
+  const byWorker = {};
+  idleEntries.forEach(e=>{ if(!e.worker) return; byWorker[e.worker]=(byWorker[e.worker]||0)+(e.minutes||0); });
+  const rank = Object.entries(byWorker).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const maxV = rank.length? rank[0][1] : 0;
+  document.getElementById('idleRankWorker').innerHTML = rank.map(([name,v],i)=>{
+    const pct = maxV>0 ? (v/maxV*100) : 0;
+    return `<li><span class="rk" style="background:var(--cause-4)">${i+1}</span>
+      <span style="width:90px;flex-shrink:0;">${name}</span>
+      <span class="bar"><div style="width:${pct}%;background:var(--cause-4)"></div></span>
+      <span class="rv">${fmtMin(v)}</span></li>`;
+  }).join('') || '<li style="color:var(--text-muted)">이력이 없습니다</li>';
+}
+
+function renderIdleHeatmap(){
+  const wrap = document.getElementById('idleHeatmap');
+  const cell=64, labelW=90;
+  const table={};
+  let maxV=0;
+  EQUIP.forEach(eq=>{ table[eq.key]={}; CAUSE_TYPES.forEach(c=>{ const v = idleEntries.filter(e=>e.equip===eq.key && e.cause===c).reduce((a,e)=>a+(e.minutes||0),0); table[eq.key][c]=v; maxV=Math.max(maxV,v); }); });
+  let html = '<div style="display:flex;"><div style="width:'+labelW+'px;flex-shrink:0;"></div>' + CAUSE_TYPES.map(c=>`<div style="width:${cell}px;flex-shrink:0;font-size:11px;text-align:center;color:var(--text-secondary);font-weight:700;">${c}</div>`).join('') + '</div>';
+  EQUIP.forEach(eq=>{
+    html += `<div style="display:flex;align-items:center;">`;
+    html += `<div style="width:${labelW}px;flex-shrink:0;font-size:11.5px;color:var(--text-secondary);">${eq.name}</div>`;
+    CAUSE_TYPES.forEach(c=>{
+      const v = table[eq.key][c];
+      let bg = 'var(--surface-3)';
+      if (v>0 && maxV>0){
+        const frac = v/maxV;
+        bg = frac >= 0.66 ? 'var(--heat-low)' : (frac >= 0.33 ? 'var(--heat-mid)' : 'var(--heat-high)');
+      }
+      html += `<div class="heat-cell" data-eq="${eq.key}" data-cause="${c}" style="width:${cell-2}px;height:28px;margin:1px;background:${bg};display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;color:var(--text-secondary);">${v>0?fmtInt(v):''}</div>`;
+    });
+    html += `</div>`;
+  });
+  wrap.innerHTML = html;
+  wrap.querySelectorAll('.heat-cell').forEach(c=>{
+    c.addEventListener('mousemove',(ev)=>{
+      const k=c.dataset.eq, cs=c.dataset.cause;
+      const v = table[k][cs];
+      showTip(ev.clientX, ev.clientY, `<div class="t-title">${EQ[k].name} · ${cs}</div><div class="t-row"><span class="k">유휴시간 합계</span><b>${fmtMin(v)}</b></div>`);
+    });
+    c.addEventListener('mouseleave', hideTip);
+  });
+}
+
+function renderIdleAnalytics(){
+  renderIdleKpisAndTrend();
+  renderIdleDonuts();
+  renderIdleHeatmap();
+  renderIdleTable();
+}
+
+
+/* ===== INIT (페이지 최초 표시 시 1회) ===== */
+function renderAll(){
+  renderEntryTable();
+  renderMonthly();
+  renderWeekly();
+  renderDaily();
+  renderAnalytics();
+  renderIdleAnalytics();
+}
+const PR_RENDER = {
+  entry: ()=>renderEntryTable(),
+  monthly: ()=>renderMonthly(),
+  weekly: ()=>renderWeekly(),
+  daily: ()=>renderDaily(),
+  analytics: ()=>renderAnalytics(),
+  idle: ()=>renderIdleAnalytics(),
+};
+function prRenderView(name){ const f = PR_RENDER[name]; if(f) f(); }
+function prRenderActive(){
+  const b = PRROOT.querySelector('.tab-btn.active');
+  prRenderView(b ? b.dataset.view : 'entry');
+}
+let prReady = false;
+function prInit(){
+  if(prReady) return;
+  prReady = true;
+  document.getElementById('monthPicker').value = '2022-05';
+  document.getElementById('weekPicker').value = '2022-05-23';
+  document.getElementById('dayPicker').value = '2022-05-31';
+  document.getElementById('monthPicker').addEventListener('change', renderMonthly);
+  document.getElementById('weekPicker').addEventListener('change', renderWeekly);
+  document.getElementById('dayPicker').addEventListener('change', renderDaily);
+  document.getElementById('mChartType1').addEventListener('change', renderMonthly);
+  document.getElementById('mChartType2').addEventListener('change', renderMonthly);
+
+  document.getElementById('idleMonthPicker').value = '2022-05';
+  document.getElementById('idleWeekPicker').value = '2022-05-23';
+  document.getElementById('idleDayPicker').value = '2022-05-31';
+  document.getElementById('idlePeriodType').addEventListener('change', ()=>{
+    const type = document.getElementById('idlePeriodType').value;
+    document.getElementById('idleMonthPicker').style.display = type==='month' ? '' : 'none';
+    document.getElementById('idleWeekPicker').style.display = type==='week' ? '' : 'none';
+    document.getElementById('idleDayPicker').style.display = type==='day' ? '' : 'none';
+    renderIdleKpisAndTrend();
+  });
+  document.getElementById('idleMonthPicker').addEventListener('change', renderIdleKpisAndTrend);
+  document.getElementById('idleWeekPicker').addEventListener('change', renderIdleKpisAndTrend);
+  document.getElementById('idleDayPicker').addEventListener('change', renderIdleKpisAndTrend);
+
+
+}
+let prResizeT;
+window.addEventListener('resize', ()=>{
+  if(!prReady || !PRROOT.classList.contains('active')) return;
+  clearTimeout(prResizeT); prResizeT = setTimeout(prRenderActive, 200);
+});
+window.PR = {
+  // 화면이 열린 뒤에 그려야 차트 폭이 제대로 잡힌다
+  onShow(){ prInit(); prRenderActive(); },
+};
+})();
 </script>
 </body>
 </html>
