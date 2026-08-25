@@ -3915,7 +3915,7 @@ function renderShtTable(data) {
       <td style="font-size:12.5px; white-space:nowrap;">${lc(r.mid3T, r.mid3P, r.mid3F)}</td>
       <td style="font-size:12.5px; white-space:nowrap;">${lc(r.baseT, r.baseP, r.baseF)}</td>
       <td style="text-align:center; white-space:nowrap;">
-        <div style="font-weight:800; font-size:13.5px; color:var(--accent2); letter-spacing:-0.5px;">${r.density.toFixed(4)}</div>
+        <div style="font-weight:800; font-size:13.5px; color:var(--accent2); letter-spacing:-0.5px;">${r.density.toFixed(3)}</div>
       </td>
       <td style="text-align:center; white-space:nowrap;">
         <div style="font-weight:700; font-size:12px; color:#0369a1;">${pf.dotp}</div>
@@ -3959,7 +3959,7 @@ function renderIskTable(data) {
       <td style="font-size:12.5px; white-space:nowrap;">${lc(r.mid3T, r.mid3P, r.mid3F)}</td>
       <td style="font-size:12.5px; white-space:nowrap;">${lc(r.baseT, r.baseP, r.baseF)}</td>
       <td style="text-align:center; white-space:nowrap;">
-        <div style="font-weight:800; font-size:13.5px; color:var(--accent2); letter-spacing:-0.5px;">${r.density.toFixed(4)}</div>
+        <div style="font-weight:800; font-size:13.5px; color:var(--accent2); letter-spacing:-0.5px;">${r.density.toFixed(3)}</div>
       </td>
       <td style="text-align:center; white-space:nowrap;">
         <div style="font-weight:700; font-size:12px; color:#0369a1;">${pf.dotp}</div>
@@ -3999,7 +3999,7 @@ function renderLayerTable(data, tbodyId) {
       <td style="font-size:12.5px; white-space:nowrap;">${lc(r.mid2T, r.mid2P, r.mid2F)}</td>
       <td style="font-size:12.5px; white-space:nowrap;">${lc(r.baseT, r.baseP, r.baseF)}</td>
       <td style="text-align:center; white-space:nowrap;">
-        <div style="font-weight:800; font-size:13px; color:var(--accent2);">${r.density.toFixed(4)}</div>
+        <div style="font-weight:800; font-size:13px; color:var(--accent2);">${r.density.toFixed(3)}</div>
       </td>
       <td style="text-align:center; white-space:nowrap;">
         <div style="font-size:12px; color:#0369a1; font-weight:700;">${pf.dotp}</div>
@@ -4054,7 +4054,7 @@ function renderLayerSelectList() {
         </div>
       </div>
       <div style="text-align:right;">
-        <div style="font-size:11.5px; font-weight:700; color:var(--teal);">${r.density.toFixed(4)}</div>
+        <div style="font-size:11.5px; font-weight:700; color:var(--teal);">${r.density.toFixed(3)}</div>
         <div style="font-size:10.5px; color:var(--text3);">${r.setT}mm</div>
       </div>
     </div>
@@ -4254,7 +4254,7 @@ function showLayerViz(no) {
         <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
           <div>
             <div style="font-size:10px; color:rgba(255,255,255,0.4);">계산 비중</div>
-            <div style="font-size:34px; font-weight:800; letter-spacing:-1px; line-height:1;">${r.density.toFixed(4)}</div>
+            <div style="font-size:34px; font-weight:800; letter-spacing:-1px; line-height:1;">${r.density.toFixed(3)}</div>
           </div>
           <div>
             <div class="comp-bar-group" style="width:130px; height:20px; border-radius:4px; overflow:hidden; margin-bottom:5px;">
@@ -4305,7 +4305,7 @@ function showLayerViz(no) {
               <td style="padding:7px 10px;font-weight:700;">합계</td>
               <td style="padding:7px 10px;text-align:right;font-weight:800;color:var(--accent2);">${totalT.toFixed(1)}mm</td>
               <td colspan="2"></td>
-              <td style="padding:7px 10px;text-align:right;font-weight:800;color:var(--accent2);">${r.density.toFixed(4)}</td>
+              <td style="padding:7px 10px;text-align:right;font-weight:800;color:var(--accent2);">${r.density.toFixed(3)}</td>
             </tr>
           </tbody>
         </table>
@@ -4435,7 +4435,7 @@ function calcMain() {
   if(s('r-vol-dotp'))    s('r-vol-dotp').textContent     = vDotp.toFixed(2);
   if(s('r-vol-filler'))  s('r-vol-filler').textContent   = vFill.toFixed(2);
   if(s('r-total-phr'))   s('r-total-phr').textContent    = totalPHR.toFixed(2)+' PHR';
-  if(s('r-density-main'))s('r-density-main').textContent = density.toFixed(4);
+  if(s('r-density-main'))s('r-density-main').textContent = density.toFixed(3);
   if(s('r-dotp-disp'))   s('r-dotp-disp').textContent    = dotpPHR.toFixed(2);
   if(s('r-filler-disp')) s('r-filler-disp').textContent  = fillerPHR.toFixed(2);
 
@@ -4919,7 +4919,7 @@ function renderPhrTable() {
         ${phrCell2(r.m2,  '#eff6ff', '#0369a1')}
         ${phrCell2(r.m3,  '#f5f3ff', '#7c3aed')}
         ${phrCell2(r.base,'#f8f9fc', '#334155')}
-        <td style="text-align:center;font-weight:700;font-size:13px;color:${dc};">${r.density.toFixed(4)}</td>
+        <td style="text-align:center;font-weight:700;font-size:13px;color:${dc};">${r.density.toFixed(3)}</td>
       </tr>`;
     });
   });
@@ -5271,7 +5271,7 @@ function updateStatsOnly(li) {
   if(s(`layer-total-phr-${li}`)) s(`layer-total-phr-${li}`).textContent = tot.toFixed(2);
   if(s(`layer-dotp-${li}`))      s(`layer-dotp-${li}`).textContent      = dotp.toFixed(2);
   if(s(`layer-filler-${li}`))    s(`layer-filler-${li}`).textContent    = fill.toFixed(2);
-  if(s(`layer-density-${li}`))   s(`layer-density-${li}`).textContent   = dens>0?dens.toFixed(4):'—';
+  if(s(`layer-density-${li}`))   s(`layer-density-${li}`).textContent   = dens>0?dens.toFixed(3):'—';
   // % 비율과 부피기여 업데이트 (행 innerHTML 변경 없이)
   layer.items.forEach((it, ji) => {
     const pEl = s(`pct-${li}-${ji}`);
@@ -5305,7 +5305,7 @@ function refreshLayerView(li) {
   if(s(`layer-total-phr-${li}`)) s(`layer-total-phr-${li}`).textContent = tot.toFixed(2);
   if(s(`layer-dotp-${li}`))      s(`layer-dotp-${li}`).textContent      = dotp.toFixed(2);
   if(s(`layer-filler-${li}`))    s(`layer-filler-${li}`).textContent    = fill.toFixed(2);
-  if(s(`layer-density-${li}`))   s(`layer-density-${li}`).textContent   = dens>0?dens.toFixed(4):'—';
+  if(s(`layer-density-${li}`))   s(`layer-density-${li}`).textContent   = dens>0?dens.toFixed(3):'—';
   calcAllLayers();
 }
 
@@ -5448,7 +5448,7 @@ function calcAllLayers() {
         </div>
       </div>
       <div style="margin-top:4px;font-size:11.5px;display:flex;justify-content:space-between;color:var(--text3);">
-        <span>비중 <strong style="color:var(--teal);">${r.dens>0?r.dens.toFixed(4):'—'}</strong></span>
+        <span>비중 <strong style="color:var(--teal);">${r.dens>0?r.dens.toFixed(3):'—'}</strong></span>
         <span>단가 <strong style="color:var(--accent2);">${r.cost.toFixed(0)}원/kg</strong></span>
       </div>
     </div>`).join('')+
@@ -5476,7 +5476,7 @@ function calcAllLayers() {
 
   // 대표 비중
   const mainR = rows.find(r=>r.layer.type!=='WEAR')||rows[0];
-  if(mainR){ const dc=document.getElementById('fc-density'); if(dc) dc.textContent=mainR.dens>0?mainR.dens.toFixed(4):'—'; }
+  if(mainR){ const dc=document.getElementById('fc-density'); if(dc) dc.textContent=mainR.dens>0?mainR.dens.toFixed(3):'—'; }
 }
 
 function setActiveLayer(idx){ activeLayerIdx=idx; buildLayerTabs(); buildLayerCard(); }
@@ -5574,7 +5574,7 @@ function buildFormulaPresets(){
         <div style="margin-top:8px;display:flex;gap:8px;font-size:12.5px;justify-content:space-between;">
           <span style="color:#0369a1;font-weight:600;">DOTP: ${dotp}</span>
           <span style="color:#6d28d9;font-weight:600;">FILLER: ${fill}</span>
-          <span style="color:var(--teal);font-weight:600;">비중: ${dens>0?dens.toFixed(4):'—'}</span>
+          <span style="color:var(--teal);font-weight:600;">비중: ${dens>0?dens.toFixed(3):'—'}</span>
         </div>
         <button class="btn btn-primary btn-sm" style="width:100%;margin-top:10px;" onclick="loadPreset('${p.id}')">
           + 계산기에 추가
@@ -5754,7 +5754,7 @@ function onBwStructChange() {
     const r = layerData.find(x => x.no === no);
     if (r) {
       const el = document.getElementById('bw-density');
-      if (el) el.value = r.density.toFixed(4);
+      if (el) el.value = r.density.toFixed(3);
     }
   }
   renderBoxWeightCalc();
@@ -5807,7 +5807,7 @@ function renderBoxWeightCalc() {
       <td style="text-align:center;color:#0369a1;font-weight:600;">${lMm.toFixed(1)}</td>
       <td style="text-align:center;font-weight:600;">${pcs||'—'}</td>
       <td style="text-align:center;">
-        <span style="font-size:13px;font-weight:700;color:${densColor};">${density.toFixed(4)}</span>
+        <span style="font-size:13px;font-weight:700;color:${densColor};">${density.toFixed(3)}</span>
         <div style="font-size:10px;color:var(--text3);margin-top:1px;">${densLabel}</div>
       </td>
       <td style="text-align:center;font-weight:800;font-size:16px;color:${isValid?'var(--accent2)':'var(--text3)'};">
@@ -5853,7 +5853,7 @@ function buildBwStructOptions() {
   if (!sel) return;
   sel.innerHTML = '<option value="">— 직접 비중 입력 —</option>' +
     layerData.filter(r => r.co === '서해테크').map(r =>
-      `<option value="${r.no}">No.${r.no} [${r.type}] ${formatStruct(r.struct)} — ρ ${r.density.toFixed(4)}</option>`
+      `<option value="${r.no}">No.${r.no} [${r.type}] ${formatStruct(r.struct)} — ρ ${r.density.toFixed(3)}</option>`
     ).join('');
 }
 
@@ -6036,7 +6036,7 @@ function openChangeMgmtModal() {
   if(sel) {
     sel.innerHTML = '<option value="">— 구조 선택 —</option>' +
       layerData.filter(r=>r.co==='서해테크').map(r=>
-        `<option value="${r.no}">No.${r.no} [${r.type}] ${formatStruct(r.struct)} — 비중 ${r.density.toFixed(4)}</option>`
+        `<option value="${r.no}">No.${r.no} [${r.type}] ${formatStruct(r.struct)} — 비중 ${r.density.toFixed(3)}</option>`
       ).join('');
   }
   // 초기화
@@ -6089,7 +6089,7 @@ function cmCalcDensity(r) {
   const c = structPHR(r);
   if(c.totalT === 0) return {dotp:0, filler:0, density:0};
   return {dotp:c.dotp.toFixed(2), filler:c.filler.toFixed(2),
-          density: c.density>0 ? c.density.toFixed(4) : '—'};
+          density: c.density>0 ? c.density.toFixed(3) : '—'};
 }
 
 // 층 그룹 카드 (읽기 전용)
