@@ -1122,6 +1122,10 @@
 
 .pm-scope .dash-cols{display:grid;grid-template-columns:1.55fr 1fr;gap:18px;align-items:start}
 @media(max-width:1150px){.pm-scope .dash-cols{grid-template-columns:1fr}}
+/* 그리드 항목은 기본 최소폭이 min-content 라, 안에 넓은 표가 있으면
+   칸이 표 폭(900px)만큼 늘어나 좁은 화면에서 페이지가 통째로 넘친다.
+   min-width:0 을 줘야 칸이 줄고 .tbl-wrap 의 가로 스크롤이 실제로 동작한다. */
+.pm-scope .dash-cols>*,.pm-scope .pcard{min-width:0}
 .pm-scope .mini-list{display:flex;flex-direction:column}
 .pm-scope .mini-item{display:flex;align-items:center;gap:11px;padding:11px 20px;border-bottom:1px solid var(--pmline)}
 .pm-scope .mini-item:last-child{border-bottom:none}
@@ -1652,6 +1656,53 @@
     body:not([class*="print-"]) .qc-scope .qcpage.on { display: block !important; }
     .qc-scope .card { overflow: visible !important; }
   }
+
+  /* ============================================================
+     모바일 최적화 (좁은 화면 전용)
+     넘침은 이미 없지만, 좌우 여백이 표에 쓸 폭을 크게 깎아먹고
+     누를 대상이 작아 손가락으로 다루기 불편했다.
+     ① 바깥 여백을 줄여 표 폭 확보 ② 터치 대상 키움
+     ③ 가로로 넓은 표는 첫 열을 고정해 스크롤해도 기준이 보이게
+     ============================================================ */
+  @media (max-width: 600px) {
+    .main { padding: 12px 8px 0; }
+
+    /* 카드 안쪽 여백을 줄여 표에 폭을 넘긴다 */
+    .qc-scope .cb { padding: 10px 8px; }
+    .qc-scope .ch { padding: 10px 10px; }
+    .pm-scope .pcard-body { padding: 12px 10px; }
+    .card-body { padding: 0.9rem 0.7rem; }
+
+    /* 손가락으로 누르기 좋은 크기로 */
+    .qc-scope .sb { padding: 8px 13px; font-size: 12.5px; }
+    .qc-scope .btn.bs { padding: 7px 12px; font-size: 12px; }
+    .qc-scope .nb { padding: 10px 13px; }
+
+    /* 표 글자를 살짝 키워 가독성 확보 */
+    .qc-scope .dt { font-size: 12.5px; }
+    .qc-scope .dt th { font-size: 11.5px; }
+
+    /* 넓은 표 첫 열 고정 — 가로로 밀어도 날짜가 계속 보인다 */
+    #hist-meas-tbl th:first-child, #hist-meas-tbl td:first-child,
+    #hist-hl-tbl th:first-child,   #hist-hl-tbl td:first-child {
+      position: sticky; left: 0; z-index: 2;
+      background: var(--w); box-shadow: 1px 0 0 var(--bd);
+    }
+    #hist-meas-tbl thead th:first-child,
+    #hist-hl-tbl thead th:first-child { z-index: 3; background: #1a3a5c; }
+
+    /* 사이트 쪽 넓은 표(층별구조 등)도 첫 열 고정 */
+    .table-wrap table th:first-child,
+    .table-wrap table td:first-child {
+      position: sticky; left: 0; z-index: 2;
+      background: var(--surface); box-shadow: 1px 0 0 var(--border);
+    }
+    .table-wrap thead th:first-child { z-index: 3; background: var(--surface3); }
+  }
+
+  /* 가로 스크롤 영역에 관성 스크롤 (iOS) */
+  .qc-scope [style*="overflow-x"], .qc-scope [style*="overflow:auto"],
+  .table-wrap, .chart-scroll { -webkit-overflow-scrolling: touch; }
 
   /* ---- 인트로 스플래시 (사이트 전역) ---- */
   /* ══════════════════════════════════════════
