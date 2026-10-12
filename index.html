@@ -2067,9 +2067,10 @@
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
           <div>
             <div class="page-title">🧱 층별 구조 분석</div>
-            <div class="page-subtitle">서해테크 기준 | Update: 2026.06.24</div>
+            <div class="page-subtitle">일신케미칼 기준 | Update: 2026.06.24</div>
           </div>
           <div style="display:flex; gap:10px;">
+            <button class="btn btn-secondary btn-sm" id="sht-toggle-btn" onclick="toggleShtHidden()">👁 서해테크 숨기기 해제</button>
             <button class="btn btn-secondary btn-sm" onclick="openModal('modal-history-add')">📝 변경이력 추가</button>
             <button class="btn btn-primary btn-sm" onclick="openModal('modal-layer-add')">+ 구조 추가</button>
           </div>
@@ -2077,14 +2078,14 @@
       </div>
 
       <div class="tabs">
-        <div class="tab active" onclick="switchTab(this,'layer-sht')">🏭 서해테크 <span style="font-size:11px; opacity:0.75;">(26종)</span></div>
-        <div class="tab" onclick="switchTab(this,'layer-isk')">📋 일신케미칼 <span style="font-size:11px; opacity:0.75;">(23종)</span></div>
+        <div class="tab active" onclick="switchTab(this,'layer-isk')">🏭 일신케미칼 <span style="font-size:11px; opacity:0.75;">(23종)</span></div>
+        <div class="tab" id="tab-layer-sht" onclick="switchTab(this,'layer-sht')" style="display:none;">📋 서해테크 <span style="font-size:11px; opacity:0.75;">(26종)</span></div>
         <div class="tab" onclick="switchTab(this,'layer-all')">전체 목록</div>
         <div class="tab" onclick="switchTab(this,'layer-detail')">구조 시각화</div>
       </div>
 
-      <!-- ===== Tab: 서해테크 (기본값) ===== -->
-      <div id="layer-sht" class="tab-content">
+      <!-- ===== Tab: 서해테크 (기본 숨김 · '숨기기 해제' 버튼으로 표시) ===== -->
+      <div id="layer-sht" class="tab-content" style="display:none;">
         <div style="display:flex; gap:10px; margin-bottom:1rem; flex-wrap:wrap; align-items:center;">
           <div class="search-bar">
             <span>🔍</span>
@@ -2123,8 +2124,8 @@
         </div>
       </div>
 
-      <!-- ===== Tab: 일신케미칼 (참고) ===== -->
-      <div id="layer-isk" class="tab-content" style="display:none;">
+      <!-- ===== Tab: 일신케미칼 (기본값) ===== -->
+      <div id="layer-isk" class="tab-content">
         <div style="padding:8px 14px; background:#fffbeb; border:1px solid #fde68a; border-radius:8px; margin-bottom:1rem; font-size:13px; color:#b45309;">
           📋 일신케미칼 층별구조 데이터입니다.
         </div>
@@ -2193,12 +2194,12 @@
           <div class="card">
             <div class="card-header">
               <div class="card-title">📋 구조 선택</div>
-              <span class="badge badge-teal" id="viz-filter-badge">서해테크</span>
+              <span class="badge badge-teal" id="viz-filter-badge">일신케미칼</span>
             </div>
             <div class="card-body" style="padding:0.75rem;">
               <div style="display:flex; gap:6px; margin-bottom:8px;">
-                <button class="btn btn-sm" id="viz-btn-sht" style="flex:1; background:var(--accent2); color:white; border:none;" onclick="setVizFilter('서해테크')">서해테크</button>
-                <button class="btn btn-secondary btn-sm" id="viz-btn-isk" style="flex:1;" onclick="setVizFilter('일신케미칼')">일신케미칼</button>
+                <button class="btn btn-sm" id="viz-btn-isk" style="flex:1; background:var(--blue); color:white; border:none;" onclick="setVizFilter('일신케미칼')">일신케미칼</button>
+                <button class="btn btn-secondary btn-sm" id="viz-btn-sht" style="flex:1; display:none;" onclick="setVizFilter('서해테크')">서해테크</button>
               </div>
               <div id="layer-select-list" style="display:flex; flex-direction:column; gap:3px; max-height:520px; overflow-y:auto;"></div>
             </div>
@@ -5407,7 +5408,8 @@ function filterLayerTable() {
     const mQ = !q||r.struct.includes(q)||r.co.includes(q)||r.type.toLowerCase().includes(q)||String(r.no).includes(q);
     const mT = !type||r.type===type;
     const mC = !co||r.co===co;
-    return mQ&&mT&&mC;
+    const mH = !(shtHidden && r.co==='서해테크');
+    return mQ&&mT&&mC&&mH;
   });
   renderLayerTable(filtered,'layer-tbody');
 }
@@ -5415,7 +5417,41 @@ function filterLayerTable() {
 // ============================================================
 // 구조 시각화
 // ============================================================
-let vizFilter = '서해테크';
+let vizFilter = '일신케미칼';
+
+// ===== 층별구조: 서해테크 숨기기 / 숨기기 해제 (기본 숨김, 브라우저에 상태 저장) =====
+let shtHidden = true;
+try { shtHidden = localStorage.getItem('lvt_layer_sht_hidden') !== '0'; } catch(e) {}
+function applyShtHidden() {
+  const page = document.getElementById('page-layer');
+  const tab = document.getElementById('tab-layer-sht');
+  const btn = document.getElementById('sht-toggle-btn');
+  const vizBtn = document.getElementById('viz-btn-sht');
+  const coSel = document.getElementById('layer-filter-co');
+  if(tab) tab.style.display = shtHidden ? 'none' : '';
+  if(vizBtn) vizBtn.style.display = shtHidden ? 'none' : '';
+  if(btn) btn.textContent = shtHidden ? '👁 서해테크 숨기기 해제' : '🙈 서해테크 숨기기';
+  if(coSel) {
+    const opt = [...coSel.options].find(o=>o.value==='서해테크'||o.text==='서해테크');
+    if(opt) opt.hidden = shtHidden;
+    if(shtHidden && coSel.value==='서해테크') coSel.value = '';
+  }
+  if(shtHidden) {
+    // 서해테크 탭이 열려 있었다면 일신케미칼 탭으로 이동
+    const sht = document.getElementById('layer-sht');
+    if(page && sht && sht.style.display !== 'none') {
+      const iskTab = page.querySelector(".tab[onclick*=\"'layer-isk'\"]");
+      if(iskTab) switchTab(iskTab, 'layer-isk');
+    }
+    if(vizFilter === '서해테크') setVizFilter('일신케미칼');
+  }
+  try { filterLayerTable(); } catch(e) {}
+}
+function toggleShtHidden() {
+  shtHidden = !shtHidden;
+  try { localStorage.setItem('lvt_layer_sht_hidden', shtHidden ? '1' : '0'); } catch(e) {}
+  applyShtHidden();
+}
 function setVizFilter(co) {
   vizFilter = co;
   const badge = document.getElementById('viz-filter-badge');
@@ -7572,7 +7608,7 @@ function saveChangeMgmt() {
     const editKeys = ['setT','topT','topP','midT','midP','midF','mid2T','mid2P','mid2F','mid3T','mid3P','mid3F','gfT','baseT','baseP','baseF'];
     editKeys.forEach(k => { if(cmAfterData[k] !== undefined) r[k] = cmAfterData[k]; });
     // 테이블 새로고침
-    try { renderShtIsk(); renderLayerTable(layerData,'layer-tbody'); renderPhrTable(); } catch(e){}
+    try { renderShtIsk(); filterLayerTable(); renderPhrTable(); } catch(e){}
   }
 
   // 변경 전/후 텍스트 요약 생성
@@ -7690,8 +7726,8 @@ function renderChangeMgmt() {
 // ============================================================
 function initAll() {
   applyNavCollapseState();
-  renderLayerTable(layerData, 'layer-tbody');
   renderShtIsk();
+  applyShtHidden();
   renderLayerSelectList();
   renderDashCharts();
   renderPhrTable();
