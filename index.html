@@ -2045,14 +2045,14 @@
           <div class="card-title">🏭 거래처별 층별구조 비중 분포</div>
         </div>
         <div class="card-body">
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-            <div>
-              <div style="font-size:13px; font-weight:600; color:var(--text2); margin-bottom:10px;">서해테크</div>
-              <div id="sht-chart" style="display:flex; flex-direction:column; gap:5px;"></div>
-            </div>
+          <div id="dash-dist-grid" style="display:grid; grid-template-columns: 1fr; gap: 1.5rem;">
             <div>
               <div style="font-size:13px; font-weight:600; color:var(--text2); margin-bottom:10px;">일신케미칼</div>
               <div id="isk-chart" style="display:flex; flex-direction:column; gap:5px;"></div>
+            </div>
+            <div id="dash-sht-block" style="display:none;">
+              <div style="font-size:13px; font-weight:600; color:var(--text2); margin-bottom:10px;">서해테크</div>
+              <div id="sht-chart" style="display:flex; flex-direction:column; gap:5px;"></div>
             </div>
           </div>
         </div>
@@ -5442,6 +5442,11 @@ function applyShtHidden() {
   const coSel = document.getElementById('layer-filter-co');
   if(tab) tab.style.display = shtHidden ? 'none' : '';
   if(vizBtn) vizBtn.style.display = shtHidden ? 'none' : '';
+  // 대시보드 거래처별 비중 분포: 서해테크 숨김 시 일신케미칼만 전체 폭으로
+  const dashSht = document.getElementById('dash-sht-block');
+  const dashGrid = document.getElementById('dash-dist-grid');
+  if(dashSht) dashSht.style.display = shtHidden ? 'none' : '';
+  if(dashGrid) dashGrid.style.gridTemplateColumns = shtHidden ? '1fr' : '1fr 1fr';
   const phrBtn = document.getElementById('phr-btn-sht');
   if(phrBtn) phrBtn.style.display = shtHidden ? 'none' : '';
   if(btn) btn.textContent = shtHidden ? '👁 숨기기 해제' : '🙈 숨기기';
