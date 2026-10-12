@@ -2825,8 +2825,16 @@
     <!-- ============================================================ -->
     <div id="page-phr-table" class="page">
       <div class="page-header">
-        <div class="page-title">📐 PHR 기준표</div>
-        <div class="page-subtitle">서해테크 층별구조 기반 — 반제품별 PHR·비중 자동 계산 (층별구조 연동)</div>
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+          <div>
+            <div class="page-title">📐 PHR 기준표</div>
+            <div class="page-subtitle" id="phr-subtitle">일신케미칼 층별구조 기반 — 반제품별 PHR·비중 자동 계산 (층별구조 연동)</div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-sm" id="phr-btn-isk" onclick="setPhrCo('일신케미칼')" style="background:var(--blue); color:white; border:none;">일신케미칼</button>
+            <button class="btn btn-secondary btn-sm" id="phr-btn-sht" onclick="setPhrCo('서해테크')" style="display:none;">서해테크</button>
+          </div>
+        </div>
       </div>
 
       <div class="tabs">
@@ -2905,6 +2913,8 @@
           <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#f59e0b;margin-right:5px;vertical-align:middle;"></span>HARD</span>
           <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#8b5cf6;margin-right:5px;vertical-align:middle;"></span>PE</span>
           <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#e94560;margin-right:5px;vertical-align:middle;"></span>DIY</span>
+          <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#14b8a6;margin-right:5px;vertical-align:middle;"></span>4합·5합</span>
+          <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#94a3b8;margin-right:5px;vertical-align:middle;"></span>기타(Acoustic·중국·내수)</span>
           <span style="margin-left:8px; font-weight:600; color:var(--text2);">비중:</span>
           <span style="color:#065f46; font-weight:600;">■ ≥1.850</span>
           <span style="color:var(--text2); font-weight:600;">■ 1.700~1.849</span>
@@ -2945,8 +2955,8 @@
         </div>
 
         <!-- 주요 패턴 요약 -->
-        <div style="margin-top:1.75rem;">
-          <div style="font-size:13px; font-weight:600; color:var(--text2); margin-bottom:10px;">⚡ 주요 배합 패턴 요약</div>
+        <div id="phr-pattern-sht" style="margin-top:1.75rem; display:none;">
+          <div style="font-size:13px; font-weight:600; color:var(--text2); margin-bottom:10px;">⚡ 주요 배합 패턴 요약 (서해테크)</div>
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:10px;">
             <div class="card"><div class="card-body" style="padding:0.9rem 1rem;">
               <div style="font-size:11px; font-weight:700; color:#065f46; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">BASE 표준 (일반)</div>
@@ -5430,6 +5440,8 @@ function applyShtHidden() {
   const coSel = document.getElementById('layer-filter-co');
   if(tab) tab.style.display = shtHidden ? 'none' : '';
   if(vizBtn) vizBtn.style.display = shtHidden ? 'none' : '';
+  const phrBtn = document.getElementById('phr-btn-sht');
+  if(phrBtn) phrBtn.style.display = shtHidden ? 'none' : '';
   if(btn) btn.textContent = shtHidden ? '👁 숨기기 해제' : '🙈 숨기기';
   if(coSel) {
     const opt = [...coSel.options].find(o=>o.value==='서해테크'||o.text==='서해테크');
@@ -5444,6 +5456,7 @@ function applyShtHidden() {
       if(iskTab) switchTab(iskTab, 'layer-isk');
     }
     if(vizFilter === '서해테크') setVizFilter('일신케미칼');
+    if(typeof phrCo !== 'undefined' && phrCo === '서해테크') setPhrCo('일신케미칼');
   }
   try { filterLayerTable(); } catch(e) {}
 }
@@ -6228,8 +6241,8 @@ function calcPHR(dotp, filler) {
 // 반제품 PHR 구분표 (layerData 연동, BASE / BALANCE 분리)
 // ============================================================
 function renderSemiTable() {
-  // layerData에서 서해테크만 사용
-  const sht = layerData.filter(r => r.co === '서해테크');
+  // layerData에서 선택된 거래처(기본: 일신케미칼)만 사용
+  const sht = layerData.filter(r => r.co === phrCo);
 
   // BASE (중지) 조합 수집
   const baseMap = {};
@@ -6267,7 +6280,7 @@ function renderSemiTable() {
     const nos = item.nos.sort((a,b)=>a-b);
     // 구분 태그 (HARD / PE 있으면 표시)
     const tags = [];
-    if (item.types.has('HARD')) tags.push('<span style="font-size:10px;background:#fef3c7;color:#92400e;border-radius:3px;padding:1px 5px;">HARD</span>');
+    if (item.types.has('HARD') || item.types.has('Hard (Sol)')) tags.push('<span style="font-size:10px;background:#fef3c7;color:#92400e;border-radius:3px;padding:1px 5px;">HARD</span>');
     if (item.types.has('PE'))   tags.push('<span style="font-size:10px;background:#ede9fe;color:#5b21b6;border-radius:3px;padding:1px 5px;">PE</span>');
 
     // 비중 색상
@@ -6300,13 +6313,52 @@ function renderSemiTable() {
   }
 }
 
+// ===== PHR 기준표 거래처 선택 (기본: 일신케미칼) =====
+let phrCo = '일신케미칼';
+function setPhrCo(co) {
+  if (co === '서해테크' && typeof shtHidden !== 'undefined' && shtHidden) co = '일신케미칼';
+  phrCo = co;
+  const on = (id, active, color) => {
+    const b = document.getElementById(id); if (!b) return;
+    b.className = active ? 'btn btn-sm' : 'btn btn-secondary btn-sm';
+    b.style.background = active ? color : ''; b.style.color = active ? 'white' : ''; b.style.border = active ? 'none' : '';
+  };
+  on('phr-btn-isk', co === '일신케미칼', 'var(--blue)');
+  on('phr-btn-sht', co === '서해테크', 'var(--accent2)');
+  const sub = document.getElementById('phr-subtitle');
+  if (sub) sub.textContent = `${co} 층별구조 기반 — 반제품별 PHR·비중 자동 계산 (층별구조 연동)`;
+  const pat = document.getElementById('phr-pattern-sht');
+  if (pat) pat.style.display = co === '서해테크' ? '' : 'none';
+  renderPhrTable();
+}
+
+// layerData 한 행 → PHR 상세표 행 (일신케미칼 등 PHR_DATA가 없는 거래처용)
+function layerToPhrRow(r) {
+  const lay = (t,d,f) => (+t > 0) ? [+t, d, f] : null;
+  return { no:r.no, type:r.type, struct:r.struct,
+    gf: (+r.gfT > 0) ? (+r.gfT).toFixed(2) : null,
+    m1: lay(r.midT, r.midP, r.midF), m2: lay(r.mid2T, r.mid2P, r.mid2F), m3: lay(r.mid3T, r.mid3P, r.mid3F),
+    base: lay(r.baseT, r.baseP, r.baseF), density: r.density };
+}
+
 function renderPhrTable() {
   renderSemiTable();
 
   const tbody = document.getElementById('phr-tbody');
   if (!tbody) return;
 
-  const PHR_GROUPS = [
+  let PHR_GROUPS;
+  if (phrCo !== '서해테크') {
+    const rows = layerData.filter(r => r.co === phrCo).map(layerToPhrRow);
+    const t = r => parseFloat(String(r.struct).split('/')[0]) || 0;
+    PHR_GROUPS = [
+      { label:'2T 구조',        rows: rows.filter(r => t(r) <  2.25) },
+      { label:'2.5T 구조',      rows: rows.filter(r => t(r) >= 2.25 && t(r) < 2.75) },
+      { label:'3T 구조',        rows: rows.filter(r => t(r) >= 2.75 && t(r) < 3.75) },
+      { label:'4T ~ 4.5T 구조', rows: rows.filter(r => t(r) >= 3.75 && t(r) < 4.75) },
+      { label:'5T 구조',        rows: rows.filter(r => t(r) >= 4.75) },
+    ].filter(g => g.rows.length);
+  } else PHR_GROUPS = [
     { label:'1.8T ~ 2T 구조', rows: PHR_DATA.slice(0,6)  },
     { label:'2.5T ~ 3T 구조', rows: PHR_DATA.slice(6,16) },
     { label:'5T 일반',        rows: PHR_DATA.slice(16,17) },
@@ -6315,7 +6367,7 @@ function renderPhrTable() {
   ];
 
   function phrTypeBadge2(t) {
-    const map = {'일반':'badge-blue','HARD':'badge-amber','PE':'badge-purple','DIY':'badge-red'};
+    const map = {'일반':'badge-blue','HARD':'badge-amber','Hard (Sol)':'badge-amber','PE':'badge-purple','DIY':'badge-red','4합':'badge-teal','5합':'badge-teal'};
     return `<span class="badge ${map[t]||'badge-gray'}" style="font-size:11px;">${t}</span>`;
   }
   function phrCell2(arr, bg, col) {
