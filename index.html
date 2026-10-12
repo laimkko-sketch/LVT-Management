@@ -2070,7 +2070,7 @@
             <div class="page-subtitle">일신케미칼 기준 | Update: 2026.06.24</div>
           </div>
           <div style="display:flex; gap:10px;">
-            <button class="btn btn-secondary btn-sm" id="sht-toggle-btn" onclick="toggleShtHidden()">👁 서해테크 숨기기 해제</button>
+            <button class="btn btn-secondary btn-sm" id="sht-toggle-btn" onclick="toggleShtHidden()">👁 숨기기 해제</button>
             <button class="btn btn-secondary btn-sm" onclick="openModal('modal-history-add')">📝 변경이력 추가</button>
             <button class="btn btn-primary btn-sm" onclick="openModal('modal-layer-add')">+ 구조 추가</button>
           </div>
@@ -5430,7 +5430,7 @@ function applyShtHidden() {
   const coSel = document.getElementById('layer-filter-co');
   if(tab) tab.style.display = shtHidden ? 'none' : '';
   if(vizBtn) vizBtn.style.display = shtHidden ? 'none' : '';
-  if(btn) btn.textContent = shtHidden ? '👁 서해테크 숨기기 해제' : '🙈 서해테크 숨기기';
+  if(btn) btn.textContent = shtHidden ? '👁 숨기기 해제' : '🙈 숨기기';
   if(coSel) {
     const opt = [...coSel.options].find(o=>o.value==='서해테크'||o.text==='서해테크');
     if(opt) opt.hidden = shtHidden;
