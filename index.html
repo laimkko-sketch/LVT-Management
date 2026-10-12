@@ -1929,15 +1929,20 @@
     <!-- ============================================================ -->
     <div id="page-dashboard" class="page active">
       <div class="page-header">
-        <div class="page-title">대시보드</div>
-        <div class="page-subtitle">타일 제품 관리 시스템 전체 현황</div>
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+          <div>
+            <div class="page-title">대시보드</div>
+            <div class="page-subtitle">타일 제품 관리 시스템 전체 현황</div>
+          </div>
+          <button class="btn btn-secondary btn-sm sht-toggle-btn" onclick="toggleShtHidden()">👁 숨기기 해제</button>
+        </div>
       </div>
 
       <div class="stats-grid">
         <div class="stat-card teal">
           <div class="stat-label">층별구조 등록</div>
-          <div class="stat-value">48</div>
-          <div class="stat-desc">서해테크 25 · 일신케미칼 23</div>
+          <div class="stat-value" id="dash-layer-count">23</div>
+          <div class="stat-desc" id="dash-layer-desc">일신케미칼 23</div>
         </div>
         <div class="stat-card blue">
           <div class="stat-label">배합 종류</div>
@@ -1951,8 +1956,8 @@
         </div>
         <div class="stat-card purple">
           <div class="stat-label">거래처 수</div>
-          <div class="stat-value">2</div>
-          <div class="stat-desc">서해테크 · 일신케미칼</div>
+          <div class="stat-value" id="dash-client-count">1</div>
+          <div class="stat-desc" id="dash-client-desc">일신케미칼</div>
         </div>
         <div class="stat-card red">
           <div class="stat-label">최근 업데이트</div>
@@ -1965,7 +1970,7 @@
         <div class="card">
           <div class="card-header">
             <div class="card-title">📋 최근 변경된 층별구조</div>
-            <span class="badge badge-teal">최신 5건</span>
+            <span class="badge badge-teal" id="dash-recent-badge">최신 3건</span>
           </div>
           <div class="card-body" style="padding:0;">
             <table>
@@ -1979,12 +1984,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
+                <tr class="dash-sht-row" style="display:none;">
                   <td>49</td><td class="td-main">서해테크</td>
                   <td><span class="badge badge-amber">HARD</span></td>
                   <td class="mono">5/0.5</td><td>1.7972</td>
                 </tr>
-                <tr>
+                <tr class="dash-sht-row" style="display:none;">
                   <td>48</td><td class="td-main">서해테크</td>
                   <td><span class="badge badge-blue">일반</span></td>
                   <td class="mono">5/0.5</td><td>1.7948</td>
@@ -5450,6 +5455,20 @@ function applyShtHidden() {
   const phrBtn = document.getElementById('phr-btn-sht');
   if(phrBtn) phrBtn.style.display = shtHidden ? 'none' : '';
   if(btn) btn.textContent = shtHidden ? '👁 숨기기 해제' : '🙈 숨기기';
+  document.querySelectorAll('.sht-toggle-btn').forEach(b=>b.textContent = shtHidden ? '👁 숨기기 해제' : '🙈 숨기기');
+  // 대시보드: 최근 변경 표 · 요약 카드
+  document.querySelectorAll('.dash-sht-row').forEach(tr=>tr.style.display = shtHidden ? 'none' : '');
+  const rb = document.getElementById('dash-recent-badge');
+  const rtb = document.querySelector('.dash-sht-row')?.closest('tbody');
+  if(rb && rtb) rb.textContent = `최신 ${[...rtb.rows].filter(tr=>tr.style.display!=='none').length}건`;
+  if(typeof layerData !== 'undefined'){
+    const nI = layerData.filter(r=>r.co==='일신케미칼').length, nS = layerData.filter(r=>r.co==='서해테크').length;
+    const set = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+    set('dash-layer-count', shtHidden ? nI : nI+nS);
+    set('dash-layer-desc',  shtHidden ? `일신케미칼 ${nI}` : `일신케미칼 ${nI} · 서해테크 ${nS}`);
+    set('dash-client-count', shtHidden ? 1 : 2);
+    set('dash-client-desc',  shtHidden ? '일신케미칼' : '일신케미칼 · 서해테크');
+  }
   if(coSel) {
     const opt = [...coSel.options].find(o=>o.value==='서해테크'||o.text==='서해테크');
     if(opt) opt.hidden = shtHidden;
