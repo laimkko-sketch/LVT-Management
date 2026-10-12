@@ -13022,7 +13022,7 @@ function buildInspCertificateHTML(){
            transform:rotate(-15deg);position:relative;overflow:hidden;
            box-shadow:${overallPass?'0 0 0 1.5px #991b1b inset':'none'}">
         ${overallPass?`
-          <div style="font-size:7.5px;font-weight:900;letter-spacing:.5px;line-height:1.1;text-align:center">서해테크</div>
+          <div style="font-size:7.5px;font-weight:900;letter-spacing:.5px;line-height:1.1;text-align:center">KDF</div>
           <div style="font-size:9px;font-weight:900;letter-spacing:.3px;line-height:1.2;border-top:1.5px solid #991b1b;border-bottom:1.5px solid #991b1b;padding:1px 3px;margin:1px 0">합 격</div>
           <div style="font-size:6.5px;font-weight:700;letter-spacing:.3px;line-height:1.1;text-align:center">APPROVED</div>
         `:overallFail?`
@@ -13806,7 +13806,7 @@ function hlUpdateSummary(){
       </div>
     </div>
     ${overallPass?`<div style="width:72px;height:72px;border-radius:50%;border:3px solid #991b1b;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-15deg);flex-shrink:0;color:#991b1b">
-      <div style="font-size:8px;font-weight:900;letter-spacing:.5px">서해테크</div>
+      <div style="font-size:8px;font-weight:900;letter-spacing:.5px">KDF</div>
       <div style="font-size:10px;font-weight:900;border-top:1.5px solid #991b1b;border-bottom:1.5px solid #991b1b;padding:1px 4px;margin:1px 0;letter-spacing:.3px">합 격</div>
       <div style="font-size:7px;font-weight:700;letter-spacing:.3px">APPROVED</div>
     </div>`:''}
@@ -14206,7 +14206,7 @@ function buildHLPrintContent(r){
         <span style="color:#475569;font-weight:700">작성자</span><span>${r.author||'—'}</span>
       </div>
       ${overallPass?`<div style="width:66px;height:66px;border-radius:50%;border:3px solid #991b1b;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-15deg);flex-shrink:0;color:#991b1b">
-        <div style="font-size:7.5px;font-weight:900;letter-spacing:.5px">서해테크</div>
+        <div style="font-size:7.5px;font-weight:900;letter-spacing:.5px">KDF</div>
         <div style="font-size:10px;font-weight:900;border-top:1.5px solid #991b1b;border-bottom:1.5px solid #991b1b;padding:1px 3px;margin:1px 0">합 격</div>
         <div style="font-size:7px;font-weight:700">APPROVED</div>
       </div>`:overallFail?`<div style="width:66px;height:66px;border-radius:50%;border:3px solid #991b1b;display:flex;align-items:center;justify-content:center;transform:rotate(-15deg);flex-shrink:0;color:#991b1b;font-weight:900;font-size:11px">불합격</div>`:''}
