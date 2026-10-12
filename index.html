@@ -1961,7 +1961,7 @@
         </div>
         <div class="stat-card red">
           <div class="stat-label">최근 업데이트</div>
-          <div class="stat-value" style="font-size:16px; margin-top:4px;">2026.04.13</div>
+          <div class="stat-value" id="dash-last-update" style="font-size:16px; margin-top:4px;" title="사이트 수정일과 데이터 저장일 중 가장 최근 날짜">2026.10.12</div>
           <div class="stat-desc">층별구조 분석 최신화</div>
         </div>
       </div>
@@ -7799,11 +7799,45 @@ function renderChangeMgmt() {
       </div>`).join('')}`;
 }
 
+
+// ===== 대시보드 '최근 업데이트' 자동 갱신 =====
+// ① 사이트(GitHub Pages)가 마지막으로 바뀐 날짜(document.lastModified)
+// ② 앱에서 데이터를 저장한 마지막 날짜(localStorage 기록)
+// 둘 중 최근 날짜를 표시한다.
+const LAST_UPDATE_KEY = 'lvt_last_update';
+const LAST_UPDATE_BASE = '2026-10-12';
+const UI_ONLY_KEYS = new Set(['lvt_nav_collapsed','lvt_layer_sht_hidden', LAST_UPDATE_KEY]);
+let _trackDataSaves = false;   // 첫 화면 로딩 중 자동 저장(초기 데이터 등)은 제외
+(function(){
+  try {
+    const orig = Storage.prototype.setItem;
+    Storage.prototype.setItem = function(k, v){
+      orig.call(this, k, v);
+      if(_trackDataSaves && this === window.localStorage && !UI_ONLY_KEYS.has(k)){
+        const d = new Date(), t = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        try { orig.call(this, LAST_UPDATE_KEY, t); } catch(e){}
+        if(typeof refreshLastUpdate === 'function') refreshLastUpdate();
+      }
+    };
+  } catch(e){}
+  window.addEventListener('load', ()=>setTimeout(()=>{ _trackDataSaves = true; }, 3000));
+})();
+function refreshLastUpdate(){
+  const el = document.getElementById('dash-last-update'); if(!el) return;
+  const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const cands = [LAST_UPDATE_BASE];
+  const lm = new Date(document.lastModified);
+  if(!isNaN(lm)) cands.push(ymd(lm));
+  try { const v = localStorage.getItem(LAST_UPDATE_KEY); if(v) cands.push(v); } catch(e){}
+  el.textContent = cands.sort().pop().replace(/-/g,'.');
+}
+
 // ============================================================
 // INIT
 // ============================================================
 function initAll() {
   applyNavCollapseState();
+  refreshLastUpdate();
   renderShtIsk();
   applyShtHidden();
   renderLayerSelectList();
