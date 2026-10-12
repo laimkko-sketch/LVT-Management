@@ -4210,6 +4210,7 @@
           <div style="display:flex;gap:7px">
             <button class="btn bg bs no-print" onclick="QC.viewCertificateFromForm()">🖨 검사성적서 인쇄</button>
             <button class="btn bg bs no-print" onclick="QC.exportCurrentRaw()">📊 엑셀 내보내기</button>
+            <button class="btn bg bs no-print" onclick="QC.exportCertXlsxFromForm()" title="검사성적서 양식(색·칸 크기·병합) 그대로 엑셀 파일로 저장">📑 성적서 엑셀(양식)</button>
             <button class="btn bg bs no-print" onclick="QC.clearForm()">초기화</button>
             <button class="btn bp no-print" onclick="QC.saveRecord()">💾 저장</button>
           </div>
@@ -4585,6 +4586,7 @@
           <div style="background:linear-gradient(135deg,#1a3a5c,#1e4976);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between">
             <span style="font-weight:600;font-size:14px">📋 검사성적서 보기</span>
             <div style="display:flex;gap:8px">
+              <button class="btn bp bs" onclick="QC.exportCertXlsxFromModal()" title="화면의 성적서 양식(색·칸 크기·병합) 그대로 엑셀 파일로 저장">📑 엑셀(양식)</button>
               <button class="btn bp bs" onclick="QC.printCertFromModal()">🖨 인쇄</button>
               <button onclick="QC.closeCertModal()" style="background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:13px">✕ 닫기</button>
             </div>
@@ -14321,7 +14323,227 @@ gp=function(id){
 
 /* ===== 사이트 연동 ===== */
 let qcReady = false;
+
+// ══════════════════════════════════════════
+// 검사성적서 → 엑셀(양식 그대로) 내보내기
+// 화면에 그려진 성적서의 실제 위치·크기·색·테두리·병합을 읽어
+// 같은 모양의 .xlsx 로 만든다. (ExcelJS 사용 — 버튼 클릭 시 1회 로드)
+// ══════════════════════════════════════════
+function loadExcelJS(){
+  if(window.ExcelJS) return Promise.resolve(window.ExcelJS);
+  return new Promise((res,rej)=>{
+    const add=(src,next)=>{
+      const s=document.createElement('script'); s.src=src;
+      s.onload=()=>window.ExcelJS?res(window.ExcelJS):next();
+      s.onerror=next; document.head.appendChild(s);
+    };
+    add('exceljs.min.js', ()=>add('https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js',
+      ()=>rej(new Error('ExcelJS 로드 실패'))));
+  });
+}
+
+async function exportCertElementToXlsx(root, fileName){
+  const ExcelJS = await loadExcelJS();
+  const K = 1.5;                       // 화면(px) → 엑셀 확대 배율 (글씨 7px → 약 8pt)
+  const R0 = root.getBoundingClientRect();
+  const rel = el => { const r=el.getBoundingClientRect();
+    return {x1:r.left-R0.left, y1:r.top-R0.top, x2:r.right-R0.left, y2:r.bottom-R0.top}; };
+  const cs = el => getComputedStyle(el);
+
+  // rgb(a) → ARGB, 투명이면 null
+  const argb = c => {
+    const m = /rgba?\(([^)]+)\)/.exec(c||''); if(!m) return null;
+    const p = m[1].split(',').map(s=>parseFloat(s));
+    if(p.length===4 && p[3]===0) return null;
+    return 'FF'+p.slice(0,3).map(v=>Math.round(v).toString(16).padStart(2,'0')).join('').toUpperCase();
+  };
+  // 배경: 자기 자신 → 투명이면 그대로 null
+  const bgOf = el => argb(cs(el).backgroundColor);
+  const fontOf = el => { const s=cs(el);
+    return { name:'Malgun Gothic', size:Math.max(5, Math.round(parseFloat(s.fontSize)*0.75*K*2)/2),
+      bold: (parseInt(s.fontWeight)||400) >= 600, color:{argb: argb(s.color)||'FF000000'} }; };
+  const borderOf = (el,side) => { const s=cs(el);
+    const w=parseFloat(s[`border${side}Width`])||0; if(!w || s[`border${side}Style`]==='none') return null;
+    return { style: w>=1.8 ? 'medium' : 'thin', color:{argb: argb(s[`border${side}Color`])||'FF888888'} }; };
+
+  // 서식 있는 글자(굵게/색 섞임) → richText
+  const richOf = el => {
+    const runs=[]; const walk=n=>{
+      if(n.nodeType===3){ const t=n.textContent.replace(/\s+/g,' '); if(t.trim()||runs.length) runs.push({text:t, font:fontOf(n.parentElement)}); }
+      else if(n.nodeName==='BR') runs.push({text:'\n', font:fontOf(el)});
+      else if(n.nodeType===1 && cs(n).display!=='none') n.childNodes.forEach(walk);
+    };
+    el.childNodes.forEach(walk);
+    while(runs.length && !runs[0].text.trim()) runs.shift();
+    while(runs.length && !runs[runs.length-1].text.trim()) runs.pop();
+    if(runs.length) { runs[0].text=runs[0].text.replace(/^ /,''); }
+    return runs;
+  };
+
+  // ── 1. 배치할 요소 수집 ─────────────────────────────
+  const stamp = [...root.querySelectorAll('div')].find(d=>cs(d).borderRadius.startsWith('50%') && d.getBoundingClientRect().width>30);
+  const items = [];    // {r, kind:'cell'|'text'|'box', el}
+  root.querySelectorAll('td,th').forEach(el=>items.push({r:rel(el), kind:'cell', el}));
+  // 표 밖의 글자 덩어리 (자식이 모두 인라인인 가장 바깥 요소)
+  const isTextBlock = el => {
+    if(el.closest('table') || (stamp && stamp.contains(el)) || !el.innerText.trim()) return false;
+    return [...el.children].every(c=>cs(c).display.startsWith('inline') || c.nodeName==='BR');
+  };
+  root.querySelectorAll('div,span').forEach(el=>{
+    if(!isTextBlock(el)) return;
+    let p=el.parentElement; while(p && p!==root){ if(isTextBlock(p)) return; p=p.parentElement; }
+    items.push({r:rel(el), kind:'text', el});
+  });
+  // 테두리가 있는 표 밖 상자(헤더 밑줄, 비고 칸 등)
+  root.querySelectorAll('div').forEach(el=>{
+    if(el===stamp || (stamp && stamp.contains(el)) || el.closest('table')) return;
+    if(['Top','Right','Bottom','Left'].some(sd=>borderOf(el,sd))) items.push({r:rel(el), kind:'box', el});
+  });
+
+  // ── 2. 격자선(열 경계 x, 행 경계 y) ─────────────────
+  const snap = arr => { arr=[...new Set(arr.map(v=>Math.round(v)))].sort((a,b)=>a-b);
+    const out=[]; arr.forEach(v=>{ if(!out.length || v-out[out.length-1]>2) out.push(v); }); return out; };
+  const W = Math.round(R0.width), H = Math.round(R0.height);
+  const xs = snap([0, W, ...items.flatMap(i=>[i.r.x1,i.r.x2])]);
+  const ys = snap([0, H, ...items.flatMap(i=>[i.r.y1,i.r.y2])]);
+  const idx = (edges,v) => { let best=0; edges.forEach((e,i)=>{ if(Math.abs(e-v)<Math.abs(edges[best]-v)) best=i; }); return best; };
+  const floorIdx = (edges,v) => { let k=0; edges.forEach((e,i)=>{ if(e<=v+2) k=i; }); return Math.min(k, edges.length-2); };
+  const ceilIdx  = (edges,v) => { for(let i=0;i<edges.length;i++) if(edges[i]>=v-2) return Math.max(i,1); return edges.length-1; };
+
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet('검사성적서', {
+    views:[{showGridLines:false}],
+    pageSetup:{paperSize:9, orientation:'portrait', fitToPage:true, fitToWidth:1, fitToHeight:1,
+      horizontalCentered:true, margins:{left:0.2,right:0.2,top:0.25,bottom:0.25,header:0,footer:0}}
+  });
+  for(let i=0;i<xs.length-1;i++){
+    const px=(xs[i+1]-xs[i])*K; ws.getColumn(i+1).width = Math.max(0.3, (px-5)/7 + 0.7);
+  }
+  for(let i=0;i<ys.length-1;i++) ws.getRow(i+1).height = Math.max(1, (ys[i+1]-ys[i])*0.75*K);
+
+  const used = new Set();   // 병합 겹침 방지
+  const place = (it, c1, c2, r1, r2) => {
+    for(let r=r1;r<=r2;r++) for(let c=c1;c<=c2;c++) if(used.has(r+','+c)) return null;
+    for(let r=r1;r<=r2;r++) for(let c=c1;c<=c2;c++) used.add(r+','+c);
+    if(c2>c1 || r2>r1) ws.mergeCells(r1,c1,r2,c2);
+    return ws.getCell(r1,c1);
+  };
+  const outline = (el,c1,c2,r1,r2) => {
+    const sides={top:borderOf(el,'Top'),bottom:borderOf(el,'Bottom'),left:borderOf(el,'Left'),right:borderOf(el,'Right')};
+    for(let r=r1;r<=r2;r++) for(let c=c1;c<=c2;c++){
+      const cell=ws.getCell(r,c), b={...(cell.border||{})};
+      if(r===r1 && sides.top) b.top=sides.top;   if(r===r2 && sides.bottom) b.bottom=sides.bottom;
+      if(c===c1 && sides.left) b.left=sides.left; if(c===c2 && sides.right) b.right=sides.right;
+      cell.border=b;
+    }
+  };
+  const alignOf = el => { const s=cs(el); const ta=s.textAlign;
+    const vertical = s.writingMode && s.writingMode.startsWith('vertical');
+    return { horizontal: vertical ? 'center' : (ta==='center'?'center': ta==='right'||ta==='end'?'right':'left'),
+      vertical: (s.display==='table-cell' || vertical) ? 'middle' : 'top',
+      wrapText: (s.whiteSpace!=='nowrap' || vertical) && !(vertical && !/[가-힣]/.test(el.innerText)),
+      shrinkToFit: s.whiteSpace==='nowrap' && !vertical,
+      ...(vertical?{textRotation: /[가-힣]/.test(el.innerText) ? 'vertical' : -90}:{}) }; };
+
+  // ── 3. 표 셀 ───────────────────────────────────────
+  items.filter(i=>i.kind==='cell').forEach(it=>{
+    const c1=idx(xs,it.r.x1)+1, c2=idx(xs,it.r.x2), r1=idx(ys,it.r.y1)+1, r2=idx(ys,it.r.y2);
+    if(c2<c1 || r2<r1) return;
+    const cell = place(it,c1,c2,r1,r2); if(!cell) return;
+    const al = alignOf(it.el);
+    const txt = it.el.innerText.replace(/\r/g,'').trim();
+    cell.value = al.textRotation==='vertical' ? txt.replace(/\s+/g,'') : al.textRotation ? txt.replace(/\s+/g,' ') : txt;
+    cell.font = fontOf(it.el); cell.alignment = al;
+    const bg = bgOf(it.el) || (it.el.parentElement && bgOf(it.el.parentElement));
+    if(bg) for(let r=r1;r<=r2;r++) for(let c=c1;c<=c2;c++)
+      ws.getCell(r,c).fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
+    outline(it.el,c1,c2,r1,r2);
+  });
+  // ── 5. 표 밖 글자 ─────────────────────────────────────
+  items.filter(i=>i.kind==='text').forEach(it=>{
+    // 글자 위치를 감싸는 격자 범위 (오른쪽은 다음 글자와 겹치지 않을 만큼만)
+    const c1=idx(xs,it.r.x1)+1, r1=idx(ys,it.r.y1)+1;
+    let c2=Math.max(c1, idx(xs,it.r.x2)), r2=Math.max(r1, idx(ys,it.r.y2));
+    // 한 줄 글자: 같은 줄의 다음 글자(또는 도장) 직전까지 넓혀 잘리지 않게
+    if(!/\n/.test(it.el.innerText.trim()) && !['Top','Right','Bottom','Left'].some(sd=>borderOf(it.el,sd))){
+      const sr = stamp ? rel(stamp) : null;
+      const others = items.filter(o=>o!==it && o.kind==='text' && o.r.y1 < it.r.y2 && o.r.y2 > it.r.y1 && o.r.x1 >= it.r.x2-1).map(o=>o.r.x1);
+      if(sr && sr.y1 < it.r.y2 && sr.y2 > it.r.y1 && sr.x1 >= it.r.x2-1) others.push(sr.x1);
+      const limit = Math.min(W, ...others);
+      c2 = Math.max(c2, idx(xs, limit));
+    }
+    while(c2>c1 && [...Array(r2-r1+1)].some((_,k)=>used.has((r1+k)+','+c2))) c2--;
+    while(r2>r1 && [...Array(c2-c1+1)].some((_,k)=>used.has(r2+','+(c1+k)))) r2--;
+    const cell = place(it,c1,c2,r1,r2); if(!cell) return;
+    const runs = richOf(it.el);
+    cell.value = runs.length>1 ? {richText:runs} : (runs[0]?.text||'');
+    if(runs.length===1) cell.font = runs[0].font;
+    const al = alignOf(it.el);
+    cell.alignment = { horizontal: al.horizontal, vertical:'middle', wrapText: /\n/.test(it.el.innerText) || cs(it.el).whiteSpace!=='nowrap' && it.el.innerText.length>60 };
+    if(cs(it.el).whiteSpace==='nowrap' || it.el.nodeName==='SPAN') cell.alignment.wrapText=false;
+  });
+
+  // ── 4. 표 밖 상자 테두리 ──────────────────────────────
+  items.filter(i=>i.kind==='box').forEach(it=>{
+    const c1=idx(xs,it.r.x1)+1, c2=idx(xs,it.r.x2), r1=idx(ys,it.r.y1)+1, r2=idx(ys,it.r.y2);
+    if(c2>=c1 && r2>=r1) outline(it.el,c1,c2,r1,r2);
+  });
+  // ── 6. 합격 도장 → 그림 ───────────────────────────────
+  if(stamp){
+    const rb = rel(stamp), size = stamp.offsetWidth, S=size*4;
+    const cx=(rb.x1+rb.x2)/2, cy=(rb.y1+rb.y2)/2;
+    const r = {x1:Math.max(0,cx-size/2), y1:Math.max(0,cy-size/2)};
+    const cv=document.createElement('canvas'); cv.width=cv.height=S; const g=cv.getContext('2d');
+    const col = cs(stamp).borderTopColor; const t=stamp.innerText.replace(/\s+/g,' ').trim();
+    g.translate(S/2,S/2); g.rotate(-15*Math.PI/180);
+    g.strokeStyle=col; g.fillStyle=col; g.lineWidth=S*0.045;
+    g.beginPath(); g.arc(0,0,S/2-g.lineWidth,0,Math.PI*2); g.stroke();
+    g.textAlign='center'; g.textBaseline='middle';
+    const font=(px,w=900)=>`${w} ${px}px 'Malgun Gothic', sans-serif`;
+    if(/합 격/.test(t)){
+      g.beginPath(); g.arc(0,0,S/2-g.lineWidth*2.6,0,Math.PI*2); g.lineWidth=S*0.02; g.stroke();
+      g.font=font(S*0.13); g.fillText(t.split(' ')[0]||'',0,-S*0.2);
+      g.lineWidth=S*0.025; g.beginPath(); g.moveTo(-S*0.3,-S*0.1); g.lineTo(S*0.3,-S*0.1); g.moveTo(-S*0.3,S*0.11); g.lineTo(S*0.3,S*0.11); g.stroke();
+      g.font=font(S*0.16); g.fillText('합 격',0,0);
+      g.font=font(S*0.1,700); g.fillText('APPROVED',0,S*0.2);
+    } else if(/불합격/.test(t)){ g.font=font(S*0.17); g.fillText('불합격',0,0); }
+    const id = wb.addImage({base64: cv.toDataURL('image/png'), extension:'png'});
+    const fx = v => { const i=floorIdx(xs,v); return i + (v-xs[i])/Math.max(1,xs[i+1]-xs[i]); };
+    const fy = v => { const i=floorIdx(ys,v); return i + (v-ys[i])/Math.max(1,ys[i+1]-ys[i]); };
+    ws.addImage(id, { tl:{col:fx(r.x1), row:fy(r.y1)}, ext:{width:size*K, height:size*K}, editAs:'oneCell' });
+  }
+
+  ws.pageSetup.printArea = `A1:${ws.getColumn(xs.length-1).letter}${ys.length-1}`;
+  const buf = await wb.xlsx.writeBuffer();
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+  a.download=fileName; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+
+// 성적서 HTML을 화면 밖에 미리보기와 같은 폭으로 그린 뒤 엑셀로 변환
+async function exportCertXlsx(html){
+  const box=document.createElement('div');
+  box.style.cssText='position:fixed;left:-10000px;top:0;width:860px;box-sizing:border-box;background:#fff;padding:14px';
+  box.innerHTML=html; document.body.appendChild(box);
+  try{
+    const root=box.firstElementChild;
+    const docNo=(root.innerText.match(/QC-[^\s]+/)||['검사성적서'])[0];
+    await exportCertElementToXlsx(root, `검사성적서_${docNo}.xlsx`);
+    if(typeof toast==='function') toast('검사성적서 엑셀(양식) 저장 완료','green');
+  }catch(e){ alert('엑셀 저장 중 오류: '+e.message); }
+  finally{ box.remove(); }
+}
+function exportCertXlsxFromModal(){
+  const body=document.getElementById('cert-view-body');
+  if(!body || !body.innerHTML.trim()){ alert('먼저 검사성적서를 열어주세요.'); return; }
+  exportCertXlsx(body.innerHTML);
+}
+function exportCertXlsxFromForm(){ exportCertXlsx(buildInspCertificateHTML()); }
+
 window.QC = {
+  exportCertXlsxFromModal,
+  exportCertXlsxFromForm,
   onShow(){
     if(qcReady) return;
     qcReady = true;
