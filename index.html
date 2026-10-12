@@ -1787,7 +1787,7 @@
     <button class="menu-toggle" onclick="toggleSidebar()" aria-label="메뉴 열기">☰</button>
     <div class="brand-home" onclick="goHome()"
          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goHome();}"
-         role="button" tabindex="0" title="처음 화면(대시보드)으로">
+         role="button" tabindex="0" title="새로고침">
       <div class="brand-icon">T</div>
       <div>
         <div class="brand-name">Tile Management System</div>
@@ -5140,8 +5140,8 @@ const layerData = [
 // 상단 로고 클릭 → 처음 화면(대시보드)
 // showPage 안에서 모바일 사이드바도 함께 닫힌다
 function goHome() {
-  showPage('dashboard');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // 좌측 상단 로고/제목 클릭 → 페이지 새로고침
+  location.reload();
 }
 
 function toggleSidebar() {
