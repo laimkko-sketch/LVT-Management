@@ -1816,7 +1816,7 @@
       <div class="nav-item" onclick="showPage('layer')">
         <span class="nav-icon">🧱</span>
         층별 구조
-        <span class="nav-badge">48</span>
+        <span class="nav-badge" id="nav-layer-count">48</span>
       </div>
 
       <div class="nav-item" onclick="showPage('analysis')">
@@ -2072,9 +2072,10 @@
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
           <div>
             <div class="page-title">🧱 층별 구조 분석</div>
-            <div class="page-subtitle">일신케미칼 기준 | Update: 2026.06.24</div>
+            <div class="page-subtitle">KDF 기준 (보령 ver.90 · 아산 ver.84) | Update: 2026.11.10</div>
           </div>
           <div style="display:flex; gap:10px;">
+            <button class="btn btn-secondary btn-sm" id="isk-toggle-btn" onclick="toggleIskHidden()" title="일신케미칼 층별구조 탭 보이기/숨기기">🏭 일신케미칼 보기</button>
             <button class="btn btn-secondary btn-sm" id="sht-toggle-btn" onclick="toggleShtHidden()">👁 숨기기 해제</button>
             <button class="btn btn-secondary btn-sm" onclick="openModal('modal-history-add')">📝 변경이력 추가</button>
             <button class="btn btn-primary btn-sm" onclick="openModal('modal-layer-add')">+ 구조 추가</button>
@@ -2083,11 +2084,78 @@
       </div>
 
       <div class="tabs">
-        <div class="tab active" onclick="switchTab(this,'layer-isk')">🏭 일신케미칼 <span style="font-size:11px; opacity:0.75;">(23종)</span></div>
+        <div class="tab active" onclick="switchTab(this,'layer-bor')">🏭 KDF 보령 <span style="font-size:11px; opacity:0.75;" id="tab-cnt-bor">(102종)</span></div>
+        <div class="tab" onclick="switchTab(this,'layer-asn')">🏭 KDF 아산 <span style="font-size:11px; opacity:0.75;" id="tab-cnt-asn">(121종)</span></div>
+        <div class="tab" id="tab-layer-isk" onclick="switchTab(this,'layer-isk')" style="display:none;">🏢 일신케미칼 <span style="font-size:11px; opacity:0.75;">(23종)</span></div>
         <div class="tab" id="tab-layer-sht" onclick="switchTab(this,'layer-sht')" style="display:none;">📋 서해테크 <span style="font-size:11px; opacity:0.75;">(26종)</span></div>
         <div class="tab" onclick="switchTab(this,'layer-all')">전체 목록</div>
+        <div class="tab" onclick="switchTab(this,'layer-cmp')">⚖️ 업체 비교 · BI</div>
+        <div class="tab" onclick="switchTab(this,'layer-verify')">🧮 계산 검증</div>
         <div class="tab" onclick="switchTab(this,'layer-detail')">구조 시각화</div>
       </div>
+
+
+      <!-- ===== Tab: KDF 보령 (ver.90 (2026.08.27)) — 메인 ===== -->
+      <div id="layer-bor" class="tab-content">
+        <div class="kdf-banner">🏭 <b>KDF 보령</b> 층별구성 ver.90 (2026.08.27) 원본 기준 · 층 구성은 원본 표 그대로(층 수 제한 없음) · <b>BI</b>는 컬 밸런스 평가시트(2026.10.29) 결과 · 행을 누르면 층별 상세·점검 내용이 펼쳐집니다.</div>
+        <div class="kdf-filters">
+          <div class="search-bar"><span>🔍</span><input type="text" placeholder="구조·제품명·그룹 검색..." id="kdf-bor-q" oninput="renderKdfTable('bor')"></div>
+          <select id="kdf-bor-type" onchange="renderKdfTable('bor')"><option value="">전체 구분</option></select>
+          <select id="kdf-bor-gf" onchange="renderKdfTable('bor')"><option value="">G/F 전체</option><option value="1">G/F 삽입</option><option value="0">G/F 없음</option></select>
+          <select id="kdf-bor-t" onchange="renderKdfTable('bor')"><option value="">전체 두께</option></select>
+          <select id="kdf-bor-judge" onchange="renderKdfTable('bor')"><option value="">BI 판정 전체</option><option>양호</option><option>주의</option><option>재검토</option><option>단독 그룹</option><option value="none">BI 미산출</option></select>
+          <label class="kdf-chk"><input type="checkbox" id="kdf-bor-flag" onchange="renderKdfTable('bor')"> 점검 항목 있는 것만</label>
+          <div class="kdf-count"><strong id="kdf-bor-count">0</strong>개 구조</div>
+        </div>
+        <div class="table-wrap">
+          <table class="kdf-table">
+            <thead><tr>
+              <th>No.</th><th>구분</th><th>그룹 / 제품(원본명)</th><th>구조<br><span class="kdf-sub">T/투명</span></th>
+              <th style="min-width:420px;">층 구성 <span class="kdf-sub">(위→아래 · 두께 mm · DOTP/FILLER)</span></th>
+              <th>총두께<br><span class="kdf-sub">층합 / 원본계</span></th>
+              <th style="color:var(--accent2);">비중<br><span class="kdf-sub">원본 / 계산</span></th>
+              <th style="color:#0369a1; white-space:nowrap;">∑DOTP<br><span style="color:#6d28d9;">∑FILLER</span></th>
+              <th>BI<br><span class="kdf-sub">ΔBI · 판정</span></th>
+              <th>점검</th>
+            </tr></thead>
+            <tbody id="kdf-bor-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== Tab: KDF 아산 (ver.84 (2026.08.19)) — 메인 ===== -->
+      <div id="layer-asn" class="tab-content" style="display:none;">
+        <div class="kdf-banner">🏭 <b>KDF 아산</b> 층별구성 ver.84 (2026.08.19) 원본 기준 · 층 구성은 원본 표 그대로(층 수 제한 없음) · <b>BI</b>는 컬 밸런스 평가시트(2026.10.29) 결과 · 행을 누르면 층별 상세·점검 내용이 펼쳐집니다.</div>
+        <div class="kdf-filters">
+          <div class="search-bar"><span>🔍</span><input type="text" placeholder="구조·제품명·그룹 검색..." id="kdf-asn-q" oninput="renderKdfTable('asn')"></div>
+          <select id="kdf-asn-type" onchange="renderKdfTable('asn')"><option value="">전체 구분</option></select>
+          <select id="kdf-asn-gf" onchange="renderKdfTable('asn')"><option value="">G/F 전체</option><option value="1">G/F 삽입</option><option value="0">G/F 없음</option></select>
+          <select id="kdf-asn-t" onchange="renderKdfTable('asn')"><option value="">전체 두께</option></select>
+          <select id="kdf-asn-judge" onchange="renderKdfTable('asn')"><option value="">BI 판정 전체</option><option>양호</option><option>주의</option><option>재검토</option><option>단독 그룹</option><option value="none">BI 미산출</option></select>
+          <label class="kdf-chk"><input type="checkbox" id="kdf-asn-flag" onchange="renderKdfTable('asn')"> 점검 항목 있는 것만</label>
+          <div class="kdf-count"><strong id="kdf-asn-count">0</strong>개 구조</div>
+        </div>
+        <div class="table-wrap">
+          <table class="kdf-table">
+            <thead><tr>
+              <th>No.</th><th>구분</th><th>그룹 / 제품(원본명)</th><th>구조<br><span class="kdf-sub">T/투명</span></th>
+              <th style="min-width:420px;">층 구성 <span class="kdf-sub">(위→아래 · 두께 mm · DOTP/FILLER)</span></th>
+              <th>총두께<br><span class="kdf-sub">층합 / 원본계</span></th>
+              <th style="color:var(--accent2);">비중<br><span class="kdf-sub">원본 / 계산</span></th>
+              <th style="color:#0369a1; white-space:nowrap;">∑DOTP<br><span style="color:#6d28d9;">∑FILLER</span></th>
+              <th>BI<br><span class="kdf-sub">ΔBI · 판정</span></th>
+              <th>점검</th>
+            </tr></thead>
+            <tbody id="kdf-asn-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== Tab: 업체 비교 · BI ===== -->
+      <div id="layer-cmp" class="tab-content" style="display:none;"><div id="layer-cmp-body"></div></div>
+
+      <!-- ===== Tab: 계산 검증 (두께 · 비중) ===== -->
+      <div id="layer-verify" class="tab-content" style="display:none;"><div id="layer-verify-body"></div></div>
 
       <!-- ===== Tab: 서해테크 (기본 숨김 · '숨기기 해제' 버튼으로 표시) ===== -->
       <div id="layer-sht" class="tab-content" style="display:none;">
@@ -2130,9 +2198,9 @@
       </div>
 
       <!-- ===== Tab: 일신케미칼 (기본값) ===== -->
-      <div id="layer-isk" class="tab-content">
+      <div id="layer-isk" class="tab-content" style="display:none;">
         <div style="padding:8px 14px; background:#fffbeb; border:1px solid #fde68a; border-radius:8px; margin-bottom:1rem; font-size:13px; color:#b45309;">
-          📋 일신케미칼 층별구조 데이터입니다.
+          📋 일신케미칼 층별구조 데이터입니다. (별도 구분 · 상단 <b>🏭 일신케미칼 보기</b> 버튼으로 표시 · 전체 목록에는 항상 포함)
         </div>
         <div style="display:flex; gap:10px; margin-bottom:1rem;">
           <div class="search-bar">
@@ -2170,20 +2238,27 @@
           <select id="layer-filter-type" onchange="filterLayerTable()" style="width:140px;">
             <option value="">전체 구분</option>
             <option>일반</option><option>HARD</option><option>PE</option><option>DIY</option><option>Acoustic</option><option>4합</option><option>5합</option>
+            <option>하우스</option><option>반제품</option><option>Dry Back</option><option>러버</option><option>벨벳</option><option>졸코팅</option><option>OA Tile</option><option>Click</option>
           </select>
-          <select id="layer-filter-co" onchange="filterLayerTable()" style="width:140px;">
+          <select id="layer-filter-co" onchange="filterLayerTable()" style="width:150px;">
             <option value="">전체 거래처</option>
-            <option>서해테크</option><option>일신케미칼</option>
+            <option value="KDF">KDF (보령+아산)</option><option>KDF 보령</option><option>KDF 아산</option>
+            <option>일신케미칼</option><option>서해테크</option>
           </select>
+          <select id="layer-filter-gf" onchange="filterLayerTable()" style="width:120px;">
+            <option value="">G/F 전체</option><option value="1">G/F 삽입</option><option value="0">G/F 없음</option>
+          </select>
+          <div class="kdf-count" style="margin-left:auto;"><strong id="layer-all-count">0</strong>개 구조</div>
         </div>
         <div class="table-wrap">
           <table id="layer-table">
             <thead>
               <tr>
                 <th>No.</th><th>거래처</th><th>구분</th><th>구조</th><th>설정두께</th>
-                <th>상지</th><th>중지1</th><th>G/F</th><th>중지2</th><th>하지</th>
+                <th style="min-width:400px;">층 구성 <span class="kdf-sub">(위→아래)</span></th>
                 <th style="color:var(--accent2);">비중</th>
                 <th style="color:#0369a1; white-space:nowrap;">∑DOTP<br><span style="color:#6d28d9;">∑FILLER</span></th>
+                <th>BI</th>
                 <th>비고</th>
               </tr>
             </thead>
@@ -2199,11 +2274,13 @@
           <div class="card">
             <div class="card-header">
               <div class="card-title">📋 구조 선택</div>
-              <span class="badge badge-teal" id="viz-filter-badge">일신케미칼</span>
+              <span class="badge badge-teal" id="viz-filter-badge">KDF 보령</span>
             </div>
             <div class="card-body" style="padding:0.75rem;">
-              <div style="display:flex; gap:6px; margin-bottom:8px;">
-                <button class="btn btn-sm" id="viz-btn-isk" style="flex:1; background:var(--blue); color:white; border:none;" onclick="setVizFilter('일신케미칼')">일신케미칼</button>
+              <div style="display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap;">
+                <button class="btn btn-sm" id="viz-btn-bor" style="flex:1; background:var(--teal); color:white; border:none;" onclick="setVizFilter('KDF 보령')">KDF 보령</button>
+                <button class="btn btn-secondary btn-sm" id="viz-btn-asn" style="flex:1;" onclick="setVizFilter('KDF 아산')">KDF 아산</button>
+                <button class="btn btn-secondary btn-sm" id="viz-btn-isk" style="flex:1; display:none;" onclick="setVizFilter('일신케미칼')">일신케미칼</button>
                 <button class="btn btn-secondary btn-sm" id="viz-btn-sht" style="flex:1; display:none;" onclick="setVizFilter('서해테크')">서해테크</button>
               </div>
               <div id="layer-select-list" style="display:flex; flex-direction:column; gap:3px; max-height:520px; overflow-y:auto;"></div>
@@ -5082,6 +5159,7 @@
 <div id="fm-print-root" class="pm-scope"></div>
 
 
+<script src="kdf_layer_data.js"></script>
 <script>
 // ============================================================
 // DATA
@@ -5150,6 +5228,13 @@ const layerData = [
   {no:48,co:'서해테크',type:'일반', struct:'5/0.5',   setT:5.22, topT:0.5, topP:35,topF:0,   printT:0.07,printP:8,  midT:1,   midP:55, midF:380, gfT:0.3, gfP:80,   gfF:80, mid2T:1,   mid2P:55, mid2F:380, mid3T:1.3,mid3P:55,mid3F:380,baseT:1,   baseP:40, baseF:180, formT:0, pvc:76.28, dotp:35.64, filler:154.57,density:1.7994},
   {no:49,co:'서해테크',type:'HARD', struct:'5/0.5',   setT:5.22, topT:0.5, topP:35,topF:0,   printT:0.07,printP:8,  midT:1.2, midP:33, midF:250, gfT:0.3, gfP:80,   gfF:80, mid2T:0.9, mid2P:40, mid2F:340, mid3T:1.2,mid3P:55,mid3F:410,baseT:1,   baseP:42, baseF:200, formT:0, pvc:80.22, dotp:33.25, filler:153.03,density:1.8018}
 ];
+
+// ===== KDF 층별구조 병합 (kdf_layer_data.js — 보령 ver.90 · 아산 ver.84) =====
+// 일신·서해의 원본 비중(엑셀 표기값)은 normalizeStructValues()가 덮어쓰기 전에 densOrig로 보관 → 계산 검증 탭에서 비교
+layerData.forEach(r=>{ if(r.densOrig==null) r.densOrig = r.density; r.comp = r.comp || r.co; });
+if (typeof KDF_LAYER_DATA !== 'undefined') layerData.push(...KDF_LAYER_DATA);
+// BI 평가시트 결과 연결 (일신케미칼 · 서해테크 — KDF는 레코드에 포함)
+if (typeof LAYER_BI_EXT !== 'undefined') layerData.forEach(r=>{ const m = LAYER_BI_EXT[r.co]; if(m && m[r.no]) r.bi = m[r.no]; });
 
 // ============================================================
 // NAVIGATION
@@ -5233,6 +5318,8 @@ function switchTab(el, tabId) {
   const target = document.getElementById(tabId);
   if(target) target.style.display='block';
   // 탭 전환 시 계산 재실행
+  if(tabId === 'layer-cmp' && typeof renderLayerCompare==='function') renderLayerCompare();
+  if(tabId === 'layer-verify' && typeof renderLayerVerify==='function') renderLayerVerify();
   if(tabId === 'ana-main') calcMain();
   if(tabId === 'ana-bi')   calcBI();
   if(tabId === 'ana-weight') calcWeight();
@@ -5393,19 +5480,17 @@ function filterIsk() {
 function renderLayerTable(data, tbodyId) {
   const tbody = document.getElementById(tbodyId);
   if(!tbody) return;
+  const coColor = co => co==='서해테크'?'var(--accent2)':co==='일신케미칼'?'var(--blue)':'var(--teal)';
+  const coShort = co => co==='서해테크'?'서해':co==='일신케미칼'?'일신':co.replace('KDF ','KDF·');
   tbody.innerHTML = data.map(r=>{
     const pf = sumPF(r);
     return `<tr>
       <td style="font-weight:700;">${r.no}</td>
-      <td><span style="font-size:11.5px; font-weight:700; color:${r.co==='서해테크'?'var(--accent2)':'var(--blue)'};">${r.co==='서해테크'?'서해':'일신'}</span></td>
-      <td><span class="badge ${typeBadge(r.type)}" style="font-size:11px;">${r.type}</span></td>
-      <td class="mono" style="font-weight:700;">${formatStruct(r.struct)}</td>
-      <td style="text-align:center;">${r.setT.toFixed(1)}</td>
-      <td style="font-size:12.5px; white-space:nowrap;">${lc(r.topT, r.topP, 0)}</td>
-      <td style="font-size:12.5px; white-space:nowrap;">${lc(r.midT, r.midP, r.midF)}</td>
-      <td style="font-size:12.5px; white-space:nowrap;">${lcGF(r.gfT, r.gfP, r.gfF)}</td>
-      <td style="font-size:12.5px; white-space:nowrap;">${lc(r.mid2T, r.mid2P, r.mid2F)}</td>
-      <td style="font-size:12.5px; white-space:nowrap;">${lc(r.baseT, r.baseP, r.baseF)}</td>
+      <td><span style="font-size:11.5px; font-weight:700; white-space:nowrap; color:${coColor(r.co)};">${coShort(r.co)}</span></td>
+      <td><span class="badge ${typeBadge(r.type)}" style="font-size:11px;">${r.type}</span>${(r.gf||r.gfT>0)?' <span class="kdf-gf">G/F</span>':''}</td>
+      <td class="mono" style="font-weight:700;">${formatStruct(r.struct)}${r.name?`<div class="kdf-sub" style="font-family:var(--font);font-weight:500;max-width:200px;white-space:normal;">${r.name}</div>`:''}</td>
+      <td style="text-align:center;">${(+r.setT).toFixed(2)}</td>
+      <td>${typeof layerChips==='function'?layerChips(r):''}</td>
       <td style="text-align:center; white-space:nowrap;">
         <div style="font-weight:800; font-size:13px; color:var(--accent2);">${r.density.toFixed(3)}</div>
       </td>
@@ -5413,20 +5498,26 @@ function renderLayerTable(data, tbodyId) {
         <div style="font-size:12px; color:#0369a1; font-weight:700;">${pf.dotp}</div>
         <div style="font-size:12px; color:#6d28d9; font-weight:700;">${pf.filler}</div>
       </td>
+      <td style="text-align:center;">${typeof biCell==='function'?biCell(r,true):''}</td>
       <td style="font-size:11.5px; color:var(--text3);">${r.note||''}</td>
     </tr>`;
   }).join('');
+  const cnt = document.getElementById('layer-all-count'); if(cnt) cnt.textContent = data.length;
 }
 function filterLayerTable() {
   const q = (document.getElementById('layer-search')?.value||'').toLowerCase();
   const type = document.getElementById('layer-filter-type')?.value||'';
   const co = document.getElementById('layer-filter-co')?.value||'';
+  const gf = document.getElementById('layer-filter-gf')?.value||'';
   const filtered = layerData.filter(r=>{
-    const mQ = !q||r.struct.includes(q)||r.co.includes(q)||r.type.toLowerCase().includes(q)||String(r.no).includes(q);
+    const hay = [r.struct, r.co, r.type, r.no, r.name||'', r.group||''].join(' ').toLowerCase();
+    const mQ = !q || hay.includes(q);
     const mT = !type||r.type===type;
-    const mC = !co||r.co===co;
+    const mC = !co || r.co===co || (co==='KDF' && r.comp==='KDF');
+    const mG = !gf || (gf==='1') === !!(r.gf || r.gfT>0);
+    // 모두 보기: 일신케미칼은 탭이 숨겨져 있어도 전체 목록에는 항상 포함 / 서해테크는 기존 숨김 규칙 유지
     const mH = !(shtHidden && r.co==='서해테크');
-    return mQ&&mT&&mC&&mH;
+    return mQ&&mT&&mC&&mG&&mH;
   });
   renderLayerTable(filtered,'layer-tbody');
 }
@@ -5434,7 +5525,7 @@ function filterLayerTable() {
 // ============================================================
 // 구조 시각화
 // ============================================================
-let vizFilter = '일신케미칼';
+let vizFilter = 'KDF 보령';
 
 // ===== 층별구조: 서해테크 숨기기 / 숨기기 해제 (기본 숨김, 브라우저에 상태 저장) =====
 let shtHidden = true;
@@ -5463,11 +5554,13 @@ function applyShtHidden() {
   if(rb && rtb) rb.textContent = `최신 ${[...rtb.rows].filter(tr=>tr.style.display!=='none').length}건`;
   if(typeof layerData !== 'undefined'){
     const nI = layerData.filter(r=>r.co==='일신케미칼').length, nS = layerData.filter(r=>r.co==='서해테크').length;
+    const nB = layerData.filter(r=>r.co==='KDF 보령').length, nA = layerData.filter(r=>r.co==='KDF 아산').length;
     const set = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
-    set('dash-layer-count', shtHidden ? nI : nI+nS);
-    set('dash-layer-desc',  shtHidden ? `일신케미칼 ${nI}` : `일신케미칼 ${nI} · 서해테크 ${nS}`);
-    set('dash-client-count', shtHidden ? 1 : 2);
-    set('dash-client-desc',  shtHidden ? '일신케미칼' : '일신케미칼 · 서해테크');
+    set('dash-layer-count', nB+nA+nI+(shtHidden?0:nS));
+    set('nav-layer-count', nB+nA+nI+(shtHidden?0:nS));
+    set('dash-layer-desc',  `KDF 보령 ${nB} · 아산 ${nA} · 일신 ${nI}` + (shtHidden ? '' : ` · 서해 ${nS}`));
+    set('dash-client-count', shtHidden ? 2 : 3);
+    set('dash-client-desc',  shtHidden ? 'KDF · 일신케미칼' : 'KDF · 일신케미칼 · 서해테크');
   }
   if(coSel) {
     const opt = [...coSel.options].find(o=>o.value==='서해테크'||o.text==='서해테크');
@@ -5475,13 +5568,13 @@ function applyShtHidden() {
     if(shtHidden && coSel.value==='서해테크') coSel.value = '';
   }
   if(shtHidden) {
-    // 서해테크 탭이 열려 있었다면 일신케미칼 탭으로 이동
+    // 서해테크 탭이 열려 있었다면 KDF 보령 탭으로 이동
     const sht = document.getElementById('layer-sht');
     if(page && sht && sht.style.display !== 'none') {
-      const iskTab = page.querySelector(".tab[onclick*=\"'layer-isk'\"]");
-      if(iskTab) switchTab(iskTab, 'layer-isk');
+      const borTab = page.querySelector(".tab[onclick*=\"'layer-bor'\"]");
+      if(borTab) switchTab(borTab, 'layer-bor');
     }
-    if(vizFilter === '서해테크') setVizFilter('일신케미칼');
+    if(vizFilter === '서해테크') setVizFilter('KDF 보령');
     if(typeof phrCo !== 'undefined' && phrCo === '서해테크') setPhrCo('일신케미칼');
   }
   try { filterLayerTable(); } catch(e) {}
@@ -5495,10 +5588,13 @@ function setVizFilter(co) {
   vizFilter = co;
   const badge = document.getElementById('viz-filter-badge');
   if(badge) badge.textContent = co;
-  const btnSht = document.getElementById('viz-btn-sht');
-  const btnIsk = document.getElementById('viz-btn-isk');
-  if(btnSht) { btnSht.style.background = co==='서해테크'?'var(--accent2)':''; btnSht.style.color = co==='서해테크'?'white':''; btnSht.className = co==='서해테크'?'btn btn-sm':'btn btn-secondary btn-sm'; }
-  if(btnIsk) { btnIsk.style.background = co==='일신케미칼'?'var(--blue)':''; btnIsk.style.color = co==='일신케미칼'?'white':''; btnIsk.className = co==='일신케미칼'?'btn btn-sm':'btn btn-secondary btn-sm'; }
+  const BTN = {'KDF 보령':['viz-btn-bor','var(--teal)'], 'KDF 아산':['viz-btn-asn','var(--teal)'], '일신케미칼':['viz-btn-isk','var(--blue)'], '서해테크':['viz-btn-sht','var(--accent2)']};
+  Object.entries(BTN).forEach(([k,[id,col]])=>{
+    const b = document.getElementById(id); if(!b) return;
+    const on = k===co;
+    b.style.background = on ? col : ''; b.style.color = on ? 'white' : '';
+    b.className = on ? 'btn btn-sm' : 'btn btn-secondary btn-sm';
+  });
   renderLayerSelectList();
 }
 
@@ -5514,8 +5610,8 @@ function renderLayerSelectList() {
       <div style="display:flex; align-items:center; gap:8px;">
         <span style="width:24px; height:24px; background:var(--surface3); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--text3);">${r.no}</span>
         <div>
-          <div style="font-weight:600; color:${r.co==='서해테크'?'var(--accent2)':'var(--blue)'};">${formatStruct(r.struct)}</div>
-          <div style="font-size:11px; color:var(--text3);">${r.type}</div>
+          <div style="font-weight:600; color:${r.co==='서해테크'?'var(--accent2)':r.comp==='KDF'?'var(--teal)':'var(--blue)'};">${formatStruct(r.struct)}${r.gf?' <span class="kdf-gf">G/F</span>':''}</div>
+          <div style="font-size:11px; color:var(--text3);">${r.name ? (r.group+' · '+r.name) : r.type}</div>
         </div>
       </div>
       <div style="text-align:right;">
@@ -5527,6 +5623,7 @@ function renderLayerSelectList() {
 }
 
 function calcLayerPHR(r) {
+  if (Array.isArray(r.layers)) { const c = structPHR(r); return {dotp:c.dotp, fill:c.filler, density2:c.density}; }
   // 각 층의 PHR 기여도 계산 (종합계산식 공식 적용)
   const layers = [
     {name:'투명', t:r.topT, p:r.topP, f:0},
@@ -5561,7 +5658,7 @@ function showLayerViz(no) {
   const sel = document.getElementById(`viz-item-${no}`);
   if(sel) { sel.style.background='var(--blue-light)'; sel.style.borderColor='var(--blue)'; }
 
-  const LAYERS_DEF = [
+  const LAYERS_DEF = (Array.isArray(r.layers) && typeof kdfVizLayers==='function') ? kdfVizLayers(r) : [
     {name:'Wear Layer', eng:'Wear Layer (투명)',   t:r.topT,         p:r.topP, f:0,
      face:'#dbeafe', side:'#93c5fd', top:'#eff6ff', text:'#1e3a5f'},
     {name:'인쇄지',     eng:'Printed Layer', t:r.printT||0.07, p:8,      f:0,
@@ -6203,7 +6300,11 @@ const PHR_DATA = [
 // 따라서 층 두께나 배합만 고치면 집계값은 자동으로 따라온다.
 // ============================================================
 function structPHR(r) {
-  const layers = [
+  // KDF 등 층 배열(layers)이 있는 레코드는 원본 층 구성을 그대로 사용 (층 수 제한 없음)
+  //  - PHR 미기재 층은 평가시트 가정값(pa/fa), G/F는 PHR 없음 → PVC 기준(0/0)으로 처리
+  const layers = Array.isArray(r.layers) ? r.layers.filter(l=>(l.t||0)>0).map(l=>({
+      t:+l.t, p:+(l.p ?? l.pa ?? 0), f:+(l.f ?? l.fa ?? 0)
+    })) : [
     {t:r.topT  ||0, p:r.topP ||0, f:r.topF ||0},
     {t:r.printT||0.07, p:r.printP||8, f:0},
     {t:r.midT  ||0, p:r.midP ||0, f:r.midF ||0},
@@ -7806,7 +7907,7 @@ function renderChangeMgmt() {
 // 둘 중 최근 날짜를 표시한다.
 const LAST_UPDATE_KEY = 'lvt_last_update';
 const LAST_UPDATE_BASE = '2026-10-12';
-const UI_ONLY_KEYS = new Set(['lvt_nav_collapsed','lvt_layer_sht_hidden', LAST_UPDATE_KEY]);
+const UI_ONLY_KEYS = new Set(['lvt_nav_collapsed','lvt_layer_sht_hidden','lvt_layer_isk_hidden', LAST_UPDATE_KEY]);
 let _trackDataSaves = false;   // 첫 화면 로딩 중 자동 저장(초기 데이터 등)은 제외
 (function(){
   try {
@@ -7839,6 +7940,7 @@ function initAll() {
   applyNavCollapseState();
   refreshLastUpdate();
   renderShtIsk();
+  if (typeof kdfInit === 'function') kdfInit();
   applyShtHidden();
   renderLayerSelectList();
   renderDashCharts();
@@ -7857,6 +7959,7 @@ if(document.readyState === 'loading') {
   initAll();
 }
 </script>
+<script src="kdf_layer_ui.js"></script>
 <script src="xlsx.full.min.js"></script>
 <script>if(typeof XLSX==='undefined'){var _x=document.createElement('script');_x.src='https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';document.head.appendChild(_x);}</script>
 <script>
