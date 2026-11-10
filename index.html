@@ -1983,6 +1983,16 @@
                 </tr>
               </thead>
               <tbody>
+                <tr>
+                  <td>101~</td><td class="td-main">KDF 보령</td>
+                  <td><span class="badge badge-teal">신규 등록</span></td>
+                  <td class="mono">ver.90 · <span id="dash-kdf-bor-n">102</span>종</td><td>평균 <span id="dash-kdf-bor-d">—</span></td>
+                </tr>
+                <tr>
+                  <td>301~</td><td class="td-main">KDF 아산</td>
+                  <td><span class="badge badge-teal">신규 등록</span></td>
+                  <td class="mono">ver.84 · <span id="dash-kdf-asn-n">121</span>종</td><td>평균 <span id="dash-kdf-asn-d">—</span></td>
+                </tr>
                 <tr class="dash-sht-row" style="display:none;">
                   <td>49</td><td class="td-main">서해테크</td>
                   <td><span class="badge badge-amber">HARD</span></td>
@@ -2049,13 +2059,33 @@
           <div class="card-title">🏭 거래처별 층별구조 비중 분포</div>
         </div>
         <div class="card-body">
-          <div id="dash-dist-grid" style="display:grid; grid-template-columns: 1fr; gap: 1.5rem;">
+          <div id="dash-dist-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem 2rem;">
             <div>
-              <div style="font-size:13px; font-weight:600; color:var(--text2); margin-bottom:10px;">일신케미칼</div>
+              <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px;">
+                <span style="font-size:13px; font-weight:700; color:var(--text2);">KDF 보령</span>
+                <span id="bor-chart-stat" style="font-size:11.5px; color:var(--text3);"></span>
+              </div>
+              <div id="bor-chart" style="display:flex; flex-direction:column; gap:5px;"></div>
+            </div>
+            <div>
+              <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px;">
+                <span style="font-size:13px; font-weight:700; color:var(--text2);">KDF 아산</span>
+                <span id="asn-chart-stat" style="font-size:11.5px; color:var(--text3);"></span>
+              </div>
+              <div id="asn-chart" style="display:flex; flex-direction:column; gap:5px;"></div>
+            </div>
+            <div>
+              <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px;">
+                <span style="font-size:13px; font-weight:700; color:var(--text2);">일신케미칼</span>
+                <span id="isk-chart-stat" style="font-size:11.5px; color:var(--text3);"></span>
+              </div>
               <div id="isk-chart" style="display:flex; flex-direction:column; gap:5px;"></div>
             </div>
-            <div id="dash-sht-block" style="display:none;">
-              <div style="font-size:13px; font-weight:600; color:var(--text2); margin-bottom:10px;">서해테크</div>
+            <div id="dash-sht-block">
+              <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px;">
+                <span style="font-size:13px; font-weight:700; color:var(--text2);">서해테크</span>
+                <span id="sht-chart-stat" style="font-size:11.5px; color:var(--text3);"></span>
+              </div>
               <div id="sht-chart" style="display:flex; flex-direction:column; gap:5px;"></div>
             </div>
           </div>
@@ -5861,37 +5891,40 @@ function renderShtIsk() {
 // DASHBOARD CHARTS
 // ============================================================
 function renderDashCharts() {
-  const sht = layerData.filter(r=>r.co==='서해테크');
-  const isk = layerData.filter(r=>r.co==='일신케미칼');
-  const buckets = {'1.6~1.65':0,'1.65~1.7':0,'1.7~1.75':0,'1.75~1.8':0,'1.8~1.85':0,'1.85~1.9':0,'1.9+':0};
-
-  function buildChart(data, elId) {
+  // 거래처별 층별구조 비중 분포 — KDF 보령 · KDF 아산 · 일신케미칼 · 서해테크 (층별구조 탭 순서)
+  const KEYS = ['~1.65','1.65~1.7','1.7~1.75','1.75~1.8','1.8~1.85','1.85~1.9','1.9+'];
+  const EDGES = [1.65,1.7,1.75,1.8,1.85,1.9];
+  const COLORS = {'KDF 보령':'var(--teal)','KDF 아산':'#0f766e','일신케미칼':'var(--blue)','서해테크':'#d97706'};
+  function buildChart(co, elId, statId) {
     const el = document.getElementById(elId);
     if(!el) return;
-    const b = {...buckets};
-    data.forEach(r=>{
-      const d = r.density;
-      if(d<1.65) b['1.6~1.65']++;
-      else if(d<1.7) b['1.65~1.7']++;
-      else if(d<1.75) b['1.7~1.75']++;
-      else if(d<1.8) b['1.75~1.8']++;
-      else if(d<1.85) b['1.8~1.85']++;
-      else if(d<1.9) b['1.85~1.9']++;
-      else b['1.9+']++;
-    });
+    const data = layerData.filter(r=>r.co===co);
+    const b = Object.fromEntries(KEYS.map(k=>[k,0]));
+    data.forEach(r=>{ const i = EDGES.findIndex(e=>r.density<e); b[KEYS[i<0?KEYS.length-1:i]]++; });
     const max = Math.max(...Object.values(b),1);
-    el.innerHTML = Object.entries(b).map(([k,v])=>`
+    el.innerHTML = KEYS.map(k=>{ const v=b[k]; const pct = data.length? Math.round(v/data.length*100):0; return `
       <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
         <span style="width:70px; color:var(--text3);">${k}</span>
         <div style="flex:1; height:14px; background:var(--surface3); border-radius:4px; overflow:hidden;">
-          <div style="height:100%; width:${(v/max)*100}%; background:var(--teal); border-radius:4px; transition:width 0.4s;"></div>
+          <div style="height:100%; width:${(v/max)*100}%; background:${COLORS[co]}; border-radius:4px; transition:width 0.4s;"></div>
         </div>
-        <span style="width:20px; text-align:right; font-weight:600;">${v}</span>
-      </div>
-    `).join('');
+        <span style="width:24px; text-align:right; font-weight:600;">${v}</span>
+        <span style="width:34px; text-align:right; color:var(--text3); font-size:11px;">${pct}%</span>
+      </div>`; }).join('');
+    const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0;
+    const dAvg = avg(data.map(r=>r.density));
+    const pf = data.map(r=>structPHR(r));
+    const st = document.getElementById(statId);
+    if(st) st.innerHTML = `${data.length}종 · 평균 비중 <b style="color:var(--accent2)">${dAvg.toFixed(3)}</b> · ∑DOTP ${avg(pf.map(c=>c.dotp)).toFixed(1)} · ∑FILLER ${avg(pf.map(c=>c.filler)).toFixed(1)}`;
+    return {n:data.length, d:dAvg};
   }
-  buildChart(sht, 'sht-chart');
-  buildChart(isk, 'isk-chart');
+  const bor = buildChart('KDF 보령','bor-chart','bor-chart-stat');
+  const asn = buildChart('KDF 아산','asn-chart','asn-chart-stat');
+  buildChart('일신케미칼','isk-chart','isk-chart-stat');
+  buildChart('서해테크','sht-chart','sht-chart-stat');
+  const set = (id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+  if(bor){ set('dash-kdf-bor-n', bor.n); set('dash-kdf-bor-d', bor.d.toFixed(3)); }
+  if(asn){ set('dash-kdf-asn-n', asn.n); set('dash-kdf-asn-d', asn.d.toFixed(3)); }
 }
 
 // ============================================================
