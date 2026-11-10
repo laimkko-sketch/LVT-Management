@@ -2906,11 +2906,13 @@
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
           <div>
             <div class="page-title">📐 PHR 기준표</div>
-            <div class="page-subtitle" id="phr-subtitle">일신케미칼 층별구조 기반 — 반제품별 PHR·비중 자동 계산 (층별구조 연동)</div>
+            <div class="page-subtitle" id="phr-subtitle">KDF 보령 층별구조 기반 — 반제품별 PHR·비중 자동 계산 (층별구조 연동)</div>
           </div>
           <div style="display:flex; gap:6px;">
-            <button class="btn btn-sm" id="phr-btn-isk" onclick="setPhrCo('일신케미칼')" style="background:var(--blue); color:white; border:none;">일신케미칼</button>
-            <button class="btn btn-secondary btn-sm" id="phr-btn-sht" onclick="setPhrCo('서해테크')" style="display:none;">서해테크</button>
+            <button class="btn btn-sm" id="phr-btn-bor" onclick="setPhrCo('KDF 보령')" style="background:var(--teal); color:white; border:none;">KDF 보령</button>
+            <button class="btn btn-secondary btn-sm" id="phr-btn-asn" onclick="setPhrCo('KDF 아산')">KDF 아산</button>
+            <button class="btn btn-secondary btn-sm" id="phr-btn-isk" onclick="setPhrCo('일신케미칼')">일신케미칼</button>
+            <button class="btn btn-secondary btn-sm" id="phr-btn-sht" onclick="setPhrCo('서해테크')">서해테크</button>
           </div>
         </div>
       </div>
@@ -3011,6 +3013,7 @@
                 <th colspan="3" style="border-left:1px solid var(--border); color:#0369a1; background:#eff6ff;">BASE 2 (중지2)</th>
                 <th colspan="3" style="border-left:1px solid var(--border); color:#7c3aed; background:#f5f3ff;">BASE 3 (중지3)</th>
                 <th colspan="3" style="border-left:1px solid var(--border); color:#334155; background:#f1f5f9;">BALANCE (하지)</th>
+                <th colspan="3" style="border-left:1px solid var(--border); color:#9a3412; background:#fff7ed;">추가층 (하지2·러버·벨벳·Acoustic·졸코팅)</th>
                 <th rowspan="2" style="color:var(--accent2);">비중</th>
               </tr>
               <tr>
@@ -3026,6 +3029,9 @@
                 <th style="border-left:1px solid var(--border); background:#f1f5f9; color:#334155;">두께</th>
                 <th style="background:#f1f5f9; color:#334155;">DOTP</th>
                 <th style="background:#f1f5f9; color:#334155;">FILLER</th>
+                <th style="border-left:1px solid var(--border); background:#fff7ed; color:#9a3412;">층 · 두께</th>
+                <th style="background:#fff7ed; color:#9a3412;">DOTP</th>
+                <th style="background:#fff7ed; color:#9a3412;">FILLER</th>
               </tr>
             </thead>
             <tbody id="phr-tbody"></tbody>
@@ -6376,10 +6382,13 @@ function renderSemiTable() {
   // layerData에서 선택된 거래처(기본: 일신케미칼)만 사용
   const sht = layerData.filter(r => r.co === phrCo);
 
-  // BASE (중지) 조합 수집
+  // BASE (중지) 조합 수집 — KDF는 원본 층 배열(getLayers), 일신·서해는 고정 칸
   const baseMap = {};
+  const LAY = r => (typeof getLayers === 'function') ? getLayers(r) : [];
   sht.forEach(r => {
-    const layers = [
+    const layers = Array.isArray(r.layers)
+      ? LAY(r).filter(l => l.ty === '중지' && l.p != null).map(l => ({d:l.p, f:l.f||0, t:l.t}))
+      : [
       {d: r.midP,  f: r.midF,  t: r.midT},
       {d: r.mid2P, f: r.mid2F, t: r.mid2T},
       {d: r.mid3P, f: r.mid3F, t: r.mid3T},
@@ -6393,14 +6402,19 @@ function renderSemiTable() {
     });
   });
 
-  // BALANCE (하지) 조합 수집
+  // BALANCE (하지) 조합 수집 — KDF는 하지·하지2와 하단 시트(러버·벨벳·Acoustic·졸코팅)까지 포함, 층 이름 태그 표시
   const balMap = {};
   sht.forEach(r => {
-    if (!r.baseT || r.baseT === 0) return;
-    const key = `${r.baseP}|${r.baseF}`;
-    if (!balMap[key]) balMap[key] = { dotp: r.baseP, filler: r.baseF, nos: [], types: new Set() };
-    if (!balMap[key].nos.includes(r.no)) balMap[key].nos.push(r.no);
-    balMap[key].types.add(r.type);
+    const bl = Array.isArray(r.layers)
+      ? LAY(r).filter(l => !['투명','인쇄지','중지','G/F'].includes(l.ty) && l.p != null).map(l => ({d:l.p, f:l.f||0, t:l.t, tag: l.ty==='하지' ? '' : l.ty}))
+      : [{d:r.baseP, f:r.baseF, t:r.baseT, tag:''}];
+    bl.forEach(l => {
+      if (!l.t || l.t === 0) return;
+      const key = `${l.d}|${l.f}|${l.tag}`;
+      if (!balMap[key]) balMap[key] = { dotp: l.d, filler: l.f, nos: [], types: new Set(), tag: l.tag };
+      if (!balMap[key].nos.includes(r.no)) balMap[key].nos.push(r.no);
+      balMap[key].types.add(r.type);
+    });
   });
 
   // 정렬: DOTP 오름차순 → FILLER 오름차순
@@ -6414,6 +6428,7 @@ function renderSemiTable() {
     const tags = [];
     if (item.types.has('HARD') || item.types.has('Hard (Sol)')) tags.push('<span style="font-size:10px;background:#fef3c7;color:#92400e;border-radius:3px;padding:1px 5px;">HARD</span>');
     if (item.types.has('PE'))   tags.push('<span style="font-size:10px;background:#ede9fe;color:#5b21b6;border-radius:3px;padding:1px 5px;">PE</span>');
+    if (item.tag) tags.unshift(`<span style="font-size:10px;background:#ffedd5;color:#9a3412;border-radius:3px;padding:1px 5px;font-weight:700;">${item.tag}</span>`);
 
     // 비중 색상
     const dc = c.density >= 1.85 ? '#065f46' : c.density < 1.70 ? '#1d4ed8' : 'var(--text)';
@@ -6446,15 +6461,17 @@ function renderSemiTable() {
 }
 
 // ===== PHR 기준표 거래처 선택 (기본: 일신케미칼) =====
-let phrCo = '일신케미칼';
+let phrCo = 'KDF 보령';
 function setPhrCo(co) {
-  if (co === '서해테크' && typeof shtHidden !== 'undefined' && shtHidden) co = '일신케미칼';
+  if (co === '서해테크' && typeof shtHidden !== 'undefined' && shtHidden) co = 'KDF 보령';
   phrCo = co;
   const on = (id, active, color) => {
     const b = document.getElementById(id); if (!b) return;
     b.className = active ? 'btn btn-sm' : 'btn btn-secondary btn-sm';
     b.style.background = active ? color : ''; b.style.color = active ? 'white' : ''; b.style.border = active ? 'none' : '';
   };
+  on('phr-btn-bor', co === 'KDF 보령', 'var(--teal)');
+  on('phr-btn-asn', co === 'KDF 아산', 'var(--teal)');
   on('phr-btn-isk', co === '일신케미칼', 'var(--blue)');
   on('phr-btn-sht', co === '서해테크', 'var(--accent2)');
   const sub = document.getElementById('phr-subtitle');
@@ -6467,6 +6484,15 @@ function setPhrCo(co) {
 // layerData 한 행 → PHR 상세표 행 (일신케미칼 등 PHR_DATA가 없는 거래처용)
 function layerToPhrRow(r) {
   const lay = (t,d,f) => (+t > 0) ? [+t, d, f] : null;
+  if (Array.isArray(r.layers) && typeof formSlots === 'function') {
+    // KDF: 원본 층 배열 → 중지1·2·3 / 하지 / 추가층(하지2·러버·벨벳·Acoustic·졸코팅)
+    const s = formSlots(r), L = l => l ? [l.t, l.p ?? '—', l.f ?? 0] : null;
+    const ex = [['base2','하지2'],['rubber','러버'],['velvet','벨벳'],['acoustic','Acoustic'],['sol','졸코팅']].find(([k])=>s[k]);
+    return { no:r.no, type:r.type, struct:r.struct,
+      gf: s.gf ? (+s.gf.t).toFixed(2) : null,
+      m1: L(s.mid1), m2: L(s.mid2), m3: L(s.mid3), base: L(s.base),
+      extra: ex ? [...L(s[ex[0]]), ex[1]] : null, density: r.density };
+  }
   return { no:r.no, type:r.type, struct:r.struct,
     gf: (+r.gfT > 0) ? (+r.gfT).toFixed(2) : null,
     m1: lay(r.midT, r.midP, r.midF), m2: lay(r.mid2T, r.mid2P, r.mid2F), m3: lay(r.mid3T, r.mid3P, r.mid3F),
@@ -6484,11 +6510,11 @@ function renderPhrTable() {
     const rows = layerData.filter(r => r.co === phrCo).map(layerToPhrRow);
     const t = r => parseFloat(String(r.struct).split('/')[0]) || 0;
     PHR_GROUPS = [
-      { label:'2T 구조',        rows: rows.filter(r => t(r) <  2.25) },
+      { label:'2T 이하 구조',   rows: rows.filter(r => t(r) <  2.25) },
       { label:'2.5T 구조',      rows: rows.filter(r => t(r) >= 2.25 && t(r) < 2.75) },
-      { label:'3T 구조',        rows: rows.filter(r => t(r) >= 2.75 && t(r) < 3.75) },
+      { label:'3T ~ 3.5T 구조', rows: rows.filter(r => t(r) >= 2.75 && t(r) < 3.75) },
       { label:'4T ~ 4.5T 구조', rows: rows.filter(r => t(r) >= 3.75 && t(r) < 4.75) },
-      { label:'5T 구조',        rows: rows.filter(r => t(r) >= 4.75) },
+      { label:'5T 이상 구조',   rows: rows.filter(r => t(r) >= 4.75) },
     ].filter(g => g.rows.length);
   } else PHR_GROUPS = [
     { label:'1.8T ~ 2T 구조', rows: PHR_DATA.slice(0,6)  },
@@ -6513,7 +6539,7 @@ function renderPhrTable() {
   let html = '';
   PHR_GROUPS.forEach(g => {
     html += `<tr style="background:var(--surface3);">
-      <td colspan="17" style="padding:6px 10px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;border-bottom:1px solid var(--border);">${g.label}</td>
+      <td colspan="20" style="padding:6px 10px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;border-bottom:1px solid var(--border);">${g.label}</td>
     </tr>`;
     g.rows.forEach(r => {
       const gfCell = r.gf
@@ -6529,6 +6555,11 @@ function renderPhrTable() {
         ${phrCell2(r.m2,  '#eff6ff', '#0369a1')}
         ${phrCell2(r.m3,  '#f5f3ff', '#7c3aed')}
         ${phrCell2(r.base,'#f8f9fc', '#334155')}
+        ${r.extra
+          ? `<td style="text-align:center;background:#fff7ed;font-size:11px;color:#9a3412;white-space:nowrap;"><b>${r.extra[3]}</b> ${(+r.extra[0]).toFixed(2)}</td>
+             <td style="text-align:center;background:#fff7ed;font-weight:700;font-size:13px;color:#9a3412;">${r.extra[1]}</td>
+             <td style="text-align:center;background:#fff7ed;font-weight:700;font-size:13px;color:#9a3412;">${r.extra[2]}</td>`
+          : phrCell2(null,'#fffbf5','#9a3412')}
         <td style="text-align:center;font-weight:700;font-size:13px;color:${dc};">${r.density.toFixed(3)}</td>
       </tr>`;
     });
