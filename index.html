@@ -3615,6 +3615,18 @@
         <div>
           <div class="timeline" id="history-timeline">
             <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--accent);box-shadow:0 0 0 2px var(--accent);"></div>
+              <div class="timeline-date">2026.11.12</div>
+              <div class="timeline-title">일신케미칼 No.19 (5/0.5 Hard (Sol)) 중지2 DOTP 정정</div>
+              <div class="timeline-body">중지2 PHR 30/280 → 38/280 (입력 오타 정정, 두께 1.5 유지). 비중 1.7082 → 1.7003, ∑DOTP 34.11 → 35.72, ∑FILLER 145.80 → 145.28 재계산 반영. 확인: 김동현 부장</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--teal);box-shadow:0 0 0 2px var(--teal);"></div>
+              <div class="timeline-date">2026.11.10</div>
+              <div class="timeline-title">KDF 보령·아산 층별구조 등록</div>
+              <div class="timeline-body">KDF 보령 ver.90 102종 · 아산 ver.84 121종 등록. 일신케미칼 폼 + 추가 열(하지2·러버·벨벳·Acoustic·졸코팅), PHR 기준표·대시보드 KDF 반영</div>
+            </div>
+            <div class="timeline-item">
               <div class="timeline-dot" style="background:var(--green);box-shadow:0 0 0 2px var(--green);"></div>
               <div class="timeline-date">2026.07.16</div>
               <div class="timeline-title">No.33 (2.5/0.5) 하지 배합 변경</div>
@@ -5197,7 +5209,7 @@ const layerData = [
   {no:16,co:'일신케미칼',type:'내수',   struct:'4.5/0.5', setT:4.57, topT:0.5, topP:30,topF:0, printT:0.07,printP:8, midT:0.9, midP:35, midF:380, gfT:0.3,gfP:71.5,gfF:70,mid2T:1.8, mid2P:65, mid2F:600,mid3T:0, mid3P:0, mid3F:0, baseT:1,   baseP:40, baseF:250, formT:0, pvc:63.92, dotp:27.12, filler:144.53,density:1.8569},
   {no:17,co:'일신케미칼',type:'일반',   struct:'5/0.3',   setT:5.07, topT:0.3, topP:30,topF:0, printT:0.07,printP:8, midT:1.2, midP:35, midF:380, gfT:0.3,gfP:71.5,gfF:70,mid2T:2.2, mid2P:65, mid2F:600,mid3T:0, mid3P:0, mid3F:0, baseT:1,   baseP:40, baseF:250, formT:0, pvc:61.69, dotp:27.54, filler:172.11,density:1.9229},
   {no:18,co:'일신케미칼',type:'일반',   struct:'5/0.5',   setT:5.07, topT:0.5, topP:30,topF:0, printT:0.07,printP:8, midT:1.1, midP:35, midF:380, gfT:0.3,gfP:71.5,gfF:70,mid2T:2.1, mid2P:65, mid2F:600,mid3T:0, mid3P:0, mid3F:0, baseT:1,   baseP:40, baseF:250, formT:0, pvc:67.95, dotp:29.13, filler:164.26,density:1.8788},
-  {no:19,co:'일신케미칼',type:'Hard (Sol)',struct:'5/0.5',setT:5.07, topT:0.5, topP:30,topF:0, printT:0.07,printP:8, midT:1.25,midP:30, midF:120, gfT:0.3,gfP:71.5,gfF:70,mid2T:1.5, mid2P:30, mid2F:280,mid3T:0, mid3P:0, mid3F:0, baseT:1.45,baseP:40, baseF:250, formT:0, pvc:93.37, dotp:31.85, filler:136.13,density:1.7469},
+  {no:19,co:'일신케미칼',type:'Hard (Sol)',struct:'5/0.5',setT:5.07, topT:0.5, topP:30,topF:0, printT:0.07,printP:8, midT:1.25,midP:30, midF:120, gfT:0.3,gfP:71.5,gfF:70,mid2T:1.5, mid2P:38, mid2F:280,mid3T:0, mid3P:0, mid3F:0, baseT:1.45,baseP:40, baseF:250, formT:0, pvc:93.37, dotp:31.85, filler:136.13,density:1.7371}, // 2026-11-12 중지2 DOTP 30→38 정정(오타), 원본비중 1.7469→1.7371 (pvc·dotp·filler·density는 로딩 시 structPHR로 재계산)
   {no:20,co:'일신케미칼',type:'Acoustic',struct:'5/0.5', setT:5.12, topT:0.5, topP:30,topF:0, printT:0.07,printP:8, midT:1.25,midP:30, midF:120, gfT:0.3,gfP:71.5,gfF:70,mid2T:1.05,mid2P:34, mid2F:420,mid3T:0, mid3P:0, mid3F:0, baseT:1.95,baseP:30, baseF:200, formT:0, pvc:95.57, dotp:30.98, filler:137.36,density:1.7506},
   {no:21,co:'일신케미칼',type:'Acoustic(중국)',struct:'5/0.5',setT:5.12,topT:0.5,topP:30,topF:0,printT:0.07,printP:8,midT:1.1,midP:30,midF:120,gfT:0.3,gfP:71.5,gfF:70,mid2T:1.2,mid2P:34,mid2F:420,mid3T:0,mid3P:0,mid3F:0,baseT:1.95,baseP:30,baseF:200,formT:0,pvc:93.87,dotp:30.53,filler:139.51,density:1.7609},
   {no:22,co:'일신케미칼',type:'일반',   struct:'5/0.55',  setT:5.17, topT:0.55,topP:32,topF:0, printT:0.07,printP:8, midT:0.95,midP:30, midF:120, gfT:0.3,gfP:71.5,gfF:70,mid2T:1.85,mid2P:38, mid2F:280,mid3T:0, mid3P:0, mid3F:0, baseT:1.45,baseP:40, baseF:250, formT:0, pvc:92.79, dotp:33.93, filler:139.78,density:1.7456},
